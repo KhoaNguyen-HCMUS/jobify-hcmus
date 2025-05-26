@@ -16,7 +16,7 @@ A full-stack job board application built with Next.js and Express.js in a monore
 src/
 ├── apps/
 │   ├── web/           # Next.js frontend application
-│   │   ├── src/
+│   │   ├── app/
 │   │   ├── public/
 │   │   ├── package.json
 │   │   └── next.config.js
