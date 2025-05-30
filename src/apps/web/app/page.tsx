@@ -10,6 +10,7 @@ export default function Home() {
           <li className="text-#d2c7b8">Company</li>
           <li className="text-#d2c7b8">CV</li>
           <li className="text-#d2c7b8">Tool</li>
+          <li className="text-#d2c7b8">Tools</li>
           <li className="text-#d2c7b8">News</li>
         </ul>
       </div>
