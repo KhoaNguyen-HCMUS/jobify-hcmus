@@ -43,54 +43,52 @@
 }
 
 /* COLOR */
-:root {
-  /* Text Colors */
-  --text-primary: rgba(17, 24, 39, 1);
-  --text-secondary: rgba(55, 65, 81, 0.8);
-  --text-tertiary: rgba(55, 65, 81, 0.6);
-  --text-quaternary: rgba(55, 65, 81, 0.4);
-  --text-disabled: rgba(55, 65, 81, 0.2);
+@theme {
 
   /* Brand Colors */
-  --color-primary: rgba(34, 49, 72, 1);
-  --color-primary-80: rgba(34, 49, 72, 0.8);
-  --color-primary-60: rgba(34, 49, 72, 0.6);
-  --color-primary-40: rgba(34, 49, 72, 0.4);
-  --color-primary-20: rgba(34, 49, 72, 0.2);
+  --color-primary: #223148;
+  --color-primary-80: #4E5A6D;
+  --color-primary-60: #7A8391;
+  --color-primary-40: #A7ADB6;
+  --color-primary-20: #D3D6DA;
 
-  --color-secondary: rgba(47, 72, 109, 1);
-  --color-secondary-80: rgba(47, 72, 109, 0.8);
-  --color-secondary-60: rgba(47, 72, 109, 0.6);
-  --color-secondary-40: rgba(47, 72, 109, 0.4);
-  --color-secondary-20: rgba(47, 72, 109, 0.2);
+  --color-secondary: #2F486D;
+  --color-secondary-80: #596D8A;
+  --color-secondary-60: #8291A7;
+  --color-secondary-40: #ACB6C5;
+  --color-secondary-20: #D5DAE2;
 
-  --color-accent: rgba(61, 108, 178, 1);
-  --color-accent-80: rgba(61, 108, 178, 0.8);
-  --color-accent-60: rgba(61, 108, 178, 0.6);
-  --color-accent-40: rgba(61, 108, 178, 0.4);
-  --color-accent-20: rgba(61, 108, 178, 0.2);
+  --color-accent: #3D6CB2;
+  --color-accent-80: #6489C1;
+  --color-accent-60: #8BA7D1;
+  --color-accent-40: #B1C4E0;
+  --color-accent-20: #D8E2F0;
 
-  --color-highlight: rgba(183, 202, 229, 1);
-  --color-highlight-80: rgba(183, 202, 229, 0.8);
-  --color-highlight-60: rgba(183, 202, 229, 0.6);
-  --color-highlight-40: rgba(183, 202, 229, 0.4);
-  --color-highlight-20: rgba(183, 202, 229, 0.2);
+  --color-highlight: #B7CAE5;
+  --color-highlight-80: #C5D5EA;
+  --color-highlight-60: #C5D5EA;
+  --color-highlight-40: #E2EAF5;
+  --color-highlight-20: #F1F4FA;
 
   /* Neutral Colors */
-  --color-neutral-medium: rgba(210, 199, 184, 1);
-  --color-neutral-medium-80: rgba(210, 199, 184, 0.8);
-  --color-neutral-medium-60: rgba(210, 199, 184, 0.6);
-  --color-neutral-medium-40: rgba(210, 199, 184, 0.4);
-  --color-neutral-medium-20: rgba(210, 199, 184, 0.2);
+  --color-neutral-medium: #D2C7B8;
+  --color-neutral-medium-80: #DBD2C6;
+  --color-neutral-medium-60: #E4DDD4;
+  --color-neutral-medium-40: #EDE9E3;
+  --color-neutral-medium-20: #F6F4F1;
 
-  --color-neutral-light: rgba(243, 234, 224, 1);
-  --color-neutral-light-80: rgba(243, 234, 224, 0.8);
-  --color-neutral-light-60: rgba(243, 234, 224, 0.6);
-  --color-neutral-light-40: rgba(243, 234, 224, 0.4);
-  --color-neutral-light-20: rgba(243, 234, 224, 0.2);
+  --color-neutral-light: #F3EAE0;
+  --color-neutral-light-80: #F5EEE6;
+  --color-neutral-light-60: #F8F2EC;
+  --color-neutral-light-40: #FAF7F3;
+  --color-neutral-light-20: #FDFBF9;
 
-  /* Background */
-  --bg-primary: rgba(242, 242, 242, 1);
+  --color-text: #111827;
+  --color-text-80: #5F6774;
+  --color-text-60: #878D97;
+  --color-text-40: #AFB3B9;
+  --color-text-20: #D7D9DC;
+  
 
   /* Links */
   --text-link: var(--color-accent);
