@@ -1,26 +1,330 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Font Families */
+  --font-primary: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-secondary: "Roboto", Arial, sans-serif;
+
+  /* font Weight */
+  --font-weight-regular: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+
+  /* Font Sizes */
+  --font-size-display-1: 80px;
+  --font-size-display-2: 72px;
+  --font-size-display-3: 64px;
+  --font-size-display-4: 56px;
+  --font-size-display-5: 48px;
+  --font-size-display-6: 40px;
+
+  --font-size-h1: 36px;
+  --font-size-h2: 28px;
+  --font-size-h3: 20px;
+  --font-size-h4: 18px;
+  --font-size-h5: 16px;
+  --font-size-h6: 14px;
+
+  --font-size-body-large: 1.125rem;
+  --font-size-body: 1rem;
+  --font-size-body-small: 0.875rem;
+  --font-size-body-caption: 0.75rem;
+
+  /* Line heights */
+  --line-height-tight: 1.2;
+  --line-height-normal: 1.4;
+  --line-height-relaxed: 1.6;
+
+  /* Letter Spacing */
+  --letter-spacing-tight: -0.02em;
+  --letter-spacing-normal: 0;
+  --letter-spacing-relaxed: 0.05em;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+/* COLOR */
+:root {
+  /* Text Colors */
+  --text-primary: rgba(17, 24, 39, 1);
+  --text-secondary: rgba(55, 65, 81, 0.8);
+  --text-tertiary: rgba(55, 65, 81, 0.6);
+  --text-quaternary: rgba(55, 65, 81, 0.4);
+  --text-disabled: rgba(55, 65, 81, 0.2);
+
+  /* Brand Colors */
+  --color-primary: rgba(34, 49, 72, 1);
+  --color-primary-80: rgba(34, 49, 72, 0.8);
+  --color-primary-60: rgba(34, 49, 72, 0.6);
+  --color-primary-40: rgba(34, 49, 72, 0.4);
+  --color-primary-20: rgba(34, 49, 72, 0.2);
+
+  --color-secondary: rgba(47, 72, 109, 1);
+  --color-secondary-80: rgba(47, 72, 109, 0.8);
+  --color-secondary-60: rgba(47, 72, 109, 0.6);
+  --color-secondary-40: rgba(47, 72, 109, 0.4);
+  --color-secondary-20: rgba(47, 72, 109, 0.2);
+
+  --color-accent: rgba(61, 108, 178, 1);
+  --color-accent-80: rgba(61, 108, 178, 0.8);
+  --color-accent-60: rgba(61, 108, 178, 0.6);
+  --color-accent-40: rgba(61, 108, 178, 0.4);
+  --color-accent-20: rgba(61, 108, 178, 0.2);
+
+  --color-highlight: rgba(183, 202, 229, 1);
+  --color-highlight-80: rgba(183, 202, 229, 0.8);
+  --color-highlight-60: rgba(183, 202, 229, 0.6);
+  --color-highlight-40: rgba(183, 202, 229, 0.4);
+  --color-highlight-20: rgba(183, 202, 229, 0.2);
+
+  /* Neutral Colors */
+  --color-neutral-medium: rgba(210, 199, 184, 1);
+  --color-neutral-medium-80: rgba(210, 199, 184, 0.8);
+  --color-neutral-medium-60: rgba(210, 199, 184, 0.6);
+  --color-neutral-medium-40: rgba(210, 199, 184, 0.4);
+  --color-neutral-medium-20: rgba(210, 199, 184, 0.2);
+
+  --color-neutral-light: rgba(243, 234, 224, 1);
+  --color-neutral-light-80: rgba(243, 234, 224, 0.8);
+  --color-neutral-light-60: rgba(243, 234, 224, 0.6);
+  --color-neutral-light-40: rgba(243, 234, 224, 0.4);
+  --color-neutral-light-20: rgba(243, 234, 224, 0.2);
+
+  /* Background */
+  --bg-primary: rgba(242, 242, 242, 1);
+
+  /* Links */
+  --text-link: var(--color-accent);
+  --text-link-hover: var(--color-accent-80);
+}
+
+/* FORCE DARK THEME */
+[data-theme="dark"] {
+  --text-primary: ;
+  --text-secondary: ;
+  --text-tertiary: ;
+  --text-quaternary: ;
+  --text-disabled: ;
+
+  --color-primary: ;
+  --color-secondary: ;
+  --color-accent: ;
+  --color-highlight: ;
+
+  --bg-primary: ;
+
+  --text-link: ;
+  --text-link-hover: ;
+}
+
+/* MANUAL THEME OVERRIDES */
+/* FORCE LIGHT THEME */
+[data-theme="light"] {
+  --text-primary: rgba(17, 24, 39, 1);
+  --text-secondary: rgba(55, 65, 81, 0.8);
+  --text-tertiary: rgba(55, 65, 81, 0.6);
+  --text-quaternary: rgba(55, 65, 81, 0.4);
+  --text-disabled: rgba(55, 65, 81, 0.2);
+
+  --color-primary: rgba(34, 49, 72, 1);
+  --color-secondary: rgba(47, 72, 109, 1);
+  --color-accent: rgba(61, 108, 178, 1);
+  --color-highlight: rgba(183, 202, 229, 1);
+
+  --bg-primary: linear-gradient(
+    to_bottom_right,
+    rgba(225, 239, 251, 1),
+    rgba(237, 245, 252, 1)
+  );
+
+  --text-link: rgba(61, 108, 178, 1);
+  --text-link-hover: rgba(34, 49, 72, 1);
 }
 
 @media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+  :root:not([data-theme="light"]) {
+    --text-primary: ;
+    --text-secondary: ;
+    --text-tertiary: ;
+    --text-quaternary: ;
+    --text-disabled: ;
+
+    --color-primary: ;
+    --color-accent: ;
+
+    --bg-primary: ;
+
+    --text-link: ;
+    --text-link-hover: ;
+
+    --border-primary: ;
+    --border-secondary: ;
   }
 }
 
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-primary);
+  font-size: var(--font-size-body);
+  font-weight: var(--font-weight-regular);
+  line-height: var(--line-height-normal);
+  color: var(--text-primary);
+  background-color: var(--bg-primary);
+  margin: 0;
+  padding: 0;
+}
+
+/* DISPLAY STYLES */
+.display-1 {
+  font-size: var(--font-size-display-1);
+  font-weight: var(--font-weight-bold);
+  line-height: var(--line-height-tight);
+  letter-spacing: var(--letter-spacing-normal);
+  color: var(--text-primary);
+  margin: 0 0 1.5rem 0;
+}
+
+.display-2 {
+  font-size: var(--font-size-display-2);
+  font-weight: var(--font-weight-bold);
+  line-height: var(--line-height-tight);
+  letter-spacing: var(--letter-spacing-normal);
+  color: var(--text-primary);
+  margin: 0 0 1.25rem 0;
+}
+
+.display-3 {
+  font-size: var(--font-size-display-3);
+  font-weight: var(--font-weight-bold);
+  line-height: var(--line-height-tight);
+  letter-spacing: var(--letter-spacing-normal);
+  color: var(--text-primary);
+  margin: 0 0 1rem 0;
+}
+
+.display-4 {
+  font-size: var(--font-size-display-4);
+  font-weight: var(--font-weight-bold);
+  line-height: var(--line-height-normal);
+  letter-spacing: var(--letter-spacing-normal);
+  color: var(--text-primary);
+  margin: 0 0 1rem 0;
+}
+
+.display-5 {
+  font-size: var(--font-size-display-5);
+  font-weight: var(--font-weight-bold);
+  line-height: var(--line-height-normal);
+  letter-spacing: var(--letter-spacing-normal);
+  color: var(--text-primary);
+  margin: 0 0 0.75rem 0;
+}
+
+.display-6 {
+  font-size: var(--font-size-display-6);
+  font-weight: var(--font-weight-bold);
+  line-height: var(--line-height-normal);
+  letter-spacing: var(--letter-spacing-normal);
+  color: var(--text-primary);
+  margin: 0 0 0.75rem 0;
+}
+
+/* HEADING STYLES */
+h1,
+.h1 {
+  font-size: var(--font-size-h1);
+  font-weight: var(--font-weight-bold);
+  line-height: var(--line-height-tight);
+  color: var(--text-primary);
+  margin: 0 0 1rem 0;
+}
+
+h2,
+.h2 {
+  font-size: var(--font-size-h2);
+  font-weight: var(--font-weight-bold);
+  line-height: var(--line-height-tight);
+  color: var(--text-primary);
+  margin: 0 0 0.75rem 0;
+}
+
+h3,
+.h3 {
+  font-size: var(--font-size-h3);
+  font-weight: var(--font-weight-bold);
+  line-height: var(--line-height-normal);
+  color: var(--text-primary);
+  margin: 0 0 0.5rem 0;
+}
+
+h4,
+.h4 {
+  font-size: var(--font-size-h4);
+  font-weight: var(--font-weight-bold);
+  line-height: var(--line-height-normal);
+  color: var(--text-primary);
+  margin: 0 0 0.5rem 0;
+}
+
+h5,
+.h5 {
+  font-size: var(--font-size-h5);
+  font-weight: var(--font-weight-bold);
+  line-height: var(--line-height-normal);
+  color: var(--text-primary);
+  margin: 0 0 0.25rem 0;
+}
+
+h6,
+.h6 {
+  font-size: var(--font-size-h6);
+  font-weight: var(--font-weight-bold);
+  line-height: var(--line-height-normal);
+  color: var(--text-primary);
+  margin: 0 0 0.25rem 0;
+}
+
+/* BODY TEXT STYLES */
+p {
+  font-size: var(--font-size-body);
+  font-weight: var(--font-weight-regular);
+  line-height: var(--line-height-relaxed);
+  color: var(--text-primary);
+  margin: 0 0 1rem 0;
+}
+
+.body-large {
+  font-size: var(--font-size-body-large);
+  font-weight: var(--font-weight-regular);
+  line-height: var(--line-height-relaxed);
+  color: var(--text-secondary);
+}
+
+.caption {
+  font-size: var(--font-size-caption);
+  font-weight: var(--font-weight-regular);
+  line-height: var(--line-height-normal);
+  color: var(--text-quaternary);
+}
+
+/* LINKS */
+a {
+  color: var(--text-link);
+}
+
+a:hover {
+  color: var(--text-link-hover);
+  text-decoration: underline;
+}
+
+a:focus {
+  outline: 2px var(--color-accent);
+  outline-offset: 2px;
+  border-radius: 2px;
 }
