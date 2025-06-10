@@ -12,7 +12,7 @@ function App() {
     document.documentElement.setAttribute("data-theme", "light");
   }, []);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     console.log("Full Name:", fullName);
     console.log("Password:", password);
