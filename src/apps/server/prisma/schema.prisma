@@ -1,0 +1,342 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model application_status_history {
+  id               String           @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  application_id   String           @db.Uuid
+  old_status       String?          @db.VarChar(50)
+  new_status       String?          @db.VarChar(50)
+  changed_by       String?          @db.Uuid
+  notes            String?
+  created_at       DateTime         @default(now()) @db.Timestamp(6)
+  job_applications job_applications @relation(fields: [application_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  users            users?           @relation(fields: [changed_by], references: [id], onUpdate: NoAction)
+}
+
+model audit_logs {
+  id         String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  user_id    String?  @db.Uuid
+  action     String?  @db.VarChar(100)
+  table_name String?  @db.VarChar(100)
+  record_id  String?  @db.Uuid
+  old_values Json?
+  new_values Json?
+  ip_address String?  @db.Inet
+  user_agent String?
+  created_at DateTime @default(now()) @db.Timestamp(6)
+  users      users?   @relation(fields: [user_id], references: [id], onUpdate: NoAction)
+}
+
+model coin_transactions {
+  id               String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  company_id       String    @db.Uuid
+  amount           Int
+  transaction_type String?   @db.VarChar(50)
+  description      String?
+  created_at       DateTime  @default(now()) @db.Timestamp(6)
+  companies        companies @relation(fields: [company_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+model companies {
+  id                String              @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name              String              @db.VarChar(255)
+  description       String?
+  industry          String?             @db.VarChar(100)
+  size              String?             @db.VarChar(50)
+  website           String?             @db.VarChar(255)
+  logo_url          String?             @db.VarChar(255)
+  headquarters      String?             @db.VarChar(255)
+  founded_year      Int?
+  status            String?             @db.VarChar(50)
+  created_by        String?             @db.Uuid
+  created_at        DateTime            @default(now()) @db.Timestamp(6)
+  updated_at        DateTime            @default(now()) @db.Timestamp(6)
+  coin_transactions coin_transactions[]
+  users             users?              @relation(fields: [created_by], references: [id], onUpdate: NoAction)
+  company_wallets   company_wallets?
+  hr_profiles       hr_profiles[]
+  job_posts         job_posts[]
+}
+
+model company_wallets {
+  id           String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  company_id   String    @unique @db.Uuid
+  coin_balance Int?      @default(0)
+  updated_at   DateTime  @default(now()) @db.Timestamp(6)
+  companies    companies @relation(fields: [company_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+model currency_exchange_rates {
+  id         String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  currency   String   @unique @db.VarChar(10)
+  coin_rate  Decimal  @db.Decimal
+  updated_at DateTime @default(now()) @db.Timestamp(6)
+}
+
+model experiences_educations {
+  id                 String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  user_profile_id    String        @db.Uuid
+  exp_company_name   String?       @db.VarChar(255)
+  exp_job_title      String?       @db.VarChar(255)
+  exp_description    String?
+  exp_start_date     DateTime?     @db.Date
+  exp_end_date       DateTime?     @db.Date
+  exp_is_current     Boolean?
+  exp_location       String?       @db.VarChar(255)
+  edu_institution    String?       @db.VarChar(255)
+  edu_degree         String?       @db.VarChar(100)
+  edu_field_of_study String?       @db.VarChar(100)
+  edu_start_date     DateTime?     @db.Date
+  edu_end_date       DateTime?     @db.Date
+  edu_grade          String?       @db.VarChar(50)
+  edu_description    String?
+  created_at         DateTime      @default(now()) @db.Timestamp(6)
+  updated_at         DateTime      @default(now()) @db.Timestamp(6)
+  user_profiles      user_profiles @relation(fields: [user_profile_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@index([user_profile_id], map: "idx_experiences_educations_profile")
+}
+
+model file_uploads {
+  id                String             @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  user_id           String?            @db.Uuid
+  filename          String?            @db.VarChar(255)
+  original_filename String?            @db.VarChar(255)
+  file_path         String?            @db.VarChar(500)
+  file_size         Int?
+  mime_type         String?            @db.VarChar(100)
+  file_type         String?            @db.VarChar(50)
+  is_primary        Boolean?           @default(false)
+  created_at        DateTime           @default(now()) @db.Timestamp(6)
+  users             users?             @relation(fields: [user_id], references: [id], onUpdate: NoAction)
+  job_applications  job_applications[]
+
+  @@index([user_id], map: "idx_file_uploads_user_id")
+}
+
+model hr_profiles {
+  id                 String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  user_id            String    @db.Uuid
+  company_id         String    @db.Uuid
+  job_title          String?   @db.VarChar(100)
+  department         String?   @db.VarChar(100)
+  is_primary_contact Boolean?  @default(false)
+  created_at         DateTime  @default(now()) @db.Timestamp(6)
+  updated_at         DateTime  @default(now()) @db.Timestamp(6)
+  companies          companies @relation(fields: [company_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  users              users     @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@index([company_id], map: "idx_hr_profiles_company")
+  @@index([user_id], map: "idx_hr_profiles_user")
+}
+
+model job_applications {
+  id                         String                       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  job_id                     String                       @db.Uuid
+  candidate_id               String                       @db.Uuid
+  resume_file_id             String?                      @db.Uuid
+  cover_letter               String?
+  status                     String?                      @db.VarChar(50)
+  notes                      String?
+  applied_at                 DateTime                     @default(now()) @db.Timestamp(6)
+  updated_at                 DateTime                     @default(now()) @db.Timestamp(6)
+  application_status_history application_status_history[]
+  users                      users                        @relation(fields: [candidate_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  job_posts                  job_posts                    @relation(fields: [job_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  file_uploads               file_uploads?                @relation(fields: [resume_file_id], references: [id], onUpdate: NoAction)
+
+  @@index([candidate_id], map: "idx_job_applications_candidate")
+  @@index([job_id], map: "idx_job_applications_job")
+}
+
+model job_categories {
+  id                   String           @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name                 String           @unique @db.VarChar(100)
+  description          String?
+  parent_id            String?          @db.Uuid
+  created_at           DateTime         @default(now()) @db.Timestamp(6)
+  job_categories       job_categories?  @relation("job_categoriesTojob_categories", fields: [parent_id], references: [id], onUpdate: NoAction)
+  other_job_categories job_categories[] @relation("job_categoriesTojob_categories")
+  job_posts            job_posts[]
+}
+
+model job_matches {
+  id            String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  user_id       String    @db.Uuid
+  job_id        String    @db.Uuid
+  match_score   Decimal?  @db.Decimal
+  match_reasons Json?
+  is_dismissed  Boolean?  @default(false)
+  created_at    DateTime  @default(now()) @db.Timestamp(6)
+  job_posts     job_posts @relation(fields: [job_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  users         users     @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@index([job_id], map: "idx_job_matches_job")
+  @@index([user_id], map: "idx_job_matches_user")
+}
+
+model job_posts {
+  id                                 String             @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  company_id                         String             @db.Uuid
+  created_by                         String?            @db.Uuid
+  title                              String             @db.VarChar(255)
+  description                        String?
+  requirements                       String?
+  responsibilities                   String?
+  benefits                           String?
+  category_id                        String?            @db.Uuid
+  job_type                           String?            @db.VarChar(50)
+  employment_type                    String?            @db.VarChar(50)
+  experience_level                   String?            @db.VarChar(50)
+  location                           String?            @db.VarChar(255)
+  salary_min                         Decimal?           @db.Decimal
+  salary_max                         Decimal?           @db.Decimal
+  currency                           String?            @db.VarChar(20)
+  is_salary_negotiable               Boolean?           @default(false)
+  application_deadline               DateTime?          @db.Date
+  status                             String?            @db.VarChar(50)
+  cost_coin                          Int?               @default(1)
+  views_count                        Int?               @default(0)
+  applications_count                 Int?               @default(0)
+  saved_count                        Int?               @default(0)
+  moderator_notes                    String?
+  approved_by                        String?            @db.Uuid
+  approved_at                        DateTime?          @db.Timestamp(6)
+  created_at                         DateTime           @default(now()) @db.Timestamp(6)
+  updated_at                         DateTime           @default(now()) @db.Timestamp(6)
+  job_applications                   job_applications[]
+  job_matches                        job_matches[]
+  users_job_posts_approved_byTousers users?             @relation("job_posts_approved_byTousers", fields: [approved_by], references: [id], onUpdate: NoAction)
+  job_categories                     job_categories?    @relation(fields: [category_id], references: [id], onUpdate: NoAction)
+  companies                          companies          @relation(fields: [company_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  users_job_posts_created_byTousers  users?             @relation("job_posts_created_byTousers", fields: [created_by], references: [id], onUpdate: NoAction)
+  job_skills                         job_skills[]
+  saved_jobs                         saved_jobs[]
+
+  @@index([company_id], map: "idx_job_posts_company")
+}
+
+model job_skills {
+  id          String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  job_id      String    @db.Uuid
+  skill_id    String    @db.Uuid
+  is_required Boolean?  @default(true)
+  created_at  DateTime  @default(now()) @db.Timestamp(6)
+  job_posts   job_posts @relation(fields: [job_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  skills      skills    @relation(fields: [skill_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+model notifications {
+  id         String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  user_id    String    @db.Uuid
+  type       String?   @db.VarChar(50)
+  title      String?   @db.VarChar(255)
+  message    String?
+  data       Json?
+  is_read    Boolean?  @default(false)
+  read_at    DateTime? @db.Timestamp(6)
+  created_at DateTime  @default(now()) @db.Timestamp(6)
+  users      users     @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+model saved_jobs {
+  id         String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  user_id    String    @db.Uuid
+  job_id     String    @db.Uuid
+  created_at DateTime  @default(now()) @db.Timestamp(6)
+  job_posts  job_posts @relation(fields: [job_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  users      users     @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@index([job_id], map: "idx_saved_jobs_job")
+  @@index([user_id], map: "idx_saved_jobs_user")
+}
+
+model skills {
+  id          String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name        String        @unique @db.VarChar(100)
+  category    String?       @db.VarChar(100)
+  created_at  DateTime      @default(now()) @db.Timestamp(6)
+  job_skills  job_skills[]
+  user_skills user_skills[]
+}
+
+model system_settings {
+  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  key         String   @unique @db.VarChar(100)
+  value       String?
+  value_type  String?  @db.VarChar(50)
+  description String?
+  is_active   Boolean? @default(true)
+  updated_by  String?  @db.Uuid
+  created_at  DateTime @default(now()) @db.Timestamp(6)
+  updated_at  DateTime @default(now()) @db.Timestamp(6)
+  users       users?   @relation(fields: [updated_by], references: [id], onUpdate: NoAction)
+}
+
+model user_profiles {
+  id                     String                   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  user_id                String                   @db.Uuid
+  first_name             String?                  @db.VarChar(100)
+  last_name              String?                  @db.VarChar(100)
+  phone                  String?                  @db.VarChar(20)
+  profile_photo_url      String?                  @db.VarChar(255)
+  bio                    String?
+  location               String?                  @db.VarChar(255)
+  website                String?                  @db.VarChar(255)
+  linkedin_url           String?                  @db.VarChar(255)
+  github_url             String?                  @db.VarChar(255)
+  created_at             DateTime                 @default(now()) @db.Timestamp(6)
+  updated_at             DateTime                 @default(now()) @db.Timestamp(6)
+  experiences_educations experiences_educations[]
+  users                  users                    @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@index([user_id], map: "idx_user_profiles_user_id")
+}
+
+model user_skills {
+  id                String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  user_id           String   @db.Uuid
+  skill_id          String   @db.Uuid
+  proficiency_level Int?
+  created_at        DateTime @default(now()) @db.Timestamp(6)
+  skills            skills   @relation(fields: [skill_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  users             users    @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@index([skill_id], map: "idx_user_skills_skill")
+  @@index([user_id], map: "idx_user_skills_user")
+}
+
+model users {
+  id                                     String                       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  email                                  String                       @unique @db.VarChar(255)
+  password_hash                          String                       @db.VarChar(255)
+  role                                   String?                      @db.VarChar(50)
+  status                                 String?                      @db.VarChar(50)
+  email_verified                         Boolean?                     @default(false)
+  email_verification_token               String?                      @db.VarChar(255)
+  password_reset_token                   String?                      @db.VarChar(255)
+  password_reset_expires                 DateTime?                    @db.Timestamp(6)
+  last_login                             DateTime?                    @db.Timestamp(6)
+  created_at                             DateTime                     @default(now()) @db.Timestamp(6)
+  updated_at                             DateTime                     @default(now()) @db.Timestamp(6)
+  application_status_history             application_status_history[]
+  audit_logs                             audit_logs[]
+  companies                              companies[]
+  file_uploads                           file_uploads[]
+  hr_profiles                            hr_profiles[]
+  job_applications                       job_applications[]
+  job_matches                            job_matches[]
+  job_posts_job_posts_approved_byTousers job_posts[]                  @relation("job_posts_approved_byTousers")
+  job_posts_job_posts_created_byTousers  job_posts[]                  @relation("job_posts_created_byTousers")
+  notifications                          notifications[]
+  saved_jobs                             saved_jobs[]
+  system_settings                        system_settings[]
+  user_profiles                          user_profiles[]
+  user_skills                            user_skills[]
+}
