@@ -1,39 +1,33 @@
-"use Client";
-import Image from "next/image";
-import { Heart } from "lucide-react";
+"use client";
 
-export default function JobCard({ job }: any) {
+interface JobCardProps {
+  job: {
+    title: string;
+    company: string;
+    salary: string;
+    province: string;
+    image: string;
+    name: string;
+  };
+}
+
+export default function JobCard({ job }: JobCardProps) {
   return (
-    <div className="bg-highlight-20 p-4 rounded-2xl mx-4 my-6">
-      <div className="flex mb-4">
-        <div className="relative group">
-          <Image
-            src={job.image}
-            alt={job.name}
-            width="80"
-            height="80"
-            className="border-2 border-primary rounded-2xl mr-4"
-          />
+    <div
+      className="bg-white rounded-2xl border border-gray-200 p-6 transition-transform duration-300 hover:-translate-y-2 hover:shadow-lg cursor-pointer"
+    >
+      <div className="flex items-center space-x-4 mb-4">
+        <div className="w-16 h-16 rounded-xl overflow-hidden">
+          <img src={job.image} alt={job.name} className="w-full h-full object-cover" />
         </div>
-        <div className="outline-none flex flex-col justify-between">
-          <p className="font-bold text-primary max-w-xs line-clamp-2">
-            {job.title}
-          </p>
-          <p className="text-primary-80 font-semibold max-w-xs line-clamp-2">
-            {job.company}
-          </p>
+        <div>
+          <h3 className="font-bold text-lg text-gray-800 line-clamp-1">{job.title}</h3>
+          <p className="text-gray-600">{job.company}</p>
         </div>
       </div>
-      <div className="flex justify-between mt-2 mx-4">
-        <p className="bg-accent-20 text-primary-80 rounded-full px-4 font-semibold">
-          {job.salary}
-        </p>
-        <span className="bg-accent-20 text-primary-80 rounded-full px-4 font-semibold">
-          {job.province}
-        </span>
-        <span>
-          <Heart size={24} />
-        </span>
+      <div className="flex justify-between items-center text-sm">
+        <span className="text-green-600 font-semibold">{job.salary}</span>
+        <span className="text-gray-500">{job.province}</span>
       </div>
     </div>
   );
