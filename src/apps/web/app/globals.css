@@ -1,26 +1,127 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Font Families */
+  --font-primary: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-secondary: "Roboto", Arial, sans-serif;
+
+  /* font Weight */
+  --font-weight-regular: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+
+  /* Font Sizes */
+  --font-size-display-1: 80px;
+  --font-size-display-2: 72px;
+  --font-size-display-3: 64px;
+  --font-size-display-4: 56px;
+  --font-size-display-5: 48px;
+  --font-size-display-6: 40px;
+
+  --font-size-h1: 36px;
+  --font-size-h2: 28px;
+  --font-size-h3: 20px;
+  --font-size-h4: 18px;
+  --font-size-h5: 16px;
+  --font-size-h6: 14px;
+
+  --font-size-caption: 12px;
+  --font-size-custom: 11px;
+  --font-size-small: 10px;
+
+  --font-size-body-large: 1.125rem;
+  --font-size-body: 1rem;
+  --font-size-body-small: 0.875rem;
+  --font-size-body-caption: 0.75rem;
+
+  /* Line heights */
+  --line-height-tight: 1.2;
+  --line-height-normal: 1.4;
+  --line-height-relaxed: 1.6;
+
+  /* Letter Spacing */
+  --letter-spacing-tight: -0.02em;
+  --letter-spacing-normal: 0;
+  --letter-spacing-relaxed: 0.05em;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+/* COLOR */
+@theme {
+  /* Brand Colors */
+  --color-primary: #223148;
+  --color-primary-80: #4e5a6d;
+  --color-primary-60: #7a8391;
+  --color-primary-40: #a7adb6;
+  --color-primary-20: #d3d6da;
+
+  --color-secondary: #2f486d;
+  --color-secondary-80: #596d8a;
+  --color-secondary-60: #8291a7;
+  --color-secondary-40: #acb6c5;
+  --color-secondary-20: #d5dae2;
+
+  --color-accent: #3d6cb2;
+  --color-accent-80: #6489c1;
+  --color-accent-60: #8ba7d1;
+  --color-accent-40: #b1c4e0;
+  --color-accent-20: #d8e2f0;
+
+  --color-highlight: #b7cae5;
+  --color-highlight-80: #c5d5ea;
+  --color-highlight-60: #c5d5ea;
+  --color-highlight-40: #e2eaf5;
+  --color-highlight-20: #f1f4fa;
+
+  /* Neutral Colors */
+  --color-neutral-medium: #d2c7b8;
+  --color-neutral-medium-80: #dbd2c6;
+  --color-neutral-medium-60: #e4ddd4;
+  --color-neutral-medium-40: #ede9e3;
+  --color-neutral-medium-20: #f6f4f1;
+
+  --color-neutral-light: #f3eae0;
+  --color-neutral-light-80: #f5eee6;
+  --color-neutral-light-60: #f8f2ec;
+  --color-neutral-light-40: #faf7f3;
+  --color-neutral-light-20: #fdfbf9;
+
+  --color-text: #111827;
+  --color-text-80: #5f6774;
+  --color-text-60: #878d97;
+  --color-text-40: #afb3b9;
+  --color-text-20: #d7d9dc;
+
+  /* Links */
+  --color-link: #6489c1;
+  --color-link-hover: #3d6cb2;
+
+  --gradient-primary: 45deg, #e1effb 0%, #edf5fc 100%;
+  --color-background: #f2f2f2;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+/* FORCE DARK THEME */
+[data-theme="dark"] {
+}
+
+/* MANUAL THEME OVERRIDES */
+/* FORCE LIGHT THEME */
+[data-theme="light"] {
+}
+
+/* LINKS */
+a {
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-link);
+
+  &:hover {
+    color: var(--color-link-hover);
+    text-decoration: underline;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@utility display-* {
+  font-size: --value(-font-size-display-*);
+  font-weight: --value(-font-weight-bold);
+  text-color: --value(-text-primary-40);
 }
