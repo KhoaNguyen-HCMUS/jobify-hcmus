@@ -120,8 +120,8 @@ a {
   }
 }
 
-@utility display-* {
+/* @utility display-* {
   font-size: --value(-font-size-display-*);
   font-weight: --value(-font-weight-bold);
   text-color: --value(-text-primary-40);
-}
+} */
