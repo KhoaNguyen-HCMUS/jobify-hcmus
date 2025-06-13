@@ -16,7 +16,7 @@ function App() {
   };
 
   return (
-    <div className="flex items-center justify-center w-full min-h-screen p-4 bg-gradient-to-br from-[#e1effb] to-[#edf5fc]">
+    <div className="flex items-center justify-center w-full min-h-screen p-4 bg-linear-(--gradient-primary)">
       <div className="backdrop-blur-sm rounded-[57px] shadow-xl flex flex-col lg:flex-row items-center max-w-5xl w-full min-h-[700px] p-8 lg:p-12 gap-12 bg-highlight-20 mx-auto">
         {/* Form Section */}
         <div className="flex-1 w-full max-w-md space-y-8">

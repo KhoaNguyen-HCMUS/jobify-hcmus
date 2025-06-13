@@ -93,8 +93,11 @@
   --color-text-20: #d7d9dc;
 
   /* Links */
-  --color-link: var(--color-accent-80);
-  --color-link-hover: var(--color-accent);
+  --color-link: #6489c1;
+  --color-link-hover: #3d6cb2;
+
+  --gradient-primary: 45deg, #e1effb 0%, #edf5fc 100%;
+  --color-background: #f2f2f2;
 }
 
 /* FORCE DARK THEME */
@@ -115,4 +118,10 @@ a {
     color: var(--color-link-hover);
     text-decoration: underline;
   }
+}
+
+@utility display-* {
+  font-size: --value(-font-size-display-*);
+  font-weight: --value(-font-weight-bold);
+  text-color: --value(-text-primary-40);
 }
