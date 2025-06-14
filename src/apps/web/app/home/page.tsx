@@ -6,6 +6,7 @@ import Link from "next/link";
 import JobCard from "../components/jobCard";
 import LeftArrow from "../components/arrowLeft";
 import RightArrow from "../components/arrowRight";
+import Nav from "../components/nav";
 
 const jobs = [
   {
@@ -180,45 +181,8 @@ export default function HomePage() {
     <div className="w-full min-h-screen">
       <div className="flex w-full">
         <div className="flex w-full p-px py-4 bg-accent-20 justify-between items-center mb-10">
-          <div className="flex items-center">
-            <Image
-              src="/logo.png"
-              alt="JOBIFY Logo"
-              width={50}
-              height={50}
-            ></Image>
-            <span className="text-4xl font-bold text-primary ml-4">JOBIFY</span>
-          </div>
-          <nav className="flex items-center justify-center space-x-10">
-            <Link href="/">
-              <span className="text-2xl font-semibold text-primary cursor-pointer">
-                Home
-              </span>
-            </Link>
-            <Link href="/aboutus">
-              <span className="text-2xl font-semibold text-primary-60 cursor-pointer no-underline hover:no-underline decoration-transparent !important">
-                About us
-              </span>
-            </Link>
-            <Link href="/contact">
-              <span className="text-2xl font-semibold text-secondary-60 cursor-pointer">
-                Contact
-              </span>
-            </Link>
-            <Link href="/notification">
-              <span className="text-2xl font-semibold text-secondary-60 cursor-pointer">
-                Notification
-              </span>
-            </Link>
-          </nav>
-          <div className="flex space-x-4">
-            <button className="cursor-pointer text-primary text-2xl font-semibold px-8 pb-2 border-4 border-primary rounded-full">
-              Sign up
-            </button>
-            <button className="cursor-pointer text-background text-2xl font-semibold px-8  border-4 bg-primary border-primary rounded-full">
-              Sign in
-            </button>
-          </div>
+        <Nav />
+        
         </div>
       </div>
       <div className="mb-10">

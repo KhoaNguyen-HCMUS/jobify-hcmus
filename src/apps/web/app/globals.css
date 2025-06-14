@@ -110,7 +110,7 @@
 }
 
 /* LINKS */
-a {
+.custom-link {
   font-weight: var(--font-weight-semibold);
   color: var(--color-link);
 
