@@ -2,7 +2,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { Menu, X, Bell, Search, User } from 'lucide-react';
+import { Menu, X } from 'lucide-react';
 import { usePathname } from 'next/navigation';
 
 export default function NavBar() {
@@ -42,11 +42,8 @@ export default function NavBar() {
               >
                 <span className='relative z-10'>{item.label}</span>
                 <span
-                  className={`absolute inset-0 rounded-lg transition-all duration-300 ${
-                    item.isActive ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'
-                  }`}
+                  className='absolute inset-0 rounded-lg transition-all duration-300 '
                 >
-                  <span className='absolute inset-0 rounded-lg bg-gradient-to-r from-primary to-primary/80 transform origin-left'></span>
                 </span>
               </Link>
             ))}
