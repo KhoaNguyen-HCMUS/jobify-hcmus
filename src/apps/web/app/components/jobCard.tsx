@@ -21,13 +21,13 @@ export default function JobCard({ job }: JobCardProps) {
           <img src={job.image} alt={job.name} className="w-full h-full object-cover" />
         </div>
         <div>
-          <h3 className="font-bold text-lg text-gray-800 line-clamp-1">{job.title}</h3>
-          <p className="text-gray-600">{job.company}</p>
+          <h3 className="font-bold text-lg text-text line-clamp-1">{job.title}</h3>
+          <p className="text-text-80">{job.company}</p>
         </div>
       </div>
       <div className="flex justify-between items-center text-sm">
         <span className="text-green-600 font-semibold">{job.salary}</span>
-        <span className="text-gray-500">{job.province}</span>
+        <span className="text-text-60">{job.province}</span>
       </div>
     </div>
   );
