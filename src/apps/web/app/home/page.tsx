@@ -6,7 +6,6 @@ import Link from "next/link";
 import JobCard from "../components/jobCard";
 import LeftArrow from "../components/arrowLeft";
 import RightArrow from "../components/arrowRight";
-import Nav from "../components/nav";
 
 const jobs = [
   {
@@ -179,12 +178,6 @@ export default function HomePage() {
 
   return (
     <div className="w-full min-h-screen">
-      <div className="flex w-full">
-        <div className="flex w-full p-px py-4 bg-accent-20 justify-between items-center mb-10">
-        <Nav />
-        
-        </div>
-      </div>
       <div className="mb-10">
         <h1 className="font-bold text-7xl ml-16 text-primary mb-10">
           Find Opportunities <br /> That Fit You Best!
