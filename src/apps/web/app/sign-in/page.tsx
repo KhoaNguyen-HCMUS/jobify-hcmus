@@ -3,7 +3,7 @@ import { useState } from "react";
 import { User, Lock } from "lucide-react";
 import Image from "next/image";
 
-export default function LoginPage() {
+export default function SignInPage() {
   const [fullName, setFullName] = useState("");
   const [password, setPassword] = useState("");
   const [rememberMe, setRememberMe] = useState(false);

@@ -1,11 +1,12 @@
 "use client";
+
 import { useState } from "react";
 import { Search, MapPin, Funnel } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import JobCard from "../components/jobCard";
-import LeftArrow from "../components/arrowLeft";
-import RightArrow from "../components/arrowRight";
+import JobCard from "../../components/job/jobCard";
+import LeftArrow from "../../components/arrowLeft";
+import RightArrow from "../../components/arrowRight";
 
 const jobs = [
   {

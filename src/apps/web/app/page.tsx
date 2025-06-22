@@ -3,7 +3,7 @@ import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 
 import HomePage from "./home/page";
-import LoginPage from "./login/page";
+import SignInPage from "./sign-in/page";
 
 
 export default function App() {
@@ -19,8 +19,8 @@ export default function App() {
       case "/":
         return <HomePage />;
       
-      case "/login":
-        return <LoginPage />;
+      case "/sign-in":
+        return <SignInPage />;
       
       default:
         return <HomePage />; 
