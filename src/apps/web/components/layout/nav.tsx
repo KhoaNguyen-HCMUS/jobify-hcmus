@@ -52,13 +52,13 @@ export default function NavBar() {
           <div className='hidden md:flex items-center space-x-6'>
             <div className='flex items-center space-x-4'>
               <Link
-                href='/signup'
+                href='/sign-up'
                 className='px-6 py-2 text-primary border-2 border-primary rounded-lg font-medium transition-all duration-300 hover:bg-primary hover:text-white hover:shadow-lg hover:shadow-primary/30 transform hover:-translate-y-0.5'
               >
                 Sign up
               </Link>
               <Link
-                href='/signin'
+                href='/sign-in'
                 className='px-6 py-2 bg-primary border-2 border-primary text-white rounded-lg font-medium transition-all duration-300 hover:bg-primary/90 hover:shadow-lg hover:shadow-primary/30 transform hover:-translate-y-0.5'
               >
                 Sign in
