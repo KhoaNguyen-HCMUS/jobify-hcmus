@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 
 import HomePage from "./home/page";
 import SignInPage from "./sign-in/page";
-
+import JobDetailPage from "./job-detail/page";
 
 export default function App() {
   const pathname = usePathname();
@@ -18,18 +18,17 @@ export default function App() {
     switch (currentPath) {
       case "/":
         return <HomePage />;
-      
+
       case "/sign-in":
         return <SignInPage />;
-      
+
+      case "/job-detail":
+        return <JobDetailPage />;
+
       default:
-        return <HomePage />; 
+        return <HomePage />;
     }
   };
 
-  return (
-    <div className="w-full min-h-screen">
-      {renderPage()}
-    </div>
-  );
+  return <div className="w-full min-h-screen">{renderPage()}</div>;
 }

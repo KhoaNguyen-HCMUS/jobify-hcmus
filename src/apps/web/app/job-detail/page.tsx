@@ -30,7 +30,7 @@ interface JobDetailProps {
     applicationInformation: string;
     rank: string;
     education: string;
-    numberPhone: string;
+    numberOfRecruiter: string;
     formOfWork: string;
     relatedOccupations: string;
     requiredSkills: string;
@@ -216,7 +216,7 @@ export default function JobDetailPage({ detail }: JobDetailProps) {
             <span className="text-primary-80 font-semibold">
               Number of recruits
             </span>
-            <span>{detail?.numberPhone}</span>
+            <span>{detail?.numberOfRecruiter}</span>
           </div>
         </div>
         <div className="flex px-4">
