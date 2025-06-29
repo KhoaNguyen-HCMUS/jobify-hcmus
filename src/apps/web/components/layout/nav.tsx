@@ -56,7 +56,7 @@ export default function NavBar() {
           <div className="hidden md:flex items-center space-x-6">
             <div className="flex items-center space-x-4">
               <Link
-                href="/sign-up"
+                href="/sign-up-with-role"
                 className="px-6 py-2 text-primary border-2 border-primary rounded-lg font-medium transition-all duration-300 hover:bg-primary hover:text-white hover:shadow-lg hover:shadow-primary/30 transform hover:-translate-y-0.5"
               >
                 Sign up
