@@ -13,7 +13,7 @@ import PendingApprovalPage from "./pending-approval/page";
 import ForgotPasswordFirstPage from "./forgot-password-first/page";
 import ForgotPasswordSecondPage from "./forgot-password-second/page";
 import ForgotPasswordThirdPage from "./forgot-password-third/page";
-import Error404Page from "./error-404/page";
+import Error404Page from "./not-found";
 import Error403Page from "./error-403/page";
 
 export default function App() {
