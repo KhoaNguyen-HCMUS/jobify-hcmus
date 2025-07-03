@@ -14,7 +14,7 @@ export default function KeywordSearch() {
 
   return (
     <form onSubmit={handleFind}>
-      <div className="flex ml-16 mb-16">
+      <div className="w-full grid grid-cols-1 md:grid-cols-3 gap-10 mb-16 ml-14">
         <div className="relative mr-10">
           <div className="absolute left-4 top-1/2 transform -translate-y-1/2 text-primary">
             <Search size={24} />

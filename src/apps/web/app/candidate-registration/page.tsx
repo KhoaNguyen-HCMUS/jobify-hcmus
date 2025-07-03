@@ -135,9 +135,10 @@ export default function CandidateRegistrationPage() {
             {/* Submit Button */}
             <button
               type="submit"
+              onClick={() => (window.location.href = "/sign-in")}
               className="w-full bg-secondary hover:bg-primary rounded-full text-white py-4 px-8 font-bold transition-colors duration-300 mt-4 cursor-pointer"
             >
-              <a href="/sign-in">Sign up</a>
+              Sign up
             </button>
           </form>
         </div>

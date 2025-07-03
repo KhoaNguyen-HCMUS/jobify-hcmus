@@ -4,6 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { Menu, X } from "lucide-react";
 import { usePathname } from "next/navigation";
+//import Announcement from "../announcement";
 
 export default function NavBar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -12,7 +13,11 @@ export default function NavBar() {
   const navItems = [
     { href: "/", label: "Home" },
     { href: "/browse-jobs", label: "Browse Jobs" },
+    { href: "/support", label: "Support" },
     { href: "/about-us", label: "About Us" },
+    // { href: "/saved", label: "Saved" },
+    // { href: "/applications", label: "Applications" },
+    // { href: "/recommended", label: "Recommended" },
   ];
 
   return (
@@ -35,7 +40,6 @@ export default function NavBar() {
               JOBIFY
             </span>
           </Link>
-
           <nav className="hidden md:flex items-center space-x-4">
             {navItems.map((item) => (
               <Link
@@ -53,6 +57,33 @@ export default function NavBar() {
             ))}
           </nav>
 
+          {/* TEST PHẦN THÔNG BÁO */}
+          {/* {isSignedIn ? (
+            <>
+              <Announcement />
+            </>
+          ) : (
+            <>
+              <div className="hidden md:flex items-center space-x-6">
+                <div className="flex items-center space-x-4">
+                  <Link
+                    href="/sign-up-with-role"
+                    className="px-6 py-2 text-primary border-2 border-primary rounded-lg font-medium transition-all duration-300 hover:bg-primary hover:text-white hover:shadow-lg hover:shadow-primary/30 transform hover:-translate-y-0.5"
+                  >
+                    Sign up
+                  </Link>
+                  <Link
+                    href="/sign-in"
+                    onClick={() => setIsSignedIn}
+                    className="px-6 py-2 bg-primary border-2 border-primary text-white rounded-lg font-medium transition-all duration-300 hover:bg-primary/90 hover:shadow-lg hover:shadow-primary/30 transform hover:-translate-y-0.5"
+                  >
+                    Sign in
+                  </Link>
+                </div>
+              </div>
+            </>
+          )} */}
+
           <div className="hidden md:flex items-center space-x-6">
             <div className="flex items-center space-x-4">
               <Link
@@ -69,7 +100,6 @@ export default function NavBar() {
               </Link>
             </div>
           </div>
-
           <button
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
             className="md:hidden p-2 text-gray-600 hover:text-white hover:bg-primary rounded-lg transition-all duration-300"
@@ -95,15 +125,40 @@ export default function NavBar() {
                   {item.label}
                 </Link>
               ))}
+
+              {/* TEST PHẦN THÔNG BÁO */}
+              {/* {isSignedIn ? (
+                <>
+                  <Announcement />
+                </>
+              ) : (
+                <>
+                  <div className="pt-4 space-y-2">
+                    <Link
+                      href="/sign-up-with-role"
+                      className="block w-full px-4 py-3 text-center text-primary border-2 border-primary rounded-lg font-medium transition-all duration-300 hover:bg-primary hover:text-white hover:shadow-lg hover:shadow-primary/30"
+                    >
+                      Sign up
+                    </Link>
+                    <Link
+                      href="/sign-in"
+                      className="block w-full px-4 py-3 text-center bg-primary border-2 border-primary text-white rounded-lg font-medium transition-all duration-300 hover:bg-primary/90 hover:shadow-lg hover:shadow-primary/30"
+                    >
+                      Sign in
+                    </Link>
+                  </div>
+                </>
+              )} */}
+
               <div className="pt-4 space-y-2">
                 <Link
-                  href="/signup"
+                  href="/sign-up-with-role"
                   className="block w-full px-4 py-3 text-center text-primary border-2 border-primary rounded-lg font-medium transition-all duration-300 hover:bg-primary hover:text-white hover:shadow-lg hover:shadow-primary/30"
                 >
                   Sign up
                 </Link>
                 <Link
-                  href="/signin"
+                  href="/sign-in"
                   className="block w-full px-4 py-3 text-center bg-primary border-2 border-primary text-white rounded-lg font-medium transition-all duration-300 hover:bg-primary/90 hover:shadow-lg hover:shadow-primary/30"
                 >
                   Sign in

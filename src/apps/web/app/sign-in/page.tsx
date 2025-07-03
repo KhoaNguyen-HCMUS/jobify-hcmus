@@ -4,15 +4,15 @@ import { User, Lock } from "lucide-react";
 import LogoTagline from "../../components/logoTagline";
 
 export default function SignInPage() {
-  const [fullName, setFullName] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Full Name:", fullName);
-    console.log("Password:", password);
-    console.log("Remember Me:", rememberMe);
+    console.log("Email: ", email);
+    console.log("Password: ", password);
+    console.log("Remember: ", rememberMe);
   };
 
   return (
@@ -27,7 +27,7 @@ export default function SignInPage() {
             {/* Full Name Input */}
             <div className="space-y-3">
               <label
-                htmlFor="fullName"
+                htmlFor="email"
                 className="block text-sm font-bold text-primary ml-4"
               >
                 Full Name
@@ -37,10 +37,10 @@ export default function SignInPage() {
                   <User size={18} />
                 </div>
                 <input
-                  id="fullName"
+                  id="email"
                   type="text"
-                  value={fullName}
-                  onChange={(e) => setFullName(e.target.value)}
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
                   placeholder="Enter your full name"
                   className="w-full pl-12 pr-4 py-4 bg-highlight-40 rounded-full text-primary-80 outline-none focus:ring-2 focus:ring-blue-400 focus:bg-white transition-all duration-300"
                   required

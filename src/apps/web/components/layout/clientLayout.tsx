@@ -9,7 +9,16 @@ export default function ClientLayout({
   children: React.ReactNode;
 }>) {
   const pathname = usePathname();
-  const hideNav = ["/sign-in", "/sign-up-with-role"].includes(pathname);
+  const hideNav = [
+    "/sign-in",
+    "/sign-up-with-role",
+    "/forgot-password-first",
+    "/forgot-password-second",
+    "/forgot-password-third",
+    "/candidate-registration",
+    "/company-registration",
+    "/pending-approval",
+  ].includes(pathname);
 
   return (
     <>

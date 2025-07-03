@@ -5,7 +5,7 @@ export default function Error403Page() {
       <div className="backdrop-blur-sm rounded-[57px] shadow-xl flex flex-col lg:flex-row items-center max-w-5xl w-full p-8 lg:p-12 gap-12 bg-highlight-20 mx-auto">
         <div className="flex-1 w-full max-w-md space-y-8">
           <h1 className="text-4xl font-bold mt-4 text-primary mb-8 ml-8">
-            ERROR 404: <br /> FORBIDDEN
+            ERROR 403: <br /> FORBIDDEN
           </h1>
 
           <p className="text-primary mt-4 mb-8 ml-8">

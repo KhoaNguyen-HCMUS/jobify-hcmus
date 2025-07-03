@@ -18,12 +18,12 @@ export default function ForgotPasswordFirstPage() {
           </p>
 
           <div className="flex justify-center">
-            <button
-              type="submit"
+            <a
+              href="/"
               className="bg-secondary hover:bg-primary rounded-full text-white py-4 px-8 font-bold transition-colors duration-300 mt-4 cursor-pointer"
             >
-              <a href="/">Go to homepage</a>
-            </button>
+              Go to homepage
+            </a>
           </div>
         </div>
         <LogoTagline />

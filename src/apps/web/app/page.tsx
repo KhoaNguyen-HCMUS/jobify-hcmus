@@ -15,6 +15,8 @@ import ForgotPasswordSecondPage from "./forgot-password-second/page";
 import ForgotPasswordThirdPage from "./forgot-password-third/page";
 import Error404Page from "./not-found";
 import Error403Page from "./error-403/page";
+import SupportPage from "./support/page";
+import AboutUsPage from "./about-us/page";
 
 export default function App() {
   const pathname = usePathname();
@@ -59,11 +61,17 @@ export default function App() {
       case "/forgot-password-third":
         return <ForgotPasswordThirdPage />;
 
-      case "/error-404":
+      case "/not-found":
         return <Error404Page />;
 
       case "/error-403":
         return <Error403Page />;
+
+      case "/support":
+        return <SupportPage />;
+
+      case "/about-us":
+        return <AboutUsPage />;
 
       default:
         return <HomePage />;

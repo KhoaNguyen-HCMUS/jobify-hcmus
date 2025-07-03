@@ -67,9 +67,12 @@ export default function ForgotPasswordSecondPage() {
             <div className="flex justify-center">
               <button
                 type="submit"
+                onClick={() =>
+                  (window.location.href = "/forgot-password-third")
+                }
                 className="bg-secondary hover:bg-primary rounded-full text-white py-4 px-8 font-bold transition-colors duration-300 mt-4 cursor-pointer"
               >
-                <a href="/forgot-password-third">Update password</a>
+                Update password
               </button>
             </div>
           </form>
