@@ -2,12 +2,12 @@ const prisma = require('../prisma/client');
 
 exports.getMyProfile = async (req, res) => {
   try {
-    const userId = req.user.id; // Giả sử middleware auth đã decode JWT và gán req.user
+    const userId = req.user.id; 
 
     const profile = await prisma.user_profiles.findUnique({
       where: { user_id: userId },
       include: {
-        experiences: true,
+        experiences_educations: true,
       },
     });
 
