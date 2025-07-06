@@ -248,7 +248,7 @@ export default function RecommendedPage() {
       </div>
       <div className="pt-4">
         <h2 className="font-bold text-3xl text-neutral-light-20 pl-10 py-2 w-full bg-primary">
-          <i>Jobs</i>
+          <i>Recommended Jobs</i>
         </h2>
         <div className="flex gap-2">
           <div className="flex-1 hidden md:block bg-neutral-light-20 shadow-2xs">
@@ -512,8 +512,8 @@ export default function RecommendedPage() {
           </div>
           <div className="flex-3">
             <div className="flex flex-col gap-4">
-              <div className="flex justify-between p-4">
-                <div className="w-full flex justify-between items-center bg-highlight-40 rounded-2xl p-4">
+              <div className="flex flex-wrap justify-between gap-4 p-4">
+                <div className="flex justify-between items-center bg-highlight-40 rounded-2xl gap-x-60 p-4">
                   <div className="flex flex-wrap gap-4">
                     <div className="text-primary bg-highlight-60 hover:bg-highlight cursor-pointer shadow-md rounded-full px-6 py-1">
                       Skills
@@ -535,6 +535,9 @@ export default function RecommendedPage() {
                     <ChevronDown size={24} className="cursor-pointer" />
                   </div>
                 </div>
+                <button className="cursor-pointer bg-accent-80 hover:bg-accent  text-background font-semibold rounded-full p-4">
+                  Apply priority
+                </button>
               </div>
               <div className="px-6">
                 <div className="w-full grid grid-cols-1 md:grid-cols-2 gap-x-20 gap-y-10 p-4">
