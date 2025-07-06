@@ -29,7 +29,7 @@ export default function JobCard({ job }: JobCardProps) {
       </div>
       <div className="flex justify-between items-center text-sm">
         <span className="text-primary-80 font-semibold px-4 py-2 bg-accent-20 rounded-full">
-          {job.salary}
+          {job.salary} {" VNĐ"}
         </span>
         <span className="text-primary-80 font-semibold px-4 py-2 bg-accent-20 rounded-full">
           {job.province}

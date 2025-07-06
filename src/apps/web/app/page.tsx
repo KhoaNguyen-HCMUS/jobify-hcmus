@@ -17,6 +17,7 @@ import Error404Page from "./not-found";
 import Error403Page from "./error-403/page";
 import SupportPage from "./support/page";
 import AboutUsPage from "./about-us/page";
+import RecommendedPage from "./recommended/page";
 
 export default function App() {
   const pathname = usePathname();
@@ -72,6 +73,9 @@ export default function App() {
 
       case "/about-us":
         return <AboutUsPage />;
+
+      case "/recommended":
+        return <RecommendedPage />;
 
       default:
         return <HomePage />;
