@@ -4,6 +4,10 @@ import { User, Lock } from "lucide-react";
 import LogoTagline from "../../components/logoTagline";
 
 export default function SignInPage() {
+  // test navBar
+  localStorage.setItem("user", JSON.stringify({ role: "candidate" }));
+  window.location.href = "/";
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [rememberMe, setRememberMe] = useState(false);

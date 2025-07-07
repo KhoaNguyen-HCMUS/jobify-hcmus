@@ -8,7 +8,7 @@ export default function SystemAnnouncement() {
           size={50}
           className="text-primary b-0 bg-highlight-20 rounded-full p-2"
         />
-        <span className="flex flex-col text-highlight-20 font-bold text-3xl">
+        <span className="flex flex-col text-center text-highlight-20 font-bold text-3xl">
           SYSTEM ANNOUNCEMENT
         </span>
         <p className="text-highlight-60">Important update from system</p>

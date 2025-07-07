@@ -7,7 +7,7 @@ export default function HomePage() {
   return (
     <div className="w-full min-h-screen bg-accent-40">
       <div className="mb-10">
-        <h1 className="font-bold text-7xl ml-16 text-primary mb-10">
+        <h1 className="font-bold text-7xl text-primary mb-10">
           Find Opportunities <br /> That Fit You Best!
         </h1>
         <p className="text-2xl text-secondary ml-16">
