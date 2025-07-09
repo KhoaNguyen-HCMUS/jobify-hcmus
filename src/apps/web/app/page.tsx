@@ -19,6 +19,8 @@ import SupportPage from "./support/page";
 import AboutUsPage from "./about-us/page";
 import RecommendedPage from "./recommended/page";
 import CandidateDashboardPage from "./candidate/dashboard/page";
+import CandidateProfilePage from "./candidate/profile/page";
+import CandidateProfileEditPage from "./candidate/profile/edit/page";
 
 export default function App() {
   const pathname = usePathname();
@@ -80,6 +82,11 @@ export default function App() {
 
       case "/candidate/dashboard":
         return <CandidateDashboardPage />;
+
+      case "/candidate/profile":
+        return <CandidateProfilePage />;
+
+        return <CandidateProfileEditPage />;
 
       default:
         return <HomePage />;

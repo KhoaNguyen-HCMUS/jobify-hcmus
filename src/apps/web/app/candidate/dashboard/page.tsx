@@ -80,19 +80,19 @@ export default function CandidateDashboardPage() {
   };
   return (
     <div className="w-full h-full bg-neutral-light-60">
-      <div className="flex flex-col">
-        <div className="flex flex-wrap gap-15 p-6">
+      <div className="flex flex-col px-20 py-10 gap-10">
+        <div className="flex flex-wrap gap-15">
           <div className="flex-1 flex flex-wrap justify-between bg-highlight-20 rounded-2xl">
             <div className="flex flex-wrap">
               <div className="p-4">
                 <img
                   src={dashboard[0].avt}
                   alt={dashboard[0].name}
-                  className="w-48 h-48 object-contain rounded-2xl"
+                  className="w-40 h-44 object-contain rounded-2xl"
                 />
               </div>
               <div className="flex flex-col justify-center gap-4 p-4">
-                <span className="text-primary text-2xl font-semibold">
+                <span className="text-primary text-xl font-semibold">
                   {dashboard[0].fullName}
                 </span>
                 <div className="flex flex-col gap-2">
@@ -119,10 +119,10 @@ export default function CandidateDashboardPage() {
             <Notification />
           </div>
         </div>
-        <div className="flex flex-wrap gap-15 p-6">
+        <div className="flex flex-wrap gap-15">
           <div className="flex-1 flex flex-col bg-highlight-20 rounded-2xl p-4 shadow-lg">
             <div className="flex justify-between">
-              <span className="text-primary font-semibold text-2xl">
+              <span className="text-primary font-semibold text-xl">
                 Jobs Applied
               </span>
               <a href="/candidate/jobs-applied">
@@ -131,7 +131,7 @@ export default function CandidateDashboardPage() {
                 </span>
               </a>
             </div>
-            <div className="flex flex-col gap-y-4 p-4">
+            <div className="flex flex-col gap-y-6 px-4 py-4">
               {currentJobs.map((job) => (
                 <JobCard key={job.id} job={job} />
               ))}
@@ -139,7 +139,7 @@ export default function CandidateDashboardPage() {
           </div>
           <div className="flex-1 flex flex-col bg-highlight-20 rounded-2xl p-4 shadow-lg">
             <div className="flex justify-between">
-              <span className="text-primary font-semibold text-2xl">
+              <span className="text-primary font-semibold text-xl">
                 Jobs Saved
               </span>
               <a href="/candidate/saved-jobs">
@@ -148,7 +148,7 @@ export default function CandidateDashboardPage() {
                 </span>
               </a>
             </div>
-            <div className="flex flex-col gap-y-4 p-4">
+            <div className="flex flex-col gap-y-6 px-4 py-4">
               {currentJobs.map((job) => (
                 <JobCard key={job.id} job={job} />
               ))}
