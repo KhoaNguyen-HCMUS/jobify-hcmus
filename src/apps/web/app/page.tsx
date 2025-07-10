@@ -21,6 +21,11 @@ import RecommendedPage from "./recommended/page";
 import CandidateDashboardPage from "./candidate/dashboard/page";
 import CandidateProfilePage from "./candidate/profile/page";
 import CandidateProfileEditPage from "./candidate/profile/edit/page";
+import ChangePasswordPage from "./candidate/change-password/page";
+import JobsSavedPage from "./candidate/saved-jobs/page";
+import JobsAppliedPage from "./candidate/jobs-applied/page";
+import NotificationsPage from "./candidate/notifications/page";
+import ReportsPage from "./candidate/reports/page";
 
 export default function App() {
   const pathname = usePathname();
@@ -86,7 +91,23 @@ export default function App() {
       case "/candidate/profile":
         return <CandidateProfilePage />;
 
+      case "/candidate/profile/edit":
         return <CandidateProfileEditPage />;
+
+      case "/candidate/change-password":
+        return <ChangePasswordPage />;
+
+      case "/candidate/jobs-applied":
+        return <JobsAppliedPage />;
+
+      case "/candidate/saved-jobs":
+        return <JobsSavedPage />;
+
+      case "/candidate/notifications":
+        return <NotificationsPage />;
+
+      case "/candidate/reports":
+        return <ReportsPage />;
 
       default:
         return <HomePage />;

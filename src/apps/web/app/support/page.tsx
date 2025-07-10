@@ -6,7 +6,7 @@ export default function SupportPage() {
           <span className="font-bold text-4xl text-accent">SUPPORT CENTER</span>
           <p className="text-primary-80 font-semibold text-2xl">
             We are here to help you! Find answers to some questions about job
-            search and use the Jobfinder platform.
+            search and use the Jobify platform.
           </p>
         </div>
       </div>

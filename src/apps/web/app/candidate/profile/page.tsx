@@ -147,8 +147,10 @@ export default function CandidateProfilePage() {
             </div>
           </div>
         </div>
-        <div className="bg-accent hover:bg-secondary cursor-pointer text-neutral-light-20 font-semibold rounded-2xl px-6 py-2 w-20">
-          <a href="/candidate/profile/edit">Edit</a>
+        <div className="flex">
+          <div className="bg-accent hover:bg-secondary cursor-pointer text-neutral-light-20 font-semibold rounded-2xl px-6 py-2">
+            <a href="/candidate/profile/edit">Edit</a>
+          </div>
         </div>
       </div>
     </div>
