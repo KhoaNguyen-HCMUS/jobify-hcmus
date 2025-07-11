@@ -1,5 +1,6 @@
+"use client";
+import { useState, useEffect, useRef } from "react";
 import GoBack from "../../components/goBack";
-
 import {
   BriefcaseBusiness,
   Clock,
@@ -11,6 +12,7 @@ import {
   ShieldHalf,
   Users,
 } from "lucide-react";
+import ApplyJobModal from "../../components/applyJobModal";
 
 interface JobDetailProps {
   detail: {
@@ -42,22 +44,22 @@ interface JobDetailProps {
 
 export default function JobDetailPage({ detail }: JobDetailProps) {
   return (
-    <div className="flex flex-col m-4 gap-6">
+    <div className="flex flex-col mx-20 my-10 gap-4">
       <GoBack />
-      <div className="flex flex-wrap gap-6 pl-6 pr-8">
+      <div className="flex flex-wrap gap-8 px-6">
         <div className="flex-2 space-y-4">
           <div className="flex flex-col justify-between bg-neutral-light-20 shadow-xl rounded-3xl space-y-4 p-6">
-            <div className="text-primary font-semibold text-4xl">
+            <div className="text-primary font-semibold text-2xl">
               {detail?.head}
             </div>
             <div className="flex flex-wrap gap-4 justify-between">
               <div className="flex items-center gap-2">
                 <DollarSign
-                  size={44}
+                  size={34}
                   className="bg-linear-(--gradient-primary-2) text-background rounded-full"
                 />
                 <div className="flex flex-col justify-between">
-                  <div className="text-primary font-semibold text-2xl">
+                  <div className="text-primary font-semibold text-xl">
                     Salary
                   </div>
                   <div className="text-primary-80 font-semibold">
@@ -67,11 +69,11 @@ export default function JobDetailPage({ detail }: JobDetailProps) {
               </div>
               <div className="flex items-center gap-2">
                 <MapPin
-                  size={44}
+                  size={34}
                   className="bg-linear-(--gradient-primary-2) text-background rounded-full"
                 />
                 <div className="flex flex-col justify-between">
-                  <div className="text-primary font-semibold text-2xl">
+                  <div className="text-primary font-semibold text-xl">
                     Location
                   </div>
                   <div className="text-primary-80 font-semibold">
@@ -81,11 +83,11 @@ export default function JobDetailPage({ detail }: JobDetailProps) {
               </div>
               <div className="flex items-center gap-2">
                 <Hourglass
-                  size={44}
+                  size={34}
                   className="bg-linear-(--gradient-primary-2) text-background rounded-full"
                 />
                 <div className="flex flex-col justify-between">
-                  <div className="text-primary font-semibold text-2xl">
+                  <div className="text-primary font-semibold text-xl">
                     Experience
                   </div>
                   <div className="text-primary-80 font-semibold">
@@ -95,22 +97,19 @@ export default function JobDetailPage({ detail }: JobDetailProps) {
               </div>
             </div>
             <div className="flex flex-wrap gap-4 justify-between">
-              <div className="flex bg-highlight rounded-xl px-2">
-                <Clock size={34} />
-                <span className="text-secondary font-semibold w-full pl-2 bg-highlight rounded-xl text-2xl">
+              <div className="flex relative bg-highlight rounded-xl px-2">
+                <div className="absolute left-4 top-1/2 transform -translate-y-1/2 text-primary-80">
+                  <Clock size={24} />
+                </div>
+                <span className="w-full pl-10 pr-4 py-2 text-lg font-semibold rounded-xl text-primary-80 ">
                   Deadline: {detail?.deadline}
                 </span>
               </div>
-              <div className="flex flex-warp gap-4">
+              <div className="flex flex-wrap gap-4">
+                <ApplyJobModal />
                 <a
-                  href="apply-now"
-                  className="p-2 bg-accent rounded-full text-background font-semibold text-2xl"
-                >
-                  Apply now
-                </a>
-                <a
-                  href="save"
-                  className="p-2 bg-accent rounded-full text-background font-semibold text-2xl"
+                  href="/save"
+                  className="px-6 py-2 bg-accent rounded-full text-background font-semibold text-lg transition-all duration-300 hover:shadow-lg hover:shadow-primary/30 transform hover:-translate-y-0.5"
                 >
                   Save
                 </a>
@@ -160,7 +159,7 @@ export default function JobDetailPage({ detail }: JobDetailProps) {
           </div>
         </div>
       </div>
-      <div className="flex flex-wrap gap-4 px-6">
+      <div className="flex flex-wrap gap-6 px-6">
         <div className="flex-2 space-y-4">
           <div className="bg-neutral-light-20 shadow-xl rounded-3xl space-y-4">
             <div className="flex flex-col">
@@ -204,17 +203,12 @@ export default function JobDetailPage({ detail }: JobDetailProps) {
                 </div>
               </div>
               <div className="ml-5 my-6">
-                <a
-                  href="apply-now"
-                  className="p-2 bg-accent rounded-full text-background font-semibold"
-                >
-                  Apply now
-                </a>
+                <ApplyJobModal />
               </div>
             </div>
           </div>
         </div>
-        <div className="flex-1">
+        <div className="flex-1 space-y-4">
           <div className="flex flex-col justify-between rounded-xl p-4 space-y-4">
             <div className="bg-neutral-light-20 shadow-xl rounded-3xl space-y-4">
               <div className="flex flex-col justify-between">
@@ -224,7 +218,7 @@ export default function JobDetailPage({ detail }: JobDetailProps) {
                 <div className="flex flex-col space-y-4 my-6 mx-6">
                   <div className="flex px-4 gap-4">
                     <ShieldHalf
-                      size={44}
+                      size={34}
                       className="bg-linear-(--gradient-primary-2) rounded-full text-background"
                     />
                     <div className="flex flex-col justify-between">
@@ -236,7 +230,7 @@ export default function JobDetailPage({ detail }: JobDetailProps) {
                   </div>
                   <div className="flex px-4 gap-4">
                     <GraduationCap
-                      size={44}
+                      size={34}
                       className="bg-linear-(--gradient-primary-2) rounded-full text-background"
                     />
                     <div className="flex flex-col justify-between">
@@ -250,7 +244,7 @@ export default function JobDetailPage({ detail }: JobDetailProps) {
                   </div>
                   <div className="flex px-4 gap-4">
                     <Users
-                      size={44}
+                      size={34}
                       className="bg-linear-(--gradient-primary-2) rounded-full text-background"
                     />
                     <div className="flex flex-col justify-between">
@@ -264,7 +258,7 @@ export default function JobDetailPage({ detail }: JobDetailProps) {
                   </div>
                   <div className="flex px-4 gap-4">
                     <BriefcaseBusiness
-                      size={44}
+                      size={34}
                       className="bg-linear-(--gradient-primary-2) rounded-full text-background"
                     />
                     <div className="flex flex-col">
@@ -288,7 +282,7 @@ export default function JobDetailPage({ detail }: JobDetailProps) {
                 </span>
                 <div className="flex flex-col space-y-4 mx-6 my-6">
                   <div className="flex flex-col space-y-2">
-                    <span className="font-semibold text-2xl text-accent">
+                    <span className="font-semibold text-xl text-accent">
                       Related occupations
                     </span>
                     <div className="grid grid-cols-2 gap-4 p-2">
@@ -298,7 +292,7 @@ export default function JobDetailPage({ detail }: JobDetailProps) {
                     </div>
                   </div>
                   <div className="flex flex-col space-y-2">
-                    <span className="font-semibold text-2xl text-accent">
+                    <span className="font-semibold text-xl text-accent">
                       Required Skills
                     </span>
                     <div className="grid grid-cols-2 gap-4 p-2">
@@ -308,7 +302,7 @@ export default function JobDetailPage({ detail }: JobDetailProps) {
                     </div>
                   </div>
                   <div className="flex flex-col space-y-2">
-                    <span className="font-semibold text-2xl text-accent">
+                    <span className="font-semibold text-xl text-accent">
                       Area
                     </span>
                     <div className="grid grid-cols-2 gap-4 p-2">
