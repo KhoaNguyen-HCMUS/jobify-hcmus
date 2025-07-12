@@ -18,6 +18,10 @@ const jobRoutes = require('./routes/job.routes');
 app.use('/jobs', jobRoutes);
 const applicationRoutes = require('./routes/application.routes');
 app.use('/applications', applicationRoutes);
+const companyRoutes = require('./routes/company.routes');
+app.use('/company', companyRoutes);
+const adminRoutes = require('./routes/admin.routes');
+app.use('/admin', adminRoutes);
 
 // Health check route
 app.get('/api/health', (req, res) => {
