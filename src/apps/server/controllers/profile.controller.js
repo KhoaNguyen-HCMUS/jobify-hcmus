@@ -1,8 +1,9 @@
 const prisma = require('../prisma/client');
+const { successResponse, errorResponse } = require('../utils/response');
 
 exports.getMyProfile = async (req, res) => {
   try {
-    const userId = req.user.id; 
+    const userId = req.user.id;
 
     const profile = await prisma.user_profiles.findUnique({
       where: { user_id: userId },
@@ -12,13 +13,13 @@ exports.getMyProfile = async (req, res) => {
     });
 
     if (!profile) {
-      return res.status(404).json({ message: 'Profile not found' });
+      return res.status(404).json(errorResponse('Profile not found', 404));
     }
 
-    res.json(profile);
+    res.json(successResponse(profile, 'Profile fetched successfully'));
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: 'Error fetching profile' });
+    res.status(500).json(errorResponse('Failed to fetch profile'));
   }
 };
 
@@ -32,10 +33,10 @@ exports.updateMyProfile = async (req, res) => {
       data,
     });
 
-    res.json(updatedProfile);
+    res.json(successResponse(updatedProfile, 'Profile updated successfully'));
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: 'Error updating profile' });
+    res.status(500).json(errorResponse('Failed to update profile'));
   }
 };
 
@@ -51,12 +52,12 @@ exports.getProfileById = async (req, res) => {
     });
 
     if (!profile) {
-      return res.status(404).json({ message: 'Profile not found' });
+      return res.status(404).json(errorResponse('Profile not found', 404));
     }
 
-    res.json(profile);
+    res.json(successResponse(profile, 'Profile fetched successfully'));
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: 'Error fetching profile' });
+    res.status(500).json(errorResponse('Failed to fetch profile'));
   }
 };
