@@ -55,7 +55,7 @@ export default function CandidateProfileEditPage() {
                     value={fullName}
                     onChange={(e) => setFullName(e.target.value)}
                     placeholder="Enter your full name"
-                    className="w-full border-2 border-primary pl-12 pr-4 py-2 bg-neutral-light-20 rounded-xl text-primary-80 outline-none focus:ring-2 focus:ring-blue-400 focus:bg-white transition-all duration-300"
+                    className="w-full border border-primary-60 pl-12 pr-4 py-2 bg-neutral-light-20 rounded-xl text-primary-80 outline-none focus:ring-1 focus:primary focus:bg-white transition-all duration-300"
                     required
                   />
                 </div>
@@ -77,7 +77,7 @@ export default function CandidateProfileEditPage() {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="Enter your email"
-                    className="w-full border-2 border-primary pl-12 pr-4 py-2 bg-neutral-light-20 rounded-xl text-primary-80 outline-none focus:ring-2 focus:ring-blue-400 focus:bg-white transition-all duration-300"
+                    className="w-full border border-primary-60 pl-12 pr-4 py-2 bg-neutral-light-20 rounded-xl text-primary-80 outline-none focus:ring-1 focus:primary focus:bg-white transition-all duration-300"
                     required
                   />
                 </div>
@@ -101,7 +101,7 @@ export default function CandidateProfileEditPage() {
                     value={gender}
                     onChange={(e) => setGender(e.target.value)}
                     placeholder="Enter your gender"
-                    className="w-full border-2 border-primary pl-12 pr-4 py-2 bg-neutral-light-20 rounded-xl text-primary-80 outline-none focus:ring-2 focus:ring-blue-400 focus:bg-white transition-all duration-300"
+                    className="w-full border border-primary-60 pl-12 pr-4 py-2 bg-neutral-light-20 rounded-xl text-primary-80 outline-none focus:ring-1 focus:primary focus:bg-white transition-all duration-300"
                     required
                   />
                 </div>
@@ -123,7 +123,7 @@ export default function CandidateProfileEditPage() {
                     value={phone}
                     onChange={(e) => setPhone(e.target.value)}
                     placeholder="Enter your phone number"
-                    className="w-full border-2 border-primary pl-12 pr-4 py-2 bg-neutral-light-20 rounded-xl text-primary-80 outline-none focus:ring-2 focus:ring-blue-400 focus:bg-white transition-all duration-300"
+                    className="w-full border border-primary-60 pl-12 pr-4 py-2 bg-neutral-light-20 rounded-xl text-primary-80 outline-none focus:ring-1 focus:primary focus:bg-white transition-all duration-300"
                     required
                   />
                 </div>
@@ -144,7 +144,7 @@ export default function CandidateProfileEditPage() {
                 value={intro}
                 onChange={(e) => setIntro(e.target.value)}
                 placeholder="Enter your self-introduction"
-                className="w-full border-2 border-primary pl-4 pr-4 py-2 bg-neutral-light-20 rounded-xl text-primary-80 outline-none focus:ring-2 focus:ring-blue-400 focus:bg-white transition-all duration-300"
+                className="w-full border border-primary-60 pl-4 pr-4 py-2 bg-neutral-light-20 rounded-xl text-primary-80 outline-none focus:ring-1 focus:primary focus:bg-white transition-all duration-300"
                 required
               />
             </div>
@@ -166,7 +166,7 @@ export default function CandidateProfileEditPage() {
                 value={location}
                 onChange={(e) => setLocation(e.target.value)}
                 placeholder="Enter your location detail"
-                className="w-full border-2 border-primary pl-12 pr-4 py-2 bg-neutral-light-20 rounded-xl text-primary-80 outline-none focus:ring-2 focus:ring-blue-400 focus:bg-white transition-all duration-300"
+                className="w-full border border-primary-60 pl-12 pr-4 py-2 bg-neutral-light-20 rounded-xl text-primary-80 outline-none focus:ring-1 focus:primary focus:bg-white transition-all duration-300"
                 required
               />
             </div>
@@ -190,7 +190,7 @@ export default function CandidateProfileEditPage() {
                     value={industry}
                     onChange={(e) => setIndustry(e.target.value)}
                     placeholder="Enter your industry"
-                    className="w-full border-2 border-primary pl-12 pr-4 py-2 bg-neutral-light-20 rounded-xl text-primary-80 outline-none focus:ring-2 focus:ring-blue-400 focus:bg-white transition-all duration-300"
+                    className="w-full border border-primary-60 pl-12 pr-4 py-2 bg-neutral-light-20 rounded-xl text-primary-80 outline-none focus:ring-1 focus:primary focus:bg-white transition-all duration-300"
                     required
                   />
                 </div>
@@ -212,7 +212,7 @@ export default function CandidateProfileEditPage() {
                     value={github}
                     onChange={(e) => setGithub(e.target.value)}
                     placeholder="Enter your Github ID"
-                    className="w-full border-2 border-primary pl-12 pr-4 py-2 bg-neutral-light-20 rounded-xl text-primary-80 outline-none focus:ring-2 focus:ring-blue-400 focus:bg-white transition-all duration-300"
+                    className="w-full border border-primary-60 pl-12 pr-4 py-2 bg-neutral-light-20 rounded-xl text-primary-80 outline-none focus:ring-1 focus:primary focus:bg-white transition-all duration-300"
                     required
                   />
                 </div>
@@ -234,7 +234,7 @@ export default function CandidateProfileEditPage() {
                     value={skill}
                     onChange={(e) => setSkill(e.target.value)}
                     placeholder="Enter your skills"
-                    className="w-full border-2 border-primary pl-12 pr-4 py-2 bg-neutral-light-20 rounded-xl text-primary-80 outline-none focus:ring-2 focus:ring-blue-400 focus:bg-white transition-all duration-300"
+                    className="w-full border border-primary-60 pl-12 pr-4 py-2 bg-neutral-light-20 rounded-xl text-primary-80 outline-none focus:ring-1 focus:primary focus:bg-white transition-all duration-300"
                     required
                   />
                 </div>
@@ -256,7 +256,7 @@ export default function CandidateProfileEditPage() {
                     value={workEx}
                     onChange={(e) => setWorkEx(e.target.value)}
                     placeholder="Enter your work experience"
-                    className="w-full border-2 border-primary pl-12 pr-4 py-2 bg-neutral-light-20 rounded-xl text-primary-80 outline-none focus:ring-2 focus:ring-blue-400 focus:bg-white transition-all duration-300"
+                    className="w-full border border-primary-60 pl-12 pr-4 py-2 bg-neutral-light-20 rounded-xl text-primary-80 outline-none focus:ring-1 focus:primary focus:bg-white transition-all duration-300"
                     required
                   />
                 </div>
@@ -280,7 +280,7 @@ export default function CandidateProfileEditPage() {
                     value={profession}
                     onChange={(e) => setProfession(e.target.value)}
                     placeholder="Enter your profession"
-                    className="w-full border-2 border-primary pl-12 pr-4 py-2 bg-neutral-light-20 rounded-xl text-primary-80 outline-none focus:ring-2 focus:ring-blue-400 focus:bg-white transition-all duration-300"
+                    className="w-full border border-primary-60 pl-12 pr-4 py-2 bg-neutral-light-20 rounded-xl text-primary-80 outline-none focus:ring-1 focus:primary focus:bg-white transition-all duration-300"
                     required
                   />
                 </div>
@@ -302,7 +302,7 @@ export default function CandidateProfileEditPage() {
                     value={linkedIn}
                     onChange={(e) => setLinkedIn(e.target.value)}
                     placeholder="Enter your Linkedin ID"
-                    className="w-full border-2 border-primary pl-12 pr-4 py-2 bg-neutral-light-20 rounded-xl text-primary-80 outline-none focus:ring-2 focus:ring-blue-400 focus:bg-white transition-all duration-300"
+                    className="w-full border border-primary-60 pl-12 pr-4 py-2 bg-neutral-light-20 rounded-xl text-primary-80 outline-none focus:ring-1 focus:primary focus:bg-white transition-all duration-300"
                     required
                   />
                 </div>
@@ -324,7 +324,7 @@ export default function CandidateProfileEditPage() {
                     value={website}
                     onChange={(e) => setWebsite(e.target.value)}
                     placeholder="Enter your website link"
-                    className="w-full border-2 border-primary pl-12 pr-4 py-2 bg-neutral-light-20 rounded-xl text-primary-80 outline-none focus:ring-2 focus:ring-blue-400 focus:bg-white transition-all duration-300"
+                    className="w-full border border-primary-60 pl-12 pr-4 py-2 bg-neutral-light-20 rounded-xl text-primary-80 outline-none focus:ring-1 focus:primary focus:bg-white transition-all duration-300"
                     required
                   />
                 </div>
@@ -346,7 +346,7 @@ export default function CandidateProfileEditPage() {
                     value={education}
                     onChange={(e) => setEducation(e.target.value)}
                     placeholder="Add education"
-                    className="w-full border-2 border-primary pl-12 pr-4 py-2 bg-neutral-light-20 rounded-xl text-primary-80 outline-none focus:ring-2 focus:ring-blue-400 focus:bg-white transition-all duration-300"
+                    className="w-full border border-primary-60 pl-12 pr-4 py-2 bg-neutral-light-20 rounded-xl text-primary-80 outline-none focus:ring-1 focus:primary focus:bg-white transition-all duration-300"
                     required
                   />
                 </div>
@@ -355,10 +355,10 @@ export default function CandidateProfileEditPage() {
           </div>
         </div>
         <div className="flex flex-wrap gap-4">
-          <div className="hover:bg-accent hover:text-neutral-light-60 cursor-pointer text-accent border-2 border-accent font-semibold rounded-2xl px-6 py-2">
+          <div className="hover:bg-accent hover:text-neutral-light-60 cursor-pointer text-accent border border-accent font-semibold rounded-2xl px-6 py-2">
             <a href="/candidate/profile">Cancel</a>
           </div>
-          <div className="bg-accent hover:text-accent hover:bg-neutral-light-60 cursor-pointer border-2 border-accent text-neutral-light-20 font-semibold rounded-2xl px-6 py-2">
+          <div className="bg-accent hover:text-accent hover:bg-neutral-light-60 cursor-pointer border border-accent text-neutral-light-20 font-semibold rounded-2xl px-6 py-2">
             <a href="/candidate/profile">Save</a>
           </div>
         </div>

@@ -1,6 +1,6 @@
 import ChangePassword from "../../../components/changePassword";
 
-export default function CandidateChangePasswordPage() {
+export default function RecruiterChangePasswordPage() {
   return (
     <div>
       <ChangePassword />;

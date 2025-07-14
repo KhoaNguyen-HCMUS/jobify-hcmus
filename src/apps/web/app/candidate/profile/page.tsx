@@ -68,22 +68,13 @@ export default function CandidateProfilePage() {
           </div>
           <div className="flex flex-col gap-2">
             <b className="text-primary">Introduce yourself:</b>
-            <span className="text-primary-80">
-              Hello, my name is Hinh Diem Xuan, a recent graduate in Software
-              Engineering - IT from University of Science. I have a strong
-              foundation in programming, databases, and web development, with
-              hands-on project experience. I'm passionate about technology,
-              eager to learn, and looking forward to contributing to impactful
-              projects in a professional environment
-            </span>
+            <span className="text-primary-80">{userData.introduce}</span>
           </div>
           <div className="flex flex-col gap-2">
             <b className="text-primary">Location detail:</b>
             <div className="flex flex-wrap gap-2 text-primary-80">
               <MapPin className="w-4 h-4" />
-              <span className="flex justify-between">
-                227 Nguyen Van Cu, district 5, Ho Chi Minh city, Viet Nam
-              </span>
+              <span className="flex justify-between">{userData.location}</span>
             </div>
           </div>
           <div className="flex flex-wrap">

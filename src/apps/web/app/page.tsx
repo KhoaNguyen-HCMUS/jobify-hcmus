@@ -21,11 +21,19 @@ import RecommendedPage from "./recommended/page";
 import CandidateDashboardPage from "./candidate/dashboard/page";
 import CandidateProfilePage from "./candidate/profile/page";
 import CandidateProfileEditPage from "./candidate/profile/edit/page";
-import ChangePasswordPage from "./candidate/change-password/page";
-import JobsSavedPage from "./candidate/saved-jobs/page";
-import JobsAppliedPage from "./candidate/jobs-applied/page";
-import NotificationsPage from "./candidate/notifications/page";
-import ReportsPage from "./candidate/reports/page";
+import CandidateChangePasswordPage from "./candidate/change-password/page";
+import CandidateJobsSavedPage from "./candidate/saved-jobs/page";
+import CandidateJobsAppliedPage from "./candidate/jobs-applied/page";
+import CandidateNotificationsPage from "./candidate/notifications/page";
+import CandidateReportsPage from "./candidate/reports/page";
+import RecruiterDashboardPage from "./recruiter/dashboard/page";
+import RecruiterProfilePage from "./recruiter/profile/page";
+import RecruiterProfileEditPage from "./recruiter/profile/edit/page";
+import RecruiterJobsPage from "./recruiter/jobs/page";
+import RecruiterChangePasswordPage from "./recruiter/change-password/page";
+import RecruiterNotificationsPage from "./recruiter/notifications/page";
+import RecruiterReportsPage from "./recruiter/reports/page";
+import RecruiterWalletPage from "./recruiter/wallet/page";
 
 export default function App() {
   const pathname = usePathname();
@@ -95,19 +103,43 @@ export default function App() {
         return <CandidateProfileEditPage />;
 
       case "/candidate/change-password":
-        return <ChangePasswordPage />;
+        return <CandidateChangePasswordPage />;
 
       case "/candidate/jobs-applied":
-        return <JobsAppliedPage />;
+        return <CandidateJobsAppliedPage />;
 
       case "/candidate/saved-jobs":
-        return <JobsSavedPage />;
+        return <CandidateJobsSavedPage />;
 
       case "/candidate/notifications":
-        return <NotificationsPage />;
+        return <CandidateNotificationsPage />;
 
       case "/candidate/reports":
-        return <ReportsPage />;
+        return <CandidateReportsPage />;
+
+      case "/recruiter/dashboard":
+        return <RecruiterDashboardPage />;
+
+      case "/recruiter/profile":
+        return <RecruiterProfilePage />;
+
+      case "/recruiter/profile/edit":
+        return <RecruiterProfileEditPage />;
+
+      case "/recruiter/jobs":
+        return <RecruiterJobsPage />;
+
+      case "/recruiter/wallet":
+        return <RecruiterWalletPage />;
+
+      case "/recruiter/change-password":
+        return <RecruiterChangePasswordPage />;
+
+      case "/recruiter/notifications":
+        return <RecruiterNotificationsPage />;
+
+      case "/recruiter/reports":
+        return <RecruiterReportsPage />;
 
       default:
         return <HomePage />;

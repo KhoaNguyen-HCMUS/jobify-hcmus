@@ -65,7 +65,7 @@ export default function NavBar() {
   ];
 
   const hrItems = [
-    { href: "/hr/dashboard", label: "Dashboard" },
+    { href: "/recruiter/dashboard", label: "Dashboard" },
     { href: "/support", label: "Support" },
     { href: "/about-us", label: "About Us" },
   ];

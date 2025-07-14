@@ -43,7 +43,7 @@ const reports = [
   },
 ];
 
-export default function CandidateReportsPage() {
+export default function RecruiterReportsPage() {
   const [currentPage, setCurrentPage] = useState(1);
 
   const REPORT_PER_PAGE = 5; // 4x3

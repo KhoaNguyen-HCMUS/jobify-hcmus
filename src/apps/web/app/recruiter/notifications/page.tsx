@@ -73,7 +73,7 @@ const notification = [
   },
 ];
 
-export default function CandidateNotificationsPage() {
+export default function RecruiterNotificationsPage() {
   const [currentPage, setCurrentPage] = useState(1);
 
   const NOTIFICATION_PER_PAGE = 5; // 4x3

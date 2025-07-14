@@ -17,27 +17,17 @@ const notifications = [
 export default function Notification() {
   return (
     <div className="flex flex-col">
-      <div className="flex justify-between px-4 py-2">
-        <div className="text-xl text-primary font-semibold">Notification</div>
-        <a href="/candidate/notifications">
-          <span className="text-accent font-semibold cursor-pointer">
-            See All
-          </span>
+      {notifications.map((notification, index) => (
+        <a
+          key={index}
+          href={notification.href}
+          className={`block py-2 px-4 rounded-2xl ${
+            index % 2 === 0 ? "bg-highlight-20" : "bg-highlight-60"
+          } text-primary hover:bg-highlight transition-colors`}
+        >
+          <span className="line-clamp-1">{notification.text}</span>
         </a>
-      </div>
-      <div className="flex flex-col">
-        {notifications.map((notification, index) => (
-          <a
-            key={index}
-            href={notification.href}
-            className={`block py-2 px-4 rounded-2xl ${
-              index % 2 === 0 ? "bg-highlight-20" : "bg-highlight-60"
-            } text-primary hover:bg-highlight transition-colors`}
-          >
-            <span className="line-clamp-1">{notification.text}</span>
-          </a>
-        ))}
-      </div>
+      ))}
     </div>
   );
 }

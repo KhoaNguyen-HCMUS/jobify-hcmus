@@ -1,3 +1,5 @@
+"use client";
+import { useState, useEffect } from "react";
 import {
   Lock,
   BellIcon,
@@ -6,15 +8,30 @@ import {
   TextSelect,
   User,
   TriangleAlert,
+  Wallet,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-//import Announcement from "../announcement";
 
 export default function SideBar() {
   const pathname = usePathname();
 
-  const sideBarItems = [
+  const [user, setUser] = useState<{
+    role: "candidate" | "hr" | "moderator";
+  } | null>(null);
+
+  useEffect(() => {
+    const storedUser = localStorage.getItem("user");
+    if (storedUser) {
+      try {
+        setUser(JSON.parse(storedUser));
+      } catch (err) {
+        console.error("Invalid user date in localStorage");
+      }
+    }
+  }, []);
+
+  const candidateItems = [
     {
       href: "/candidate/dashboard",
       label: "Dashboard",
@@ -52,6 +69,53 @@ export default function SideBar() {
     },
   ];
 
+  const recruiterItems = [
+    {
+      href: "/recruiter/dashboard",
+      label: "Dashboard",
+      icon: <TextSelect size={24} />,
+    },
+    {
+      href: "/recruiter/profile",
+      label: "Profile",
+      icon: <User size={24} />,
+    },
+    {
+      href: "/recruiter/jobs",
+      label: "My Jobs",
+      icon: <ShoppingBag size={24} />,
+    },
+    {
+      href: "/recruiter/wallet",
+      label: "Wallet",
+      icon: <Wallet size={24} />,
+    },
+    {
+      href: "/recruiter/change-password",
+      label: "Change Password",
+      icon: <Lock size={24} />,
+    },
+    {
+      href: "/recruiter/notifications",
+      label: "Notifications",
+      icon: <BellIcon size={24} />,
+    },
+    {
+      href: "/recruiter/reports",
+      label: "Report History",
+      icon: <TriangleAlert size={24} />,
+    },
+  ];
+
+  let sideBarItems = candidateItems;
+
+  if (user?.role === "candidate") {
+    sideBarItems = candidateItems;
+  } else if (user?.role === "hr") {
+    sideBarItems = recruiterItems;
+  }
+
+  if (!user) return null;
   return (
     <header
       className={`fixed md:flex top-20 left-0 bottom-0 z-50 w-72 transition-all duration-300 bg-neutral-light-40 backdrop-blur-md shadow-lg`}
@@ -60,7 +124,7 @@ export default function SideBar() {
         <div className="flex flex-col">
           {sideBarItems.map((item) => (
             <Link
-              key={item.href}
+              key={`${item.href}-${item.label}`}
               href={item.href}
               className={`relative px-4 font-medium transition-all duration-300 group hover:bg-neutral-light ${
                 pathname === item.href

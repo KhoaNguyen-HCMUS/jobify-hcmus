@@ -3,7 +3,7 @@ import { useState } from "react";
 import LeftArrow from "../../../components/arrowLeft";
 import RightArrow from "../../../components/arrowRight";
 import JobCard from "../../../components/job/jobCard";
-import RejectPendingSearch from "../../../components/rejectPendingSearch";
+import { Search } from "lucide-react";
 
 const jobs = [
   {
@@ -143,7 +143,8 @@ const jobs = [
   },
 ];
 
-export default function CandidateJobsAppliedPage() {
+export default function RecruiterJobsSavedPage() {
+  const [keyword, setKeyword] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
 
   const JOBS_PER_PAGE = 8;
@@ -168,7 +169,20 @@ export default function CandidateJobsAppliedPage() {
   return (
     <div className="w-full h-full bg-neutral-light-60">
       <div className="flex flex-col px-20 py-10 gap-6">
-        <RejectPendingSearch />
+        <div className="w-full flex justify-end">
+          <div className="relative w-full sm:w-96">
+            <input
+              type="text"
+              value={keyword}
+              onChange={(e) => setKeyword(e.target.value)}
+              placeholder="Enter keyword..."
+              className="pl-4 pr-10 py-2 w-full bg-neutral-light-20 rounded-full shadow-lg text-primary-80 outline-none focus:ring-2 focus:ring-blue-400 focus:bg-white transition-all duration-300"
+            />
+            <div className="absolute right-3 top-1/2 -translate-y-1/2 text-primary cursor-pointer">
+              <Search size={24} />
+            </div>
+          </div>
+        </div>
         <div className="w-full grid grid-cols-1 md:grid-cols-2 gap-x-20 gap-y-4">
           {currentJobs.map((job) => (
             <JobCard key={job.id} job={job} />

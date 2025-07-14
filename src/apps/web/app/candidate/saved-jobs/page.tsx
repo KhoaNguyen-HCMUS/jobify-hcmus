@@ -143,8 +143,7 @@ const jobs = [
   },
 ];
 
-export default function JobsSavedPage() {
-  const [keyword, setKeyword] = useState("");
+export default function CandidateJobsSavedPage() {
   const [currentPage, setCurrentPage] = useState(1);
 
   const JOBS_PER_PAGE = 8;

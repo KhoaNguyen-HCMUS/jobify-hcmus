@@ -116,7 +116,19 @@ export default function CandidateDashboardPage() {
             </div>
           </div>
           <div className="flex-1 bg-highlight-40 rounded-2xl shadow-lg">
-            <Notification />
+            <div className="flex flex-col">
+              <div className="flex justify-between px-4 py-2">
+                <div className="text-xl text-primary font-semibold">
+                  Notification
+                </div>
+                <a href="/candidate/notifications">
+                  <span className="text-accent font-semibold cursor-pointer">
+                    See All
+                  </span>
+                </a>
+              </div>
+              <Notification />
+            </div>
           </div>
         </div>
         <div className="flex flex-wrap gap-15">
