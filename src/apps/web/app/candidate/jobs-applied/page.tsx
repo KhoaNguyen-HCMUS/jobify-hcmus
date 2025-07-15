@@ -1,9 +1,8 @@
 "use client";
-import { useState } from "react";
-import LeftArrow from "../../../components/arrowLeft";
-import RightArrow from "../../../components/arrowRight";
 import JobCard from "../../../components/job/jobCard";
 import RejectPendingSearch from "../../../components/rejectPendingSearch";
+import usePagination from "../../../hooks/usePagination";
+import Pagination from "../../../components/pagination";
 
 const jobs = [
   {
@@ -144,63 +143,18 @@ const jobs = [
 ];
 
 export default function CandidateJobsAppliedPage() {
-  const [currentPage, setCurrentPage] = useState(1);
+  const { page, maxPage, current, next, prev } = usePagination(jobs, 8);
 
-  const JOBS_PER_PAGE = 8;
-  const totalPages = Math.ceil(jobs.length / JOBS_PER_PAGE);
-
-  // Tính toán jobs hiển thị trên trang hiện tại
-  const startIndex = (currentPage - 1) * JOBS_PER_PAGE;
-  const endIndex = startIndex + JOBS_PER_PAGE;
-  const currentJobs = jobs.slice(startIndex, endIndex);
-
-  const handlePreviousPage = () => {
-    if (currentPage > 1) {
-      setCurrentPage(currentPage - 1);
-    }
-  };
-
-  const handleNextPage = () => {
-    if (currentPage < totalPages) {
-      setCurrentPage(currentPage + 1);
-    }
-  };
   return (
     <div className="w-full h-full bg-neutral-light-60">
       <div className="flex flex-col px-20 py-10 gap-6">
         <RejectPendingSearch />
         <div className="w-full grid grid-cols-1 md:grid-cols-2 gap-x-20 gap-y-4">
-          {currentJobs.map((job) => (
+          {current.map((job) => (
             <JobCard key={job.id} job={job} />
           ))}
         </div>
-        <div className="w-full mt-4 mb-2 pb-6 flex justify-center items-center space-x-4">
-          <button
-            onClick={handlePreviousPage}
-            disabled={currentPage === 1}
-            className={`${
-              currentPage === 1
-                ? "opacity-50 cursor-not-allowed"
-                : "cursor-pointer"
-            }`}
-          >
-            <LeftArrow />
-          </button>
-          <span className="font-semibold text-lg">
-            {currentPage}/{totalPages}
-          </span>
-          <button
-            onClick={handleNextPage}
-            disabled={currentPage === totalPages}
-            className={`${
-              currentPage === totalPages
-                ? "opacity-50 cursor-not-allowed"
-                : "cursor-pointer"
-            }`}
-          >
-            <RightArrow />
-          </button>
-        </div>
+        <Pagination page={page} maxPage={maxPage} onNext={next} onPrev={prev} />
       </div>
     </div>
   );

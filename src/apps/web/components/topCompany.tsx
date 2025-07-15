@@ -1,9 +1,8 @@
 "use client";
-import { useState } from "react";
-import LeftArrow from "./arrowLeft";
-import RightArrow from "./arrowRight";
 import LocationFilter from "./locationFilter";
 import CompanyCard from "./companyCard";
+import usePagination from "../hooks/usePagination";
+import Pagination from "./pagination";
 
 const companies = [
   {
@@ -144,63 +143,24 @@ const companies = [
 ];
 
 export default function TopCompany() {
-  const [currentPage, setCurrentPage] = useState(1);
-
-  const COMPANY_PER_PAGE = 12; // 4x3
-  const totalPages = Math.ceil(companies.length / COMPANY_PER_PAGE);
-
-  // Tính toán companies hiển thị trên trang hiện tại
-  const startIndex = (currentPage - 1) * COMPANY_PER_PAGE;
-  const endIndex = startIndex + COMPANY_PER_PAGE;
-  const currentCompanies = companies.slice(startIndex, endIndex);
-
-  const handlePreviousPage = () => {
-    if (currentPage > 1) {
-      setCurrentPage(currentPage - 1);
-    }
-  };
-
-  const handleNextPage = () => {
-    if (currentPage < totalPages) {
-      setCurrentPage(currentPage + 1);
-    }
-  };
+  const { page, maxPage, current, next, prev } = usePagination(companies, 12);
 
   return (
     <div>
       <LocationFilter />
       <div className="mx-7">
         <div className="w-full grid grid-cols-1 md:grid-cols-3 gap-4">
-          {currentCompanies.map((company) => (
+          {current.map((company) => (
             <CompanyCard key={company.id} company={company} />
           ))}
         </div>
-        <div className="w-full mt-4 mb-2 pb-6 flex justify-center items-center space-x-4">
-          <button
-            onClick={handlePreviousPage}
-            disabled={currentPage === 1}
-            className={`${
-              currentPage === 1
-                ? "opacity-50 cursor-not-allowed"
-                : "cursor-pointer"
-            }`}
-          >
-            <LeftArrow />
-          </button>
-          <span className="font-semibold text-lg">
-            {currentPage}/{totalPages}
-          </span>
-          <button
-            onClick={handleNextPage}
-            disabled={currentPage === totalPages}
-            className={`${
-              currentPage === totalPages
-                ? "opacity-50 cursor-not-allowed"
-                : "cursor-pointer"
-            }`}
-          >
-            <RightArrow />
-          </button>
+        <div className="py-4">
+          <Pagination
+            page={page}
+            maxPage={maxPage}
+            onNext={next}
+            onPrev={prev}
+          />
         </div>
       </div>
     </div>

@@ -1,141 +1,103 @@
 "use client";
-import { useState } from "react";
 import Noti from "../../../components/noti";
-import LeftArrow from "../../../components/arrowLeft";
-import RightArrow from "../../../components/arrowRight";
+import usePagination from "../../../hooks/usePagination";
+import Pagination from "../../../components/pagination";
+
+interface NotificationProps {
+  noti: {
+    title: string;
+    text: string;
+    time: string;
+  };
+}
 
 const notification = [
   {
     title: "Welcome to Jobify!",
-    notification:
-      "Congratulations on successfully registering your Jobify account! You're now ready to explore thousands of exciting job",
+    text: "Congratulations on successfully registering your Jobify account! You're now ready to explore thousands of exciting job",
     time: "2 days ago",
   },
   {
     title: "Welcome to Jobify!",
-    notification:
-      "Congratulations on successfully registering your Jobify account! You're now ready to explore thousands of exciting job",
+    text: "Congratulations on successfully registering your Jobify account! You're now ready to explore thousands of exciting job",
     time: "2 days ago",
   },
   {
     title: "Welcome to Jobify!",
-    notification:
-      "Congratulations on successfully registering your Jobify account! You're now ready to explore thousands of exciting job",
+    text: "Congratulations on successfully registering your Jobify account! You're now ready to explore thousands of exciting job",
     time: "2 days ago",
   },
   {
     title: "Welcome to Jobify!",
-    notification:
-      "Congratulations on successfully registering your Jobify account! You're now ready to explore thousands of exciting job",
+    text: "Congratulations on successfully registering your Jobify account! You're now ready to explore thousands of exciting job",
     time: "2 days ago",
   },
   {
     title: "Welcome to Jobify!",
-    notification:
-      "Congratulations on successfully registering your Jobify account! You're now ready to explore thousands of exciting job",
+    text: "Congratulations on successfully registering your Jobify account! You're now ready to explore thousands of exciting job",
     time: "2 days ago",
   },
   {
     title: "Welcome to Jobify!",
-    notification:
-      "Congratulations on successfully registering your Jobify account! You're now ready to explore thousands of exciting job",
+    text: "Congratulations on successfully registering your Jobify account! You're now ready to explore thousands of exciting job",
     time: "2 days ago",
   },
   {
     title: "Welcome to Jobify!",
-    notification:
-      "Congratulations on successfully registering your Jobify account! You're now ready to explore thousands of exciting job",
+    text: "Congratulations on successfully registering your Jobify account! You're now ready to explore thousands of exciting job",
     time: "2 days ago",
   },
   {
     title: "Welcome to Jobify!",
-    notification:
-      "Congratulations on successfully registering your Jobify account! You're now ready to explore thousands of exciting job",
+    text: "Congratulations on successfully registering your Jobify account! You're now ready to explore thousands of exciting job",
     time: "2 days ago",
   },
   {
     title: "Welcome to Jobify!",
-    notification:
-      "Congratulations on successfully registering your Jobify account! You're now ready to explore thousands of exciting job",
+    text: "Congratulations on successfully registering your Jobify account! You're now ready to explore thousands of exciting job",
     time: "2 days ago",
   },
   {
     title: "Welcome to Jobify!",
-    notification:
-      "Congratulations on successfully registering your Jobify account! You're now ready to explore thousands of exciting job",
+    text: "Congratulations on successfully registering your Jobify account! You're now ready to explore thousands of exciting job",
     time: "2 days ago",
   },
   {
     title: "Welcome to Jobify!",
-    notification:
-      "Congratulations on successfully registering your Jobify account! You're now ready to explore thousands of exciting job",
+    text: "Congratulations on successfully registering your Jobify account! You're now ready to explore thousands of exciting job",
     time: "2 days ago",
   },
 ];
 
-export default function RecruiterNotificationsPage() {
-  const [currentPage, setCurrentPage] = useState(1);
-
-  const NOTIFICATION_PER_PAGE = 5; // 4x3
-  const totalPages = Math.ceil(notification.length / NOTIFICATION_PER_PAGE);
-
-  // Tính toán NOTIFICATION hiển thị trên trang hiện tại
-  const startIndex = (currentPage - 1) * NOTIFICATION_PER_PAGE;
-  const endIndex = startIndex + NOTIFICATION_PER_PAGE;
-  const currentNotification = notification.slice(startIndex, endIndex);
-
-  const handlePreviousPage = () => {
-    if (currentPage > 1) {
-      setCurrentPage(currentPage - 1);
-    }
-  };
-
-  const handleNextPage = () => {
-    if (currentPage < totalPages) {
-      setCurrentPage(currentPage + 1);
-    }
-  };
+export default function RecruiterNotificationsPage({
+  noti,
+}: NotificationProps) {
+  const { page, maxPage, current, next, prev } = usePagination(notification, 5);
 
   return (
     <div className="w-full h-screen bg-neutral-light-60">
       <div className="flex flex-col justify-between px-20 py-10 space-y-6">
-        <div className="text-accent font-bold text-3xl">Notification</div>
+        <div className="flex flex-nowrap justify-between">
+          <div className="text-accent font-bold text-3xl">Notification</div>
+          <button className="text-neutral-light-20 bg-accent px-6 py-2 rounded-full hover:bg-secondary cursor-pointer">
+            Mark all as read
+          </button>
+        </div>
         <div className="w-full grid grid-cols-1 gap-2 bg-highlight-40 shadow-2xl p-4">
-          {currentNotification?.map((noti, idx) => (
+          {current.map((noti, idx) => (
             <Noti
               key={idx}
               title={noti.title}
-              notification={noti.notification}
+              notification={noti.text}
               time={noti.time}
             />
           ))}
-          <div className="w-full mt-4 flex justify-center items-center space-x-4">
-            <button
-              onClick={handlePreviousPage}
-              disabled={currentPage === 1}
-              className={`${
-                currentPage === 1
-                  ? "opacity-50 cursor-not-allowed"
-                  : "cursor-pointer"
-              }`}
-            >
-              <LeftArrow />
-            </button>
-            <span className="font-semibold text-lg">
-              {currentPage}/{totalPages}
-            </span>
-            <button
-              onClick={handleNextPage}
-              disabled={currentPage === totalPages}
-              className={`${
-                currentPage === totalPages
-                  ? "opacity-50 cursor-not-allowed"
-                  : "cursor-pointer"
-              }`}
-            >
-              <RightArrow />
-            </button>
-          </div>
+          <Pagination
+            page={page}
+            maxPage={maxPage}
+            onNext={next}
+            onPrev={prev}
+          />
         </div>
       </div>
     </div>

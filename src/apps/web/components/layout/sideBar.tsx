@@ -117,8 +117,8 @@ export default function SideBar() {
 
   if (!user) return null;
   return (
-    <header
-      className={`fixed md:flex top-20 left-0 bottom-0 z-50 w-72 transition-all duration-300 bg-neutral-light-40 backdrop-blur-md shadow-lg`}
+    <aside
+      className={`fixed md:flex  top-20 left-0 bottom-0 z-50 w-72 transition-all duration-300 bg-neutral-light-40 backdrop-blur-md shadow-lg`}
     >
       <div className="container">
         <div className="flex flex-col">
@@ -140,6 +140,6 @@ export default function SideBar() {
           ))}
         </div>
       </div>
-    </header>
+    </aside>
   );
 }

@@ -1,11 +1,11 @@
 "use client";
 import JobCard from "../../components/job/jobCard";
 import KeywordSearch from "../../components/keywordSearch";
-import LeftArrow from "../../components/arrowLeft";
-import RightArrow from "../../components/arrowRight";
 import { useState } from "react";
 import MainCategoryItem from "../../components/mainCategoryItem";
 import { ChevronDown } from "lucide-react";
+import usePagination from "../../hooks/usePagination";
+import Pagination from "../../components/pagination";
 
 const jobs = [
   {
@@ -204,33 +204,10 @@ const mains = [
   },
 ];
 export default function RecommendedPage() {
+  const { page, maxPage, current, next, prev } = usePagination(jobs, 18);
   const [experience, setExperience] = useState("allExperience");
   const [salary, setSalary] = useState("allSalary");
   const [typeOfWork, setTypeOfWork] = useState("allTypeOfWork");
-
-  const [currentPage, setCurrentPage] = useState(1);
-
-  const JOBS_PER_PAGE = 18;
-  const totalPages = Math.ceil(jobs.length / JOBS_PER_PAGE);
-
-  // Tính toán jobs hiển thị trên trang hiện tại
-  const startIndex = (currentPage - 1) * JOBS_PER_PAGE;
-  const endIndex = startIndex + JOBS_PER_PAGE;
-  const currentJobs = jobs.slice(startIndex, endIndex);
-
-  const handlePreviousPage = () => {
-    if (currentPage > 1) {
-      setCurrentPage(currentPage - 1);
-    }
-  };
-
-  const handleNextPage = () => {
-    if (currentPage < totalPages) {
-      setCurrentPage(currentPage + 1);
-    }
-  };
-
-  const [open, setOpen] = useState(false);
 
   return (
     <div className="bg-neutral-light-40">
@@ -539,39 +516,18 @@ export default function RecommendedPage() {
                   Apply priority
                 </button>
               </div>
-              <div className="px-6">
+              <div className="px-6 pb-4">
                 <div className="w-full grid grid-cols-1 md:grid-cols-2 gap-x-20 gap-y-10 p-4">
-                  {currentJobs.map((job) => (
+                  {current.map((job) => (
                     <JobCard key={job.id} job={job} />
                   ))}
                 </div>
-                <div className="w-full mt-4 mb-2 pb-6 flex justify-center items-center space-x-4">
-                  <button
-                    onClick={handlePreviousPage}
-                    disabled={currentPage === 1}
-                    className={`${
-                      currentPage === 1
-                        ? "opacity-50 cursor-not-allowed"
-                        : "cursor-pointer"
-                    }`}
-                  >
-                    <LeftArrow />
-                  </button>
-                  <span className="font-semibold text-lg">
-                    {currentPage}/{totalPages}
-                  </span>
-                  <button
-                    onClick={handleNextPage}
-                    disabled={currentPage === totalPages}
-                    className={`${
-                      currentPage === totalPages
-                        ? "opacity-50 cursor-not-allowed"
-                        : "cursor-pointer"
-                    }`}
-                  >
-                    <RightArrow />
-                  </button>
-                </div>
+                <Pagination
+                  page={page}
+                  maxPage={maxPage}
+                  onNext={next}
+                  onPrev={prev}
+                />
               </div>
             </div>
           </div>

@@ -3,8 +3,8 @@ import { MapPin, Search, Unlink2, Users } from "lucide-react";
 import GoBack from "../../components/goBack";
 import { useState } from "react";
 import JobCard from "../../components/job/jobCard";
-import LeftArrow from "../../components/arrowLeft";
-import RightArrow from "../../components/arrowRight";
+import usePagination from "../../hooks/usePagination";
+import Pagination from "../../components/pagination";
 
 // interface CompanyProps {
 //   company: {
@@ -170,6 +170,8 @@ const jobs = [
 ];
 
 export default function CompanyDetailPage() {
+  const { page, maxPage, current, next, prev } = usePagination(jobs, 6);
+
   const [keyword, setKeyword] = useState("");
   const [address, setAddress] = useState("");
 
@@ -177,28 +179,6 @@ export default function CompanyDetailPage() {
     e.preventDefault();
     console.log("Key word: ", keyword);
     console.log("Address: ", address);
-  };
-
-  const [currentPage, setCurrentPage] = useState(1);
-
-  const JOBS_PER_PAGE = 6; // 3x2
-  const totalPages = Math.ceil(jobs.length / JOBS_PER_PAGE);
-
-  // Tính toán jobs hiển thị trên trang hiện tại
-  const startIndex = (currentPage - 1) * JOBS_PER_PAGE;
-  const endIndex = startIndex + JOBS_PER_PAGE;
-  const currentJobs = jobs.slice(startIndex, endIndex);
-
-  const handlePreviousPage = () => {
-    if (currentPage > 1) {
-      setCurrentPage(currentPage - 1);
-    }
-  };
-
-  const handleNextPage = () => {
-    if (currentPage < totalPages) {
-      setCurrentPage(currentPage + 1);
-    }
   };
 
   return (
@@ -312,36 +292,17 @@ export default function CompanyDetailPage() {
               <div>
                 <div className="mx-7">
                   <div className="w-full grid grid-cols-1 md:grid-cols-2 gap-x-20 gap-y-10">
-                    {currentJobs.map((job) => (
+                    {current.map((job) => (
                       <JobCard key={job.id} job={job} />
                     ))}
                   </div>
-                  <div className="w-full mt-4 mb-2 pb-6 flex justify-center items-center space-x-4">
-                    <button
-                      onClick={handlePreviousPage}
-                      disabled={currentPage === 1}
-                      className={`${
-                        currentPage === 1
-                          ? "opacity-50 cursor-not-allowed"
-                          : "cursor-pointer"
-                      }`}
-                    >
-                      <LeftArrow />
-                    </button>
-                    <span className="font-semibold text-lg">
-                      {currentPage}/{totalPages}
-                    </span>
-                    <button
-                      onClick={handleNextPage}
-                      disabled={currentPage === totalPages}
-                      className={`${
-                        currentPage === totalPages
-                          ? "opacity-50 cursor-not-allowed"
-                          : "cursor-pointer"
-                      }`}
-                    >
-                      <RightArrow />
-                    </button>
+                  <div className="py-4">
+                    <Pagination
+                      page={page}
+                      maxPage={maxPage}
+                      onNext={next}
+                      onPrev={prev}
+                    />
                   </div>
                 </div>
               </div>

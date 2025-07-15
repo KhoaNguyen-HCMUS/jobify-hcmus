@@ -16,18 +16,22 @@ const notifications = [
 ];
 export default function Notification() {
   return (
-    <div className="flex flex-col">
-      {notifications.map((notification, index) => (
-        <a
-          key={index}
-          href={notification.href}
-          className={`block py-2 px-4 rounded-2xl ${
-            index % 2 === 0 ? "bg-highlight-20" : "bg-highlight-60"
-          } text-primary hover:bg-highlight transition-colors`}
-        >
-          <span className="line-clamp-1">{notification.text}</span>
-        </a>
-      ))}
+    <div className="flex flex-col overflow-hidden">
+      {notifications.map((notification, index) => {
+        const isLast = index === notifications.length - 1;
+        return (
+          <a
+            key={index}
+            href={notification.href}
+            className={`block py-2 px-4 text-primary hover:bg-highlight transition-colors
+              ${index % 2 === 0 ? "bg-highlight-20" : "bg-highlight-60"}
+              ${isLast ? "rounded-b-2xl" : ""}
+            `}
+          >
+            <span className="line-clamp-1">{notification.text}</span>
+          </a>
+        );
+      })}
     </div>
   );
 }

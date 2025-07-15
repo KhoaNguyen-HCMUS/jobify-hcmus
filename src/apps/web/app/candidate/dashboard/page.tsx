@@ -1,8 +1,9 @@
 "use client";
-import { useState } from "react";
 import { FilePenLine, Mail, Phone, MapPin } from "lucide-react";
 import Notification from "../../../components/notification";
 import JobCard from "../../../components/job/jobCard";
+import usePagination from "../../../hooks/usePagination";
+import Pagination from "../../../components/pagination";
 
 const dashboard = [
   {
@@ -56,28 +57,9 @@ const jobs = [
   },
 ];
 
-export default function CandidateDashboardPage() {
-  const [currentPage, setCurrentPage] = useState(1);
+export default function CandidateDashboardPage({ dashboard }: DashboardProps) {
+  const { page, maxPage, current, next, prev } = usePagination(jobs, 2);
 
-  const JOBS_PER_PAGE = 2;
-  const totalPages = Math.ceil(jobs.length / JOBS_PER_PAGE);
-
-  // Tính toán jobs hiển thị trên trang hiện tại
-  const startIndex = (currentPage - 1) * JOBS_PER_PAGE;
-  const endIndex = startIndex + JOBS_PER_PAGE;
-  const currentJobs = jobs.slice(startIndex, endIndex);
-
-  const handlePreviousPage = () => {
-    if (currentPage > 1) {
-      setCurrentPage(currentPage - 1);
-    }
-  };
-
-  const handleNextPage = () => {
-    if (currentPage < totalPages) {
-      setCurrentPage(currentPage + 1);
-    }
-  };
   return (
     <div className="w-full h-full bg-neutral-light-60">
       <div className="flex flex-col px-20 py-10 gap-10">
@@ -86,27 +68,27 @@ export default function CandidateDashboardPage() {
             <div className="flex flex-wrap">
               <div className="p-4">
                 <img
-                  src={dashboard[0].avt}
-                  alt={dashboard[0].name}
+                  src={dashboard?.avt}
+                  alt={dashboard?.name}
                   className="w-40 h-44 object-contain rounded-2xl"
                 />
               </div>
               <div className="flex flex-col justify-center gap-4 p-4">
                 <span className="text-primary text-xl font-semibold">
-                  {dashboard[0].fullName}
+                  {dashboard?.fullName}
                 </span>
                 <div className="flex flex-col gap-2">
                   <span className="flex gap-2 text-primary">
                     <Mail size={24} />
-                    <span>{dashboard[0].email}</span>
+                    <span>{dashboard?.email}</span>
                   </span>
                   <span className="flex gap-2 text-primary">
                     <Phone size={24} />
-                    <span>{dashboard[0].email}</span>
+                    <span>{dashboard?.email}</span>
                   </span>
                   <span className="flex gap-2 text-primary">
                     <MapPin size={24} />
-                    <span>{dashboard[0].email}</span>
+                    <span>{dashboard?.email}</span>
                   </span>
                 </div>
               </div>
@@ -144,10 +126,16 @@ export default function CandidateDashboardPage() {
               </a>
             </div>
             <div className="flex flex-col gap-y-6 px-4 py-4">
-              {currentJobs.map((job) => (
+              {current.map((job) => (
                 <JobCard key={job.id} job={job} />
               ))}
             </div>
+            <Pagination
+              page={page}
+              maxPage={maxPage}
+              onNext={next}
+              onPrev={prev}
+            />
           </div>
           <div className="flex-1 flex flex-col bg-highlight-20 rounded-2xl p-4 shadow-lg">
             <div className="flex justify-between">
@@ -161,10 +149,16 @@ export default function CandidateDashboardPage() {
               </a>
             </div>
             <div className="flex flex-col gap-y-6 px-4 py-4">
-              {currentJobs.map((job) => (
+              {current.map((job) => (
                 <JobCard key={job.id} job={job} />
               ))}
             </div>
+            <Pagination
+              page={page}
+              maxPage={maxPage}
+              onNext={next}
+              onPrev={prev}
+            />
           </div>
         </div>
       </div>
