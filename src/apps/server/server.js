@@ -22,6 +22,12 @@ const companyRoutes = require('./routes/company.routes');
 app.use('/company', companyRoutes);
 const adminRoutes = require('./routes/admin.routes');
 app.use('/admin', adminRoutes);
+const notificationRoutes = require('./routes/notification.routes');
+app.use('/notifications', notificationRoutes);
+const announcementRoutes = require('./routes/announcement.routes');
+app.use('/announcements', announcementRoutes);
+const reportRoutes = require('./routes/report.routes');
+app.use('/reports', reportRoutes);
 
 // Health check route
 app.get('/api/health', (req, res) => {
