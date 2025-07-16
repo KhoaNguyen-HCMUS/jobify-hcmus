@@ -2,8 +2,6 @@ import { MapPin, Briefcase } from "lucide-react";
 import CompanyInformation from "../../../components/companyInformation";
 import Profession from "../../../components/profession";
 import Industry from "../../../components/industry";
-import Education from "../../../components/education";
-import WorkExperience from "../../../components/workExperience";
 
 export default function RecruiterProfilePage() {
   const userData = {

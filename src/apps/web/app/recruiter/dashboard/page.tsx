@@ -14,6 +14,7 @@ const jobs = [
     province: "Ho Chi Minh",
     image: "/google-logo.png",
     name: "Google Logo",
+    status: "shortlist",
   },
   {
     id: 2,
@@ -23,6 +24,7 @@ const jobs = [
     province: "Ha Noi",
     image: "/microsoft-logo.png",
     name: "Microsoft Logo",
+    status: "interview_request",
   },
   {
     id: 3,
@@ -32,6 +34,7 @@ const jobs = [
     province: "Ho Chi Minh",
     image: "/google-logo.png",
     name: "Google Logo",
+    status: "hire",
   },
   {
     id: 4,
@@ -41,6 +44,7 @@ const jobs = [
     province: "Ho Chi Minh",
     image: "/google-logo.png",
     name: "Google Logo",
+    status: "reject",
   },
   {
     id: 5,
@@ -50,6 +54,7 @@ const jobs = [
     province: "Ho Chi Minh",
     image: "/google-logo.png",
     name: "Google Logo",
+    status: "",
   },
 ];
 

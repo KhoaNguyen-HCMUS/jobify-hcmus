@@ -1,4 +1,5 @@
 import { Heart } from "lucide-react";
+import JobStatusBadge from "./jobStatusBadge";
 
 interface JobCardProps {
   job: {
@@ -8,13 +9,13 @@ interface JobCardProps {
     province: string;
     image: string;
     name: string;
-    isPending?: boolean;
+    status?: string;
   };
 }
 
 export default function JobCard({ job }: JobCardProps) {
   return (
-    <div className="bg-white rounded-2xl border border-gray-200 p-6 transition-transform duration-300 hover:-translate-y-2 hover:shadow-lg cursor-pointer">
+    <div className="bg-neutral-light-20 rounded-2xl border border-gray-200 p-6 transition-transform duration-300 hover:-translate-y-2 hover:shadow-lg cursor-pointer">
       <div className="flex items-center space-x-4 mb-4">
         <div className="w-16 h-16 rounded-xl overflow-hidden">
           <img
@@ -37,13 +38,7 @@ export default function JobCard({ job }: JobCardProps) {
         <span className="text-primary-80 font-semibold px-4 py-2 bg-accent-20 rounded-full">
           {job.province}
         </span>
-        {job.isPending ? (
-          <span className="text-highlight-20 font-semibold px-4 py-2 bg-accent-80 rounded-full">
-            Pending
-          </span>
-        ) : (
-          <span></span>
-        )}
+        <JobStatusBadge status={job.status} />
         <span className="text-primary-80">
           <Heart size={24} />
         </span>

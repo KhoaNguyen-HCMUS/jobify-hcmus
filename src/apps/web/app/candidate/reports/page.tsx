@@ -46,11 +46,8 @@ export default function RecruiterReportsPage({ report }: ReportProps) {
   return (
     <div className="w-full h-screen bg-neutral-light-60">
       <div className="flex flex-col justify-between px-20 py-10 space-y-6">
-        <div className="flex flex-nowrap justify-between">
+        <div className="flex justify-between">
           <div className="text-accent font-bold text-3xl">Report History</div>
-          <button className="text-neutral-light-20 bg-accent px-6 py-2 rounded-full hover:bg-secondary cursor-pointer">
-            Mark all as read
-          </button>
         </div>
         <div className="w-full grid grid-cols-1 gap-2 bg-highlight-40 shadow-2xl p-4">
           {current.map((report, idx) => (

@@ -15,6 +15,7 @@ export default function ApplyJobModal() {
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
+  const [description, setDescription] = useState("");
   const [isOpen, setIsOpen] = useState(false);
 
   useEffect(() => {
@@ -51,7 +52,7 @@ export default function ApplyJobModal() {
       {isOpen && (
         <div
           onClick={() => setIsOpen(false)}
-          className="fixed inset-0 bg-gray-700 z-50 flex items-center justify-center"
+          className="fixed inset-0 bg-primary-80 z-50 flex items-center justify-center"
         >
           <div
             onClick={(e) => e.stopPropagation()}
@@ -172,7 +173,7 @@ export default function ApplyJobModal() {
                     <div className="flex flex-wrap justify-between gap-10">
                       <div className="flex-1 flex flex-col">
                         <label
-                          htmlFor="fullName"
+                          htmlFor="email"
                           className="block text-sm text-primary"
                         >
                           Email*
@@ -229,9 +230,9 @@ export default function ApplyJobModal() {
                 </span>
                 <div className="relative border border-primary-60 bg-neutral-light-20 mb-4 rounded-xl">
                   <textarea
-                    id="phone"
-                    value={phone}
-                    onChange={(e) => setPhone(e.target.value)}
+                    id="description"
+                    value={description}
+                    onChange={(e) => setDescription(e.target.value)}
                     className="w-full h-32 px-4 py-3 pr-12 text-primary-60 placeholder-primary-60 focus:outline-none resize-none"
                     placeholder="Write a brief introduction about yourself (strengths, weaknesses) and clearly state your desire and reason for applying for this position."
                   ></textarea>
