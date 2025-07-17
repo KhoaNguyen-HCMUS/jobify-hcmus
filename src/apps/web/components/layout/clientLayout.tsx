@@ -38,6 +38,7 @@ export default function ClientLayout({
     "/job-detail",
     "/recommended",
     "/support",
+    "/recruiter/applications",
   ].includes(pathname);
 
   return (

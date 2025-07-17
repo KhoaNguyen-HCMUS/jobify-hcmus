@@ -1,9 +1,10 @@
 "use client";
 import { useState, useEffect } from "react";
 import JobCard from "../../../components/job/jobCard";
-import { CircleX, Plus, Search, ChevronDown, ChevronUp, X } from "lucide-react";
+import { CircleX, Plus, ChevronDown, ChevronUp, X } from "lucide-react";
 import usePagination from "../../../hooks/usePagination";
 import Pagination from "../../../components/pagination";
+import KeyWord from "@web/components/keyWord";
 
 const jobs = [
   {
@@ -167,7 +168,7 @@ export default function RecruiterJobsSavedPage() {
   const [benefit, setBenefit] = useState("");
 
   const { page, maxPage, current, next, prev } = usePagination(jobs, 8);
-  const [keyword, setKeyword] = useState("");
+
   const [isOpen, setIsOpen] = useState(false);
 
   const [selectedRelatedOccupations, setSelectedRelatedOccupations] = useState<
@@ -778,19 +779,7 @@ export default function RecruiterJobsSavedPage() {
               </div>
             </div>
           )}
-
-          <div className="relative w-full sm:w-96">
-            <input
-              type="text"
-              value={keyword}
-              onChange={(e) => setKeyword(e.target.value)}
-              placeholder="Enter keyword..."
-              className="pl-4 pr-10 py-2 w-full bg-neutral-light-20 rounded-full shadow-lg text-primary-80 outline-none focus:ring-2 focus:ring-blue-400 focus:bg-white transition-all duration-300"
-            />
-            <div className="absolute right-3 top-1/2 -translate-y-1/2 text-primary cursor-pointer">
-              <Search size={24} />
-            </div>
-          </div>
+          <KeyWord />
         </div>
         <div className="w-full grid grid-cols-1 md:grid-cols-2 gap-x-20 gap-y-4">
           {current.map((job) => (

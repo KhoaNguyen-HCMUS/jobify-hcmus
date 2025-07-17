@@ -34,6 +34,7 @@ import RecruiterChangePasswordPage from "./recruiter/change-password/page";
 import RecruiterNotificationsPage from "./recruiter/notifications/page";
 import RecruiterReportsPage from "./recruiter/reports/page";
 import RecruiterWalletPage from "./recruiter/wallet/page";
+import RecruiterApplicationsPage from "./recruiter/applications/page";
 
 export default function App() {
   const pathname = usePathname();
@@ -140,6 +141,9 @@ export default function App() {
 
       case "/recruiter/reports":
         return <RecruiterReportsPage />;
+
+      case "/recruiter/applications":
+        return <RecruiterApplicationsPage />;
 
       default:
         return <HomePage />;

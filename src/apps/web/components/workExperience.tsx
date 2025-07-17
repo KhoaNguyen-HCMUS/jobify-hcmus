@@ -23,13 +23,13 @@ export default function WorkExperience({
   timeRange,
 }: WorkExperienceProps) {
   return (
-    <div className=" flex flex-col gap-2">
+    <div className=" flex flex-col">
       <div className="text-primary font-semibold">{title}</div>
       <div className="text-secondary font-semibold">{company}</div>
       <div className="text-accent font-semibold">{timeRange}</div>
       <div className="flex flex-col">
         <span className="text-primary-80">Achievements:</span>
-        <div className="flex flex-col gap-2 px-2">
+        <div className="flex flex-col px-2">
           {achievements?.map((achievement, idx) => (
             <Achievement key={idx} achievement={achievement.achievement} />
           ))}

@@ -17,6 +17,7 @@ import {
   X,
 } from "lucide-react";
 import ApplyJobModal from "../../components/applyJobModal";
+import { useRouter } from "next/navigation";
 
 interface JobDetailProps {
   detail: {
@@ -54,6 +55,8 @@ const areaList = ["Sales", "Construction", "Python", "Design", "Marketing"];
 const skills = ["Sales", "Construction", "Python", "Design", "Marketing"];
 
 export default function JobDetailPage({ detail, isHR }: JobDetailProps) {
+  const router = useRouter();
+
   const [title, setTitle] = useState(detail?.title || "");
   const [deadline, setDeadline] = useState(detail?.deadline || "");
   const [location, setLocation] = useState(detail?.location || "");
@@ -1031,7 +1034,10 @@ export default function JobDetailPage({ detail, isHR }: JobDetailProps) {
               </div>
             )}
 
-            <button className="bg-secondary-60 hover:bg-secondary text-background px-6 py-2 rounded-full cursor-pointer">
+            <button
+              onClick={() => router.push("/recruiter/applications")}
+              className="bg-secondary-60 hover:bg-secondary text-background px-6 py-2 rounded-full cursor-pointer"
+            >
               View applications
             </button>
             <button className="bg-[#E91919] hover:bg-red-800 text-background px-6 py-2 rounded-full cursor-pointer">
