@@ -35,6 +35,15 @@ import RecruiterNotificationsPage from "./recruiter/notifications/page";
 import RecruiterReportsPage from "./recruiter/reports/page";
 import RecruiterWalletPage from "./recruiter/wallet/page";
 import RecruiterApplicationsPage from "./recruiter/applications/page";
+import OperatorCompanyPendingPage from "./operator/company-pending/page";
+import OperatorJobPendingPage from "./operator/job-pending/page";
+import OperatorReportsPage from "./operator/reports/page";
+import OperatorAnnouncementsPage from "./operator/announcements/page";
+import OperatorNotificationsPage from "./operator/notifications/page";
+import OperatorChangePasswordPage from "./operator/change-password/page";
+import OperatorUsersPage from "./operator/users/page";
+import OperatorLogsPage from "./operator/logs/page";
+import OperatorSystemSettingsPage from "./operator/system-settings/page";
 
 export default function App() {
   const pathname = usePathname();
@@ -144,6 +153,33 @@ export default function App() {
 
       case "/recruiter/applications":
         return <RecruiterApplicationsPage />;
+
+      case "/operator/company-pending":
+        return <OperatorCompanyPendingPage />;
+
+      case "/operator/job-pending":
+        return <OperatorJobPendingPage />;
+
+      case "/operator/reports":
+        return <OperatorReportsPage />;
+
+      case "/operator/announcements":
+        return <OperatorAnnouncementsPage />;
+
+      case "/operator/notifications":
+        return <OperatorNotificationsPage />;
+
+      case "/operator/change-password":
+        return <OperatorChangePasswordPage />;
+
+      case "/operator/users":
+        return <OperatorUsersPage />;
+
+      case "/operator/logs":
+        return <OperatorLogsPage />;
+
+      case "/operator/system-settings":
+        return <OperatorSystemSettingsPage />;
 
       default:
         return <HomePage />;

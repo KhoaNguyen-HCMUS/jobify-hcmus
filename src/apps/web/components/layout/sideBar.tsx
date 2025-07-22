@@ -1,4 +1,5 @@
 "use client";
+import React from "react";
 import { useState, useEffect } from "react";
 import {
   Lock,
@@ -107,12 +108,57 @@ export default function SideBar() {
     },
   ];
 
-  let sideBarItems = candidateItems;
+  const moderatorItems = [
+    {
+      href: "/operator/company-pending",
+      label: "Company Pending",
+    },
+    {
+      href: "/operator/job-pending",
+      label: "Job Pending",
+    },
+    {
+      href: "/operator/reports",
+      label: "Report",
+    },
+    {
+      href: "/operator/announcements",
+      label: "Announcements",
+    },
+    {
+      href: "/operator/notifications",
+      label: "Notifications",
+    },
+    {
+      href: "/operator/change-password",
+      label: "Change Password",
+    },
+    {
+      href: "/operator/users",
+      label: "User Management",
+    },
+    {
+      href: "/operator/logs",
+      label: "Logs",
+    },
+    {
+      href: "/operator/system-settings",
+      label: "System Management",
+    },
+  ];
+
+  let sideBarItems: {
+    href: string;
+    label: string;
+    icon?: React.ReactElement;
+  }[] = candidateItems;
 
   if (user?.role === "candidate") {
     sideBarItems = candidateItems;
   } else if (user?.role === "hr") {
     sideBarItems = recruiterItems;
+  } else if (user?.role === "moderator") {
+    sideBarItems = moderatorItems;
   }
 
   if (!user) return null;

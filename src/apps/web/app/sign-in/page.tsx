@@ -5,7 +5,7 @@ import LogoTagline from "../../components/logoTagline";
 
 export default function SignInPage() {
   // test navBar
-  localStorage.setItem("user", JSON.stringify({ role: "hr" }));
+  localStorage.setItem("user", JSON.stringify({ role: "moderator" }));
   window.location.href = "/";
 
   const [email, setEmail] = useState("");

@@ -133,7 +133,7 @@ const jobs = [
 const mains = [
   {
     id: 1,
-    category: "Software Engineer",
+    category: "Software & IT",
   },
   {
     id: 2,

@@ -71,7 +71,7 @@ export default function NavBar() {
   ];
 
   const moderatorItems = [
-    { href: "/operator/jobs-pending", label: "Approvals" },
+    { href: "/operator/company-pending", label: "Approvals" },
     { href: "/operator/reports", label: "Reports" },
     { href: "/operator/system-settings", label: "Settings" },
     { href: "/operator/logs", label: "Logs" },
@@ -158,13 +158,13 @@ export default function NavBar() {
               <>
                 <Link
                   href="/sign-up-with-role"
-                  className="px-6 py-2 text-primary border-2 border-primary rounded-lg font-medium transition-all duration-300 hover:bg-primary hover:text-white hover:shadow-lg hover:shadow-primary/30 transform hover:-translate-y-0.5"
+                  className="px-6 py-2 text-primary border-2 border-primary rounded-lg font-medium transition-all duration-300 hover:bg-primary hover:text-background hover:shadow-lg hover:shadow-primary/30 transform hover:-translate-y-0.5"
                 >
                   Sign up
                 </Link>
                 <Link
                   href="/sign-in"
-                  className="px-6 py-2 bg-primary border-2 border-primary text-background rounded-lg font-medium transition-all duration-300 hover:bg-primary/90 hover:shadow-lg hover:shadow-primary/30 transform hover:-translate-y-0.5"
+                  className="px-6 py-2 text-primary border-2 border-primary rounded-lg font-medium transition-all duration-300 hover:bg-primary hover:text-background hover:shadow-lg hover:shadow-primary/30 transform hover:-translate-y-0.5"
                 >
                   Sign in
                 </Link>
@@ -229,13 +229,13 @@ export default function NavBar() {
                 <div className="pt-4 space-y-2">
                   <Link
                     href="/sign-up-with-role"
-                    className="block w-full px-4 py-3 text-center text-primary border-2 border-primary rounded-lg font-medium transition-all duration-300 hover:bg-primary hover:text-white"
+                    className="block w-full px-4 py-3 text-center text-primary border-2 border-primary rounded-lg font-medium transition-all duration-300 hover:bg-primary hover:text-background"
                   >
                     Sign up
                   </Link>
                   <Link
                     href="/sign-in"
-                    className="block w-full px-4 py-3 text-center bg-primary text-background rounded-lg font-medium"
+                    className="block w-full px-4 py-3 text-center text-primary border-2 border-primary rounded-lg font-medium transition-all duration-300 hover:bg-primary hover:text-background"
                   >
                     Sign in
                   </Link>
