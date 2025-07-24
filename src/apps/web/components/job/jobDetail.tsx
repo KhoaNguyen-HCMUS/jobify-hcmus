@@ -18,9 +18,11 @@ import {
 } from "lucide-react";
 import ApplyJobModal from "../../components/applyJobModal";
 import { useRouter } from "next/navigation";
+import { useParams } from "next/navigation";
+import { jobs } from "../../components/fakeJob";
 
 interface JobDetailProps {
-  detail: {
+  details?: {
     title: string;
     salary: string;
     location: string;
@@ -54,34 +56,44 @@ const related = ["Sales", "Construction", "Python", "Design", "Marketing"];
 const areaList = ["Sales", "Construction", "Python", "Design", "Marketing"];
 const skills = ["Sales", "Construction", "Python", "Design", "Marketing"];
 
-export default function JobDetailPage({ detail, isHR }: JobDetailProps) {
+export default function JobDetail({ details, isHR }: JobDetailProps) {
+  const params = useParams();
+  const id = Array.isArray(params.id) ? params.id[0] : params.id;
+
+  const [job, setJob] = useState<any>(null);
+
+  useEffect(() => {
+    const jobFound = jobs.find((j) => j.id === Number(id));
+    setJob(jobFound ?? null);
+  }, [id]);
+
   const router = useRouter();
 
-  const [title, setTitle] = useState(detail?.title || "");
-  const [deadline, setDeadline] = useState(detail?.deadline || "");
-  const [location, setLocation] = useState(detail?.location || "");
-  const [salary, setSalary] = useState(detail?.salary || "");
-  const [experience, setExperience] = useState(detail?.experience || "");
-  const [rank, setRank] = useState(detail?.rank || "");
-  const [education, setEducation] = useState(detail?.education || "");
+  const [title, setTitle] = useState(job?.title || "");
+  const [deadline, setDeadline] = useState(job?.deadline || "");
+  const [location, setLocation] = useState(job?.location || "");
+  const [salary, setSalary] = useState(job?.salary || "");
+  const [experience, setExperience] = useState(job?.experience || "");
+  const [rank, setRank] = useState(job?.rank || "");
+  const [education, setEducation] = useState(job?.education || "");
   const [numberOfRecruits, setNumberOfRecruits] = useState(
-    detail?.numberOfRecruiter || ""
+    job?.numberOfRecruiter || ""
   );
-  const [formOfWork, setFormOfWork] = useState(detail?.formOfWork || "");
+  const [formOfWork, setFormOfWork] = useState(job?.formOfWork || "");
   const [relatedOccupations, setRelatedOccupations] = useState(
-    detail?.relatedOccupations || ""
+    job?.relatedOccupations || ""
   );
-  const [skill, setSkill] = useState(detail?.requiredSkills || "");
-  const [area, setArea] = useState(detail?.area || "");
-  const [workingTime, setWorkingTime] = useState(detail?.workingTime || "");
-  const [workPlace, setWorkPlace] = useState(detail?.workPlace || "");
+  const [skill, setSkill] = useState(job?.requiredSkills || "");
+  const [area, setArea] = useState(job?.area || "");
+  const [workingTime, setWorkingTime] = useState(job?.workingTime || "");
+  const [workPlace, setWorkPlace] = useState(job?.workPlace || "");
   const [jobDescription, setJobDescription] = useState(
-    detail?.jobDescription || ""
+    job?.jobDescription || ""
   );
   const [applicantRequirements, setApplicantRequirements] = useState(
-    detail?.applicantRequirements || ""
+    job?.applicantRequirements || ""
   );
-  const [benefit, setBenefit] = useState(detail?.benefit || "");
+  const [benefit, setBenefit] = useState(job?.benefit || "");
 
   const isHrSafe = isHR ?? true;
 
@@ -137,7 +149,7 @@ export default function JobDetailPage({ detail, isHR }: JobDetailProps) {
         <div className="flex-2 space-y-4">
           <div className="flex flex-col justify-between bg-neutral-light-20 shadow-xl rounded-3xl space-y-4 p-6">
             <div className="text-primary font-semibold text-2xl">
-              {detail?.title}
+              {job?.title}
             </div>
             <div className="flex flex-wrap gap-4 justify-between">
               <div className="flex items-center gap-2">
@@ -150,7 +162,7 @@ export default function JobDetailPage({ detail, isHR }: JobDetailProps) {
                     Salary
                   </div>
                   <div className="text-primary-80 font-semibold">
-                    {detail?.salary}
+                    {job?.salary}
                   </div>
                 </div>
               </div>
@@ -164,7 +176,7 @@ export default function JobDetailPage({ detail, isHR }: JobDetailProps) {
                     Location
                   </div>
                   <div className="text-primary-80 font-semibold">
-                    {detail?.location}
+                    {job?.location}
                   </div>
                 </div>
               </div>
@@ -178,7 +190,7 @@ export default function JobDetailPage({ detail, isHR }: JobDetailProps) {
                     Experience
                   </div>
                   <div className="text-primary-80 font-semibold">
-                    {detail?.experience}
+                    {job?.experience}
                   </div>
                 </div>
               </div>
@@ -189,7 +201,7 @@ export default function JobDetailPage({ detail, isHR }: JobDetailProps) {
                   <Clock size={24} />
                 </div>
                 <span className="w-full pl-10 pr-4 py-2 text-lg font-semibold rounded-xl text-primary-80 ">
-                  Deadline: {detail?.deadline}
+                  Deadline: {job?.deadline}
                 </span>
               </div>
               <div className="flex flex-wrap gap-4">
@@ -200,7 +212,7 @@ export default function JobDetailPage({ detail, isHR }: JobDetailProps) {
                     disabled
                     className="px-6 py-2 bg-accent rounded-full text-background font-semibold text-lg cursor-not-allowed"
                   >
-                    Applied: {detail?.current}/{detail?.max}
+                    Applied: {job?.current}/{job?.max}
                   </button>
                 )}
                 <a
@@ -217,11 +229,11 @@ export default function JobDetailPage({ detail, isHR }: JobDetailProps) {
           <div className="flex flex-col justify-between bg-neutral-light-20 shadow-xl rounded-3xl space-y-4 p-6">
             <div className="flex px-2">
               <img
-                src={detail?.image}
-                alt={detail?.companyName}
+                src={job?.image}
+                alt={job?.companyName}
                 className="border-1 rounded-xs"
               />
-              <div className="text-primary">{detail?.companyName}</div>
+              <div className="text-primary">{job?.companyName}</div>
             </div>
             <div className="px-4 space-y-3">
               <div className="flex gap-10">
@@ -229,21 +241,21 @@ export default function JobDetailPage({ detail, isHR }: JobDetailProps) {
                   <Users size={24} className="text-primary" />
                   <span className="text-primary font-semibold">Scale: </span>
                 </div>
-                <span className="text-primary-80">{detail?.scale}</span>
+                <span className="text-primary-80">{job?.scale}</span>
               </div>
               <div className="flex gap-10">
                 <div className="flex gap-2">
                   <BriefcaseBusiness size={24} className="text-primary" />
                   <span className="text-primary font-semibold">Field: </span>
                 </div>
-                <span className="text-primary-80">{detail?.field}</span>
+                <span className="text-primary-80">{job?.field}</span>
               </div>
               <div className="flex gap-3">
                 <div className="flex gap-2">
                   <MapPin size={24} className="text-primary" />
                   <span className="text-primary font-semibold">Location: </span>
                 </div>
-                <span className="text-primary-80">{detail?.location}</span>
+                <span className="text-primary-80">{job?.location}</span>
               </div>
             </div>
             <div className="flex space-x-1 text-accent font-semibold justify-center">
@@ -265,37 +277,33 @@ export default function JobDetailPage({ detail, isHR }: JobDetailProps) {
               <div className="flex flex-col justify-between px-6 space-y-4 mt-4">
                 <div className="">
                   <h2 className="font-semibold text-accent">Job Description</h2>
-                  <p className="text-primary">{detail?.jobDescription}</p>
+                  <p className="text-primary">{job?.jobDescription}</p>
                 </div>
                 <div>
                   <h2 className="font-semibold text-accent">
                     Applicant Requirements
                   </h2>
-                  <p className="text-primary">
-                    {detail?.applicantRequirements}
-                  </p>
+                  <p className="text-primary">{job?.applicantRequirements}</p>
                 </div>
                 <div>
                   <h2 className="font-semibold text-accent">Benefit</h2>
-                  <p className="text-primary">{detail?.benefit}</p>
+                  <p className="text-primary">{job?.benefit}</p>
                 </div>
                 <div>
                   <h2 className="font-semibold text-accent">Right</h2>
-                  <p className="text-primary">{detail?.right}</p>
+                  <p className="text-primary">{job?.right}</p>
                 </div>
                 <div>
                   <h2 className="font-semibold text-accent">Work Place</h2>
-                  <p className="text-primary">{detail?.workPlace}</p>
+                  <p className="text-primary">{job?.workPlace}</p>
                 </div>
                 <div>
                   <h2 className="font-semibold text-accent">Working Time</h2>
-                  <p className="text-primary">{detail?.workingTime}</p>
+                  <p className="text-primary">{job?.workingTime}</p>
                 </div>
                 <div>
                   <h2 className="font-semibold text-accent">Apply now!</h2>
-                  <p className="text-primary">
-                    {detail?.applicationInformation}
-                  </p>
+                  <p className="text-primary">{job?.applicationInformation}</p>
                 </div>
               </div>
               <div>
@@ -327,7 +335,7 @@ export default function JobDetailPage({ detail, isHR }: JobDetailProps) {
                       <span className="text-secondary font-semibold">
                         Ranks
                       </span>
-                      <span className="text-secondary-80">{detail?.rank}</span>
+                      <span className="text-secondary-80">{job?.rank}</span>
                     </div>
                   </div>
                   <div className="flex px-4 gap-4">
@@ -340,7 +348,7 @@ export default function JobDetailPage({ detail, isHR }: JobDetailProps) {
                         Education
                       </span>
                       <span className="text-secondary-80">
-                        {detail?.education}
+                        {job?.education}
                       </span>
                     </div>
                   </div>
@@ -354,7 +362,7 @@ export default function JobDetailPage({ detail, isHR }: JobDetailProps) {
                         Number of recruits
                       </span>
                       <span className="text-secondary-80">
-                        {detail?.numberOfRecruiter}
+                        {job?.numberOfRecruiter}
                       </span>
                     </div>
                   </div>
@@ -368,7 +376,7 @@ export default function JobDetailPage({ detail, isHR }: JobDetailProps) {
                         Form of work
                       </span>
                       <span className="text-secondary-80">
-                        {detail?.formOfWork}
+                        {job?.formOfWork}
                       </span>
                     </div>
                   </div>
@@ -389,7 +397,7 @@ export default function JobDetailPage({ detail, isHR }: JobDetailProps) {
                     </span>
                     <div className="grid grid-cols-2 gap-4 p-2">
                       <span className="bg-highlight-40 rounded-full px-4 py-2 text-center text-primary font-semibold">
-                        {detail?.relatedOccupations}
+                        {job?.relatedOccupations}
                       </span>
                     </div>
                   </div>
@@ -399,7 +407,7 @@ export default function JobDetailPage({ detail, isHR }: JobDetailProps) {
                     </span>
                     <div className="grid grid-cols-2 gap-4 p-2">
                       <span className="bg-highlight-40 rounded-full px-4 py-2 text-center text-primary font-semibold">
-                        {detail?.requiredSkills}
+                        {job?.requiredSkills}
                       </span>
                     </div>
                   </div>
@@ -409,7 +417,7 @@ export default function JobDetailPage({ detail, isHR }: JobDetailProps) {
                     </span>
                     <div className="grid grid-cols-2 gap-4 p-2">
                       <span className="bg-highlight-40 rounded-full px-4 py-2 text-center text-primary font-semibold">
-                        {detail?.area}
+                        {job?.area}
                       </span>
                     </div>
                   </div>

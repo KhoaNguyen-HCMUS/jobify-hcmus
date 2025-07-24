@@ -4,6 +4,7 @@ import Notification from "../../../components/notification";
 import JobCard from "../../../components/job/jobCard";
 import usePagination from "../../../hooks/usePagination";
 import Pagination from "../../../components/pagination";
+import { jobs } from "../../../components/fakeJob";
 
 const dashboard = [
   {
@@ -26,36 +27,6 @@ interface DashboardProps {
     location: string;
   };
 }
-
-const jobs = [
-  {
-    id: 1,
-    title: "Senior Frontend Developer",
-    company: "Google",
-    salary: "2000 - 3000$",
-    province: "Ho Chi Minh",
-    image: "/google-logo.png",
-    name: "Google Logo",
-  },
-  {
-    id: 2,
-    title: "Backend Developer",
-    company: "Microsoft",
-    salary: "1800 - 2800$",
-    province: "Ha Noi",
-    image: "/microsoft-logo.png",
-    name: "Microsoft Logo",
-  },
-  {
-    id: 3,
-    title: "Senior Frontend Developer",
-    company: "Google",
-    salary: "2000 - 3000$",
-    province: "Ho Chi Minh",
-    image: "/google-logo.png",
-    name: "Google Logo",
-  },
-];
 
 export default function CandidateDashboardPage({ dashboard }: DashboardProps) {
   const { page, maxPage, current, next, prev } = usePagination(jobs, 2);

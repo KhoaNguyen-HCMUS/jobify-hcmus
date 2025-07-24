@@ -4,59 +4,7 @@ import Notification from "../../../components/notification";
 import JobCard from "../../../components/job/jobCard";
 import usePagination from "../../../hooks/usePagination";
 import Pagination from "../../../components/pagination";
-
-const jobs = [
-  {
-    id: 1,
-    title: "Senior Frontend Developer",
-    company: "Google",
-    salary: "2000 - 3000$",
-    province: "Ho Chi Minh",
-    image: "/google-logo.png",
-    name: "Google Logo",
-    status: "shortlist",
-  },
-  {
-    id: 2,
-    title: "Backend Developer",
-    company: "Microsoft",
-    salary: "1800 - 2800$",
-    province: "Ha Noi",
-    image: "/microsoft-logo.png",
-    name: "Microsoft Logo",
-    status: "interview_request",
-  },
-  {
-    id: 3,
-    title: "Senior Frontend Developer",
-    company: "Google",
-    salary: "2000 - 3000$",
-    province: "Ho Chi Minh",
-    image: "/google-logo.png",
-    name: "Google Logo",
-    status: "hire",
-  },
-  {
-    id: 4,
-    title: "Senior Frontend Developer",
-    company: "Google",
-    salary: "2000 - 3000$",
-    province: "Ho Chi Minh",
-    image: "/google-logo.png",
-    name: "Google Logo",
-    status: "reject",
-  },
-  {
-    id: 5,
-    title: "Senior Frontend Developer",
-    company: "Google",
-    salary: "2000 - 3000$",
-    province: "Ho Chi Minh",
-    image: "/google-logo.png",
-    name: "Google Logo",
-    status: "",
-  },
-];
+import { jobs } from "../../../components/fakeJob";
 
 interface CompanyProps {
   company: {

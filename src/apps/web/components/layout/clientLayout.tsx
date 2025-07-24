@@ -22,24 +22,25 @@ export default function ClientLayout({
     "/pending-approval",
   ].includes(pathname);
 
-  const hideSideBar = [
-    "/auth/login",
-    "/",
-    "/auth/register",
-    "/forgot-password",
-    "/forgot-password-second",
-    "/forgot-password-third",
-    "/register/candidate",
-    "/register/company",
-    "/pending-approval",
-    "/about-us",
-    "/jobs",
-    "/company-detail",
-    "/job-detail",
-    "/recommended",
-    "/support",
-    "/recruiter/applications",
-  ].includes(pathname);
+  const hideSideBar =
+    [
+      "/auth/login",
+      "/",
+      "/auth/register",
+      "/forgot-password",
+      "/forgot-password-second",
+      "/forgot-password-third",
+      "/register/candidate",
+      "/register/company",
+      "/pending-approval",
+      "/about-us",
+      "/jobs",
+      "/company-detail",
+      "/job-detail",
+      "/recommended",
+      "/support",
+      "/recruiter/applications",
+    ].includes(pathname) || pathname.startsWith("/jobs/");
 
   return (
     <>

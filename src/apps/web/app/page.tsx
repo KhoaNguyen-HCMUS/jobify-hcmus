@@ -5,7 +5,6 @@ import { useEffect, useState } from "react";
 import HomePage from "./home/page";
 import LogInPage from "./auth/login/page";
 import RegisterPage from "./auth/register/page";
-import JobDetailPage from "./job-detail/page";
 import JobsPage from "./jobs/page";
 import CandidateRegistrationPage from "./register/candidate/page";
 import CompanyRegistrationPage from "./register/company/page";
@@ -67,9 +66,6 @@ export default function App() {
       case "/jobs":
         return <JobsPage />;
 
-      case "/job-detail":
-        return <JobDetailPage />;
-
       case "/register/candidate":
         return <CandidateRegistrationPage />;
 
@@ -80,7 +76,7 @@ export default function App() {
         return <PendingApprovalPage />;
 
       case "/forgot-password":
-        return <ForgotPasswordFirstPage />;
+        return <ForgotPasswordPage />;
 
       case "/forgot-password-second":
         return <ForgotPasswordSecondPage />;

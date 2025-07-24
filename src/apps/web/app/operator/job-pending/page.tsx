@@ -1,6 +1,6 @@
 "use client";
 import { BookUp } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import KeyWord from "@web/components/keyWord";
 
 interface JobPendingProps {
@@ -28,16 +28,6 @@ const notes = ["Moderator's Note"];
 
 const randomItem = (arr: any[]) => arr[Math.floor(Math.random() * arr.length)];
 
-const apps = Array.from({ length: 30 }, (_, i) => ({
-  id: (i + 1).toString(),
-  date: randomItem(dates),
-  jobTitle: randomItem(jobTitles),
-  status: randomItem(statuss),
-  detail: <BookUp />,
-  time: randomItem(times),
-  note: randomItem(notes),
-}));
-
 export default function OperatorJobPendingPage({ job }: JobPendingProps) {
   const [fromDate, setFromDate] = useState("");
   const [toDate, setToDate] = useState("");
@@ -53,6 +43,22 @@ export default function OperatorJobPendingPage({ job }: JobPendingProps) {
     setSelectedJobId(id);
     setShowModal(true);
   };
+
+  const [apps, setApps] = useState<any[]>([]);
+
+  useEffect(() => {
+    const generatedApps = Array.from({ length: 30 }, (_, i) => ({
+      id: (i + 1).toString(),
+      date: randomItem(dates),
+      jobTitle: randomItem(jobTitles),
+      status: randomItem(statuss),
+      detail: <BookUp />,
+      time: randomItem(times),
+      note: randomItem(notes),
+    }));
+
+    setApps(generatedApps);
+  }, []);
 
   const selectedJob = apps.find((c) => c.id === selectedJobId);
 
@@ -109,25 +115,25 @@ export default function OperatorJobPendingPage({ job }: JobPendingProps) {
                   }`}
                 >
                   <td className="w-4/13 border border-primary-60 p-2">
-                    <span className="line-clamp-1">{job.jobTitle}</span>
+                    <span className="line-clamp-1">{job?.jobTitle}</span>
                   </td>
                   <td className="w-2/13 border border-primary-60 p-2">
                     <span className="flex justify-center line-clamp-1">
-                      {job.status}
+                      {job?.status}
                     </span>
                   </td>
                   <td className="w-1/13 border border-primary-60 p-2">
                     <span className="flex justify-center line-clamp-1">
-                      {job.detail}
+                      {job?.detail}
                     </span>
                   </td>
                   <td className="w-3/13 border border-primary-60 p-2">
                     <span className="flex justify-center items-center line-clamp-1">
-                      {job.date} - {job.time}
+                      {job?.date} - {job?.time}
                     </span>
                   </td>
                   <td className="w-4/13 border border-primary-60 p-2">
-                    <span className="line-clamp-1">{job.note}</span>
+                    <span className="line-clamp-1">{job?.note}</span>
                   </td>
                 </tr>
               ))}
@@ -136,10 +142,10 @@ export default function OperatorJobPendingPage({ job }: JobPendingProps) {
           {showModal && selectedJob && (
             <div
               onClick={() => {
-                setShowModal(true);
+                setShowModal(false);
                 setSelectedJobId(null);
               }}
-              className="fixed inset-0 z-50 flex justify-center items-center"
+              className="fixed inset-0 bg-primary-80 z-50 flex items-center justify-center"
             >
               <div
                 onClick={(e) => e.stopPropagation()}
