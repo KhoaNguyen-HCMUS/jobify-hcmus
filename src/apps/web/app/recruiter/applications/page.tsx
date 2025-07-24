@@ -7,7 +7,7 @@ import {
   Briefcase,
   GraduationCap,
 } from "lucide-react";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import KeyWord from "../../../components/keyWord";
 import Skills from "../../../components/skills";

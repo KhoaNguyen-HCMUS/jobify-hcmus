@@ -1,9 +1,6 @@
 "use client";
-import { FilePenLine, Mail, Phone, MapPin } from "lucide-react";
-import Notification from "../../../components/notification";
-import JobCard from "../../../components/job/jobCard";
-import usePagination from "../../../hooks/usePagination";
-import Pagination from "../../../components/pagination";
+import { BookUp } from "lucide-react";
+import { useState } from "react";
 import KeyWord from "@web/components/keyWord";
 
 interface CompanyPendingProps {
@@ -18,27 +15,119 @@ interface CompanyPendingProps {
   };
 }
 
+const companyNames = [
+  "Chuyên Viên Kinh Doanh",
+  "Nhân Viên Tư Vấn",
+  "Quản Lý Dự Án",
+  "Kỹ Sư Phần Mềm",
+  "Nhân Sự Tuyển Dụng",
+];
+const statuss = ["Pending"];
+const flags = ["1"];
+const dates = ["01/07/2025"];
+const times = ["15:11:03"];
+const notes = ["Moderator's Note"];
+
+const randomItem = (arr: any[]) => arr[Math.floor(Math.random() * arr.length)];
+
+const apps = Array.from({ length: 30 }, (_, i) => ({
+  id: (i + 1).toString(),
+  date: randomItem(dates),
+  companyName: randomItem(companyNames),
+  status: randomItem(statuss),
+  flag: randomItem(flags),
+  profile: <BookUp />,
+  time: randomItem(times),
+  note: randomItem(notes),
+}));
+
 export default function OperatorCompanyPendingPage({
   company,
 }: CompanyPendingProps) {
+  const [fromDate, setFromDate] = useState("");
+  const [toDate, setToDate] = useState("");
+
+  const handleFilter = () => {
+    console.log("Filter from: ", fromDate, "to: ", toDate);
+  };
+
   return (
-    <div className="w-full h-full bg-neutral-light-60">
-      <div className="flex flex-col px-20 py-10 gap-10">
-        <div className="flex justify-between">
+    <div className="w-full min-h-screen bg-neutral-light-60">
+      <div className="flex flex-col px-6 lg:px-20 py-10 gap-10">
+        <div className="flex flex-wrap justify-between">
           <KeyWord />
-          <div className="flex gap-2">
-            <b className="text-primary">Request Time:</b>
-            <span className="text-primary-80">form</span>
-            <span className="bg-neutral-light text-primary px-6 rounded-full"></span>
-            <span className="text-primary-80">to</span>
-            <span className="bg-neutral-light text-primary px-6 rounded-full"></span>
-            <span className="bg-accent text-neutral-light-20 px-6 rounded-full">
+          <div className="flex gap-2 text-primary">
+            <b className="pt-2">Request Time:</b>
+            <span className="text-primary-80 pt-2">from</span>
+            <input
+              type="date"
+              value={fromDate}
+              onChange={(e) => setFromDate(e.target.value)}
+              className="bg-neutral-light-20 border border-primary-60 rounded-full px-4"
+            />
+            <span className="text-primary-80 pt-2">to</span>
+            <input
+              type="date"
+              value={toDate}
+              onChange={(e) => setToDate(e.target.value)}
+              className="bg-neutral-light-20 border border-primary-60 rounded-full px-4"
+            />
+            <button className="bg-accent hover:bg-secondary cursor-pointer text-neutral-light-20 px-4 py-1 rounded-full">
               Filter
-            </span>
+            </button>
           </div>
         </div>
-
-        <div></div>
+        <div>
+          <table className="w-full table-fixed">
+            <thead>
+              <tr className="bg-primary text-neutral-light-20 align-middle">
+                <th className="w-4/15 border border-primary-60 p-2">
+                  Company Name
+                </th>
+                <th className="w-2/15 border border-primary-60 p-2">Status</th>
+                <th className="w-1/15 border border-primary-60 p-2">Flag</th>
+                <th className="w-1/15 border border-primary-60 p-2">Profile</th>
+                <th className="w-3/15 border border-primary-60 p-2">
+                  Request Time
+                </th>
+                <th className="w-4/15 border border-primary-60 p-2">
+                  Moderator's Note
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {apps.map((company, index) => (
+                <tr
+                  key={company.id}
+                  className={`py-2 px-4 text-primary-80 hover:bg-highlight transition-colors ${
+                    index % 2 === 0 ? "bg-highlight-20" : "bg-highlight-40"
+                  }`}
+                >
+                  <td className="w-4/15 border border-primary-60 p-2">
+                    <span className="line-clamp-1">{company.companyName}</span>
+                  </td>
+                  <td className="w-2/15 border border-primary-60 p-2">
+                    <span className="line-clamp-1">{company.status}</span>
+                  </td>
+                  <td className="w-1/15 border border-primary-60 p-2">
+                    <span className="line-clamp-1">{company.flag}</span>
+                  </td>
+                  <td className="w-1/15 border border-primary-60 p-2">
+                    <span className="line-clamp-1">{company.profile}</span>
+                  </td>
+                  <td className="w-3/15 border border-primary-60 p-2">
+                    <span className="flex justify-center items-center line-clamp-1">
+                      {company.date} - {company.time}
+                    </span>
+                  </td>
+                  <td className="w-4/15 border border-primary-60 p-2">
+                    <span className="line-clamp-1">{company.note}</span>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   );
