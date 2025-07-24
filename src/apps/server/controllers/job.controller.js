@@ -58,58 +58,6 @@ exports.deleteJob = async (req, res) => {
   }
 };
 
-exports.applyJob = async (req, res) => {
-  const { id } = req.params;
-  const { candidate_id, resume_file_id, cover_letter } = req.body;
-
-  try {
-    const application = await prisma.job_applications.create({
-      data: {
-        job_id: id,
-        candidate_id,
-        resume_file_id,
-        cover_letter,
-        status: 'pending',
-      },
-    });
-    return successResponse(res, 'Application submitted successfully', application, 201);
-  } catch (err) {
-    console.error(err);
-    return errorResponse(res, 'Failed to apply for job', [err.message], 500);
-  }
-};
-
-exports.cancelApplication = async (req, res) => {
-  const { id } = req.params;
-  const { candidate_id } = req.body;
-
-  try {
-    await prisma.job_applications.deleteMany({
-      where: { job_id: id, candidate_id },
-    });
-    return successResponse(res, 'Application cancelled successfully');
-  } catch (err) {
-    console.error(err);
-    return errorResponse(res, 'Failed to cancel application', [err.message], 500);
-  }
-};
-
-exports.getJobApplications = async (req, res) => {
-  const { id } = req.params;
-  try {
-    const applications = await prisma.job_applications.findMany({
-      where: { job_id: id },
-      include: {
-        users: true, 
-      },
-    });
-    return successResponse(res, 'Applications fetched successfully', applications);
-  } catch (err) {
-    console.error(err);
-    return errorResponse(res, 'Failed to fetch applications', [err.message], 500);
-  }
-};
-
 exports.saveJob = async (req, res) => {
   const userId = req.user.id;
   const jobId = req.params.id;
