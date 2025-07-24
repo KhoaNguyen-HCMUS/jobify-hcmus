@@ -2,10 +2,11 @@
 import { useState } from "react";
 import KeyWord from "../../../components/keyWord";
 import { useRouter } from "next/navigation";
-import { CircleX } from "lucide-react";
+import { fakeReport } from "../../../components/fakeReport";
 
 interface ReportsProps {
   reports: {
+    id: number;
     content: string;
     dateReport: string;
     timeReport: string;
@@ -15,53 +16,11 @@ interface ReportsProps {
     timeModeration: string;
   };
 }
-
-const content = [
-  "Tuyen dung nhan vien",
-  "Tuyen dung nhan vien",
-  "Tuyen dung nhan vien",
-  "Tuyen dung nhan vien",
-  "Tuyen dung nhan vien",
-];
-const datesReport = ["2023-10-01", "2023-10-02", "2023-10-03"];
-const timesReport = ["10:00", "11:00", "12:00"];
-const datesModer = ["2023-10-01", "2023-10-02", "2023-10-03"];
-const timesModer = ["10:00", "11:00", "12:00"];
-const statuses = ["Pending", "Approved", "Rejected"];
-const users = ["Diem Xuan"];
-
-const randomItem = (arr: any[]) => arr[Math.floor(Math.random() * arr.length)];
-
-const apps = Array.from({ length: 30 }, (_, i) => ({
-  id: (i + 1).toString(),
-  content: randomItem(content),
-  dateReport: randomItem(datesReport),
-  timeReport: randomItem(timesReport),
-  dateModeration: randomItem(datesModer),
-  timeModeration: randomItem(timesModer),
-  status: randomItem(statuses),
-  user: randomItem(users),
-}));
-
 export default function OperatorReportsPage({ reports }: ReportsProps) {
   const [fromDate, setFromDate] = useState("");
   const [toDate, setToDate] = useState("");
 
-  const handleFilter = () => {
-    console.log("Filter from: ", fromDate, "to: ", toDate);
-  };
-
   const router = useRouter();
-
-  const [selectedReportId, setSelectedReportId] = useState<string | null>(null);
-  const [showModal, setShowModal] = useState(false);
-
-  const handleRowClick = (id: string) => {
-    setSelectedReportId(id);
-    setShowModal(true);
-  };
-
-  const selectedReport = apps.find((c) => c.id === selectedReportId);
 
   return (
     <div className="w-full min-h-screen bg-neutral-light-60">
@@ -128,10 +87,10 @@ export default function OperatorReportsPage({ reports }: ReportsProps) {
               </tr>
             </thead>
             <tbody>
-              {apps.map((report, index) => (
+              {fakeReport.map((report, index) => (
                 <tr
                   key={report.id}
-                  onClick={() => handleRowClick(report.id)}
+                  onClick={() => router.push(`/reports/${report.id}`)}
                   className={`py-2 px-4 text-primary-80 hover:bg-highlight transition-colors cursor-pointer ${
                     index % 2 === 0 ? "bg-highlight-20" : "bg-highlight-40"
                   }`}
@@ -159,38 +118,6 @@ export default function OperatorReportsPage({ reports }: ReportsProps) {
               ))}
             </tbody>
           </table>
-          {showModal && selectedReport && (
-            <div
-              onClick={() => {
-                setShowModal(false);
-                setSelectedReportId(null);
-              }}
-              className="fixed inset-0 bg-primary-80 z-50 flex items-center justify-center"
-            >
-              <div
-                onClick={(e) => e.stopPropagation()}
-                className="w-3/5 max-h-[90vh] overflow-y-auto bg-neutral-light rounded-xl relative"
-              >
-                <div className="flex flex-col">
-                  <div className="flex flex-col gap-2 mx-10 my-4">
-                    <div className="flex justify-between">
-                      <span className="text-primary text-2xl font-bold">
-                        Profile:
-                      </span>
-                      <CircleX
-                        size={24}
-                        className="text-primary-80 cursor-pointer"
-                        onClick={() => setShowModal(false)}
-                      />
-                    </div>
-                    <div className="bg-neutral-light-40 shadow-md rounded-3xl">
-                      <div className="flex flex-col gap-y-4 mx-10 my-4"></div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
         </div>
       </div>
     </div>

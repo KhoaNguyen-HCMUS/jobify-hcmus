@@ -1,6 +1,5 @@
 "use client";
 import { useState, useEffect } from "react";
-import GoBack from "../../components/goBack";
 import {
   BriefcaseBusiness,
   Clock,
@@ -95,7 +94,7 @@ export default function JobDetail({ details, isHR }: JobDetailProps) {
   );
   const [benefit, setBenefit] = useState(job?.benefit || "");
 
-  const isHrSafe = isHR ?? true;
+  const isHrSafe = isHR ?? false;
 
   const [isOpen, setIsOpen] = useState(false);
   const [isOpenNext, setIsOpenNext] = useState(false);
@@ -143,8 +142,7 @@ export default function JobDetail({ details, isHR }: JobDetailProps) {
   }, [isOpen]);
 
   return (
-    <div className="flex flex-col mx-20 my-10 gap-4">
-      <GoBack />
+    <div className="flex flex-col gap-8">
       <div className="flex flex-wrap gap-8 px-6">
         <div className="flex-2 space-y-4">
           <div className="flex flex-col justify-between bg-neutral-light-20 shadow-xl rounded-3xl space-y-4 p-6">

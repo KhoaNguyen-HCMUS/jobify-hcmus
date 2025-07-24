@@ -1,7 +1,10 @@
 "use client";
-import { BookUp } from "lucide-react";
+import { BookUp, CircleX } from "lucide-react";
 import { useState, useEffect } from "react";
-import KeyWord from "@web/components/keyWord";
+import KeyWord from "../../../components/keyWord";
+import JobDetail from "../../../components/job/jobDetail";
+import RejectReason from "../../../components/rejectReason";
+import ModeratorNote from "../../../components/moderatorNote";
 
 interface JobPendingProps {
   job: {
@@ -62,6 +65,8 @@ export default function OperatorJobPendingPage({ job }: JobPendingProps) {
 
   const selectedJob = apps.find((c) => c.id === selectedJobId);
 
+  const [isOpen, setIsOpen] = useState(false);
+
   return (
     <div className="w-full min-h-screen bg-neutral-light-60">
       <div className="flex flex-col px-6 lg:px-20 py-10 gap-10">
@@ -110,7 +115,7 @@ export default function OperatorJobPendingPage({ job }: JobPendingProps) {
                 <tr
                   key={job.id}
                   onClick={() => handleRowClick(job.id)}
-                  className={`py-2 px-4 text-primary-80 hover:bg-highlight transition-colors ${
+                  className={`py-2 px-4 text-primary-80 hover:bg-highlight transition-colors cursor-pointer ${
                     index % 2 === 0 ? "bg-highlight-20" : "bg-highlight-40"
                   }`}
                 >
@@ -150,7 +155,55 @@ export default function OperatorJobPendingPage({ job }: JobPendingProps) {
               <div
                 onClick={(e) => e.stopPropagation()}
                 className="w-3/5 max-h-[90vh] overflow-y-auto bg-neutral-light rounded-md relative"
-              ></div>
+              >
+                <div className="flex flex-col gap-4 px-10 py-6">
+                  <div className="flex justify-between">
+                    <span className="text-primary text-xl font-bold">
+                      Profile:
+                    </span>
+                    <CircleX size={24} className="text-secondary-40" />
+                  </div>
+                  <JobDetail />
+                  <ModeratorNote />
+                  <div className="flex flex-wrap gap-2">
+                    <button className="font-semibold bg-accent hover:bg-secondary cursor-pointer text-neutral-light-20 px-4 py-2 rounded-full">
+                      Approval
+                    </button>
+                    <button
+                      onClick={() => setIsOpen(true)}
+                      className="font-semibold bg-[#F52121] hover:bg-red-800 cursor-pointer text-neutral-light-20 px-4 py-2 rounded-full"
+                    >
+                      Reject
+                    </button>
+                    {isOpen && (
+                      <div className="fixed inset-0  bg-primary/80 z-50 flex items-center justify-center">
+                        <div className="w-2/5 bg-neutral-light rounded-md">
+                          <div className="flex flex-col gap-2 mx-20 my-10 space-y-4">
+                            <RejectReason />
+                            <div className="flex flex-wrap gap-2">
+                              <button
+                                onClick={() => {
+                                  setIsOpen(false);
+                                  setShowModal(false);
+                                }}
+                                className="bg-accent rounded-full hover:bg-secondary cursor-pointer text-neutral-light-20 px-4 py-2 font-semibold"
+                              >
+                                Send
+                              </button>
+                              <button
+                                onClick={() => setIsOpen(false)}
+                                className="font-semibold rounded-full hover:bg-primary cursor-pointer bg-primary-60 text-neutral-light-20 px-4 py-2"
+                              >
+                                Cancel
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
             </div>
           )}
         </div>

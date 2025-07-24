@@ -2,8 +2,8 @@
 import { BookUp, CircleX, Info, Phone, SquarePlus } from "lucide-react";
 import { useState } from "react";
 import KeyWord from "../../../components/keyWord";
-import ModeratorNote from "@web/components/moderatorNote";
-import RejectReason from "@web/components/rejectReason";
+import ModeratorNote from "../../../components/moderatorNote";
+import RejectReason from "../../../components/rejectReason";
 
 interface CompanyPendingProps {
   company: {

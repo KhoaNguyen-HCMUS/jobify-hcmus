@@ -40,7 +40,10 @@ export default function ClientLayout({
       "/recommended",
       "/support",
       "/recruiter/applications",
-    ].includes(pathname) || pathname.startsWith("/jobs/");
+      "/operator/report-detail",
+    ].includes(pathname) ||
+    pathname.startsWith("/jobs/") ||
+    pathname.startsWith("/reports/");
 
   return (
     <>
