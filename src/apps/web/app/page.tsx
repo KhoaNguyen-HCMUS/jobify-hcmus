@@ -3,14 +3,14 @@ import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 
 import HomePage from "./home/page";
-import SignInPage from "./sign-in/page";
-import SignUpWithRolePage from "./sign-up-with-role/page";
+import LogInPage from "./auth/login/page";
+import RegisterPage from "./auth/register/page";
 import JobDetailPage from "./job-detail/page";
-import BrowseJobsPage from "./browse-jobs/page";
-import CandidateRegistrationPage from "./candidate-registration/page";
-import CompanyRegistrationPage from "./company-registration/page";
+import JobsPage from "./jobs/page";
+import CandidateRegistrationPage from "./register/candidate/page";
+import CompanyRegistrationPage from "./register/company/page";
 import PendingApprovalPage from "./pending-approval/page";
-import ForgotPasswordFirstPage from "./forgot-password-first/page";
+import ForgotPasswordPage from "./forgot-password/page";
 import ForgotPasswordSecondPage from "./forgot-password-second/page";
 import ForgotPasswordThirdPage from "./forgot-password-third/page";
 import Error404Page from "./not-found";
@@ -58,28 +58,28 @@ export default function App() {
       case "/":
         return <HomePage />;
 
-      case "/sign-in":
-        return <SignInPage />;
+      case "/auth/login":
+        return <LogInPage />;
 
-      case "/sign-up-with-role":
-        return <SignUpWithRolePage />;
+      case "/auth/register":
+        return <RegisterPage />;
 
-      case "/browse-jobs":
-        return <BrowseJobsPage />;
+      case "/jobs":
+        return <JobsPage />;
 
       case "/job-detail":
         return <JobDetailPage />;
 
-      case "/candidate-registration":
+      case "/register/candidate":
         return <CandidateRegistrationPage />;
 
-      case "/company-registration":
+      case "/register/company":
         return <CompanyRegistrationPage />;
 
       case "/pending-approval":
         return <PendingApprovalPage />;
 
-      case "/forgot-password-first":
+      case "/forgot-password":
         return <ForgotPasswordFirstPage />;
 
       case "/forgot-password-second":

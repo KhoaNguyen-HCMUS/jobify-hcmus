@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { Mail } from "lucide-react";
 import LogoTagline from "../../components/logoTagline";
-export default function ForgotPasswordFirstPage() {
+export default function ForgotPasswordPage() {
   const [email, setEmail] = useState("");
 
   const handleSubmit = (e: React.FormEvent) => {

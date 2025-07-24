@@ -188,7 +188,7 @@ const mains = [
     category: "Legal & Compliance",
   },
 ];
-export default function BrowseJobsPage() {
+export default function JobsPage() {
   const { page, maxPage, current, next, prev } = usePagination(jobs, 9);
 
   const [experience, setExperience] = useState("allExperience");

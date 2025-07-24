@@ -1,7 +1,7 @@
 "use client";
 import { useState } from "react";
 import { User, Lock, Mail } from "lucide-react";
-import LogoTagline from "../../components/logoTagline";
+import LogoTagline from "../../../components/logoTagline";
 export default function CandidateRegistrationPage() {
   const [fullName, setFullName] = useState("");
   const [password, setPassword] = useState("");

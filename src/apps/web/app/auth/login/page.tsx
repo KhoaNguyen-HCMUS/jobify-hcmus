@@ -1,13 +1,9 @@
 "use client";
 import { useState } from "react";
 import { User, Lock } from "lucide-react";
-import LogoTagline from "../../components/logoTagline";
+import LogoTagline from "../../../components/logoTagline";
 
-export default function SignInPage() {
-  // test navBar
-  localStorage.setItem("user", JSON.stringify({ role: "moderator" }));
-  window.location.href = "/";
-
+export default function LogInPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
@@ -113,7 +109,7 @@ export default function SignInPage() {
             {/* Sign Up */}
             <p className="text-center text-text-80 text-sm pt-4">
               Don't have account?{" "}
-              <a href="/sign-up-with-role" className="custom-link">
+              <a href="/auth/register" className="custom-link">
                 Sign up
               </a>
             </p>

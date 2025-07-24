@@ -153,25 +153,25 @@ export default function OperatorCompanyPendingPage({
                 >
                   <td className="w-4/15 border border-primary-60 p-2">
                     <span className="line-clamp-1">
-                      {companies.companyName}
+                      {companies?.companyName}
                     </span>
                   </td>
                   <td className="w-2/15 border border-primary-60 p-2">
-                    <span className="line-clamp-1">{companies.status}</span>
+                    <span className="line-clamp-1">{companies?.status}</span>
                   </td>
                   <td className="w-1/15 border border-primary-60 p-2">
-                    <span className="line-clamp-1">{companies.flag}</span>
+                    <span className="line-clamp-1">{companies?.flag}</span>
                   </td>
                   <td className="w-1/15 border border-primary-60 p-2">
-                    <span className="line-clamp-1">{companies.profile}</span>
+                    <span className="line-clamp-1">{companies?.profile}</span>
                   </td>
                   <td className="w-3/15 border border-primary-60 p-2">
                     <span className="flex justify-center items-center line-clamp-1">
-                      {companies.date} - {companies.time}
+                      {companies?.date} - {companies?.time}
                     </span>
                   </td>
                   <td className="w-4/15 border border-primary-60 p-2">
-                    <span className="line-clamp-1">{companies.note}</span>
+                    <span className="line-clamp-1">{companies?.note}</span>
                   </td>
                 </tr>
               ))}

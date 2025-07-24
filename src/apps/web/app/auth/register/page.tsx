@@ -1,7 +1,7 @@
 import { BriefcaseBusiness, Building } from "lucide-react";
-import LogoTagline from "../../components/logoTagline";
+import LogoTagline from "../../../components/logoTagline";
 
-export default function SignUpWithRolePage() {
+export default function RegisterPage() {
   return (
     <div className="flex items-center justify-center w-full min-h-screen p-4 bg-linear-(--gradient-primary)">
       <div className="backdrop-blur-sm rounded-[57px] shadow-xl flex flex-col lg:flex-row items-center max-w-5xl w-full p-8 lg:p-12 gap-12 bg-highlight-20 mx-auto">
@@ -20,7 +20,7 @@ export default function SignUpWithRolePage() {
               </p>
               <div className="flex justify-center">
                 <a
-                  href="/candidate-registration"
+                  href="/register/candidate"
                   className="bg-secondary hover:bg-primary rounded-full text-white py-4 px-8 font-bold transition-colors duration-300 mt-4 cursor-pointer"
                 >
                   Continue
@@ -37,7 +37,7 @@ export default function SignUpWithRolePage() {
               </p>
               <div className="flex justify-center">
                 <a
-                  href="/company-registration"
+                  href="/register/company"
                   className="bg-secondary hover:bg-primary rounded-full text-white py-4 px-8 font-bold transition-colors duration-300 mt-4 cursor-pointer"
                 >
                   Continue

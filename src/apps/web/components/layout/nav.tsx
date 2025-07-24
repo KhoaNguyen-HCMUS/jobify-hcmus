@@ -50,13 +50,13 @@ export default function NavBar() {
 
   const guestItems = [
     { href: "/", label: "Home" },
-    { href: "/browse-jobs", label: "Browse Jobs" },
+    { href: "/jobs", label: "Browse Jobs" },
     { href: "/support", label: "Support" },
     { href: "/about-us", label: "About Us" },
   ];
 
   const candidateItems = [
-    { href: "/browse-jobs", label: "Browse Jobs" },
+    { href: "/jobs", label: "Browse Jobs" },
     { href: "/saved-jobs", label: "Saved" },
     { href: "/applications", label: "Applications" },
     { href: "/recommended", label: "Recommended" },
@@ -157,13 +157,13 @@ export default function NavBar() {
             ) : (
               <>
                 <Link
-                  href="/sign-up-with-role"
+                  href="/auth/register"
                   className="px-6 py-2 text-primary border-2 border-primary rounded-lg font-medium transition-all duration-300 hover:bg-primary hover:text-background hover:shadow-lg hover:shadow-primary/30 transform hover:-translate-y-0.5"
                 >
                   Sign up
                 </Link>
                 <Link
-                  href="/sign-in"
+                  href="/auth/login"
                   className="px-6 py-2 text-primary border-2 border-primary rounded-lg font-medium transition-all duration-300 hover:bg-primary hover:text-background hover:shadow-lg hover:shadow-primary/30 transform hover:-translate-y-0.5"
                 >
                   Sign in
@@ -228,13 +228,13 @@ export default function NavBar() {
               ) : (
                 <div className="pt-4 space-y-2">
                   <Link
-                    href="/sign-up-with-role"
+                    href="/auth/register"
                     className="block w-full px-4 py-3 text-center text-primary border-2 border-primary rounded-lg font-medium transition-all duration-300 hover:bg-primary hover:text-background"
                   >
                     Sign up
                   </Link>
                   <Link
-                    href="/sign-in"
+                    href="/auth/login"
                     className="block w-full px-4 py-3 text-center text-primary border-2 border-primary rounded-lg font-medium transition-all duration-300 hover:bg-primary hover:text-background"
                   >
                     Sign in
