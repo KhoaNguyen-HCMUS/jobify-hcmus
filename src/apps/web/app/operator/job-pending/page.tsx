@@ -46,6 +46,16 @@ export default function OperatorJobPendingPage({ job }: JobPendingProps) {
     console.log("Filter from: ", fromDate, "to: ", toDate);
   };
 
+  const [selectedJobId, setSelectedJobId] = useState<string | null>(null);
+  const [showModal, setShowModal] = useState(false);
+
+  const handleRowClick = (id: string) => {
+    setSelectedJobId(id);
+    setShowModal(true);
+  };
+
+  const selectedJob = apps.find((c) => c.id === selectedJobId);
+
   return (
     <div className="w-full min-h-screen bg-neutral-light-60">
       <div className="flex flex-col px-6 lg:px-20 py-10 gap-10">
@@ -93,6 +103,7 @@ export default function OperatorJobPendingPage({ job }: JobPendingProps) {
               {apps.map((job, index) => (
                 <tr
                   key={job.id}
+                  onClick={() => handleRowClick(job.id)}
                   className={`py-2 px-4 text-primary-80 hover:bg-highlight transition-colors ${
                     index % 2 === 0 ? "bg-highlight-20" : "bg-highlight-40"
                   }`}
@@ -122,6 +133,20 @@ export default function OperatorJobPendingPage({ job }: JobPendingProps) {
               ))}
             </tbody>
           </table>
+          {showModal && selectedJob && (
+            <div
+              onClick={() => {
+                setShowModal(true);
+                setSelectedJobId(null);
+              }}
+              className="fixed inset-0 z-50 flex justify-center items-center"
+            >
+              <div
+                onClick={(e) => e.stopPropagation()}
+                className="w-3/5 max-h-[90vh] overflow-y-auto bg-neutral-light rounded-md relative"
+              ></div>
+            </div>
+          )}
         </div>
       </div>
     </div>
