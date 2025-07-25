@@ -10,6 +10,16 @@ app.use(cors());
 app.use(express.json());
 
 // Routes
+const authRoutes = require('./routes/auth.routes');
+app.use('/auth', authRoutes);
+const profileRoutes = require('./routes/profile.routes');
+app.use('/profile', profileRoutes);
+const jobRoutes = require('./routes/job.routes');
+app.use('/jobs', jobRoutes);
+const applicationRoutes = require('./routes/application.routes');
+app.use('/applications', applicationRoutes);
+
+// Health check route
 app.get('/api/health', (req, res) => {
   res.json({
     message: 'Backend is running!',
@@ -36,5 +46,5 @@ app.use((err, req, res, next) => {
 });
 
 app.listen(PORT, () => {
-  console.log(`Express server running on: http://localhost:${PORT}`);
+  console.log(`Server is running on: http://localhost:${PORT}`);
 });
