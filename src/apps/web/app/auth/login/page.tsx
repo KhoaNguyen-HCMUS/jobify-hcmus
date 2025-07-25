@@ -1,18 +1,29 @@
 "use client";
 import { useState } from "react";
 import { User, Lock } from "lucide-react";
+import { login } from "../../../services/auth";
+import { useRouter } from 'next/navigation';
+import { toast } from 'react-toastify';
 import LogoTagline from "../../../components/logoTagline";
 
 export default function LogInPage() {
+  const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Email: ", email);
-    console.log("Password: ", password);
-    console.log("Remember: ", rememberMe);
+    const res = await login({
+      email: email,
+      password: password,
+    });
+    if (res.success) {
+      router.push("/");
+    }
+    else {
+      toast.error(res.message);
+    }
   };
 
   return (

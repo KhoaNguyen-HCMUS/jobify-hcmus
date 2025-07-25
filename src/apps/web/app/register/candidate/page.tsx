@@ -1,21 +1,34 @@
 "use client";
 import { useState } from "react";
 import { User, Lock, Mail } from "lucide-react";
+import { register } from "../../../services/auth";
+import { useRouter } from 'next/navigation';
+
 import LogoTagline from "../../../components/logoTagline";
+import { toast } from 'react-toastify';
 export default function CandidateRegistrationPage() {
+  const router = useRouter();
   const [fullName, setFullName] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [email, setEmail] = useState("");
   const [check, setCheck] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Full Name:", fullName);
-    console.log("Email:", email);
-    console.log("Password:", password);
-    console.log("Confirm password: ", confirmPassword);
-    console.log("I agree...:", check);
+    const res = await register({  
+      name: fullName,
+      email: email,
+      password: password,
+      role: "candidate",
+    });
+    if (res.success) {
+      toast.success("Registration successful");
+      router.push("/sign-in");
+    } else {
+      toast.error(res.message);
+    }
+    console.log(res);
   };
   return (
     <div className="flex items-center justify-center w-full min-h-screen p-4 bg-linear-(--gradient-primary)">
@@ -135,7 +148,6 @@ export default function CandidateRegistrationPage() {
             {/* Submit Button */}
             <button
               type="submit"
-              onClick={() => (window.location.href = "/sign-in")}
               className="w-full bg-secondary hover:bg-primary rounded-full text-white py-4 px-8 font-bold transition-colors duration-300 mt-4 cursor-pointer"
             >
               Sign up

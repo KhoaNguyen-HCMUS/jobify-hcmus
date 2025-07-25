@@ -1,5 +1,8 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
 import "./globals.css";
 import ClientLayout from "../components/layout/clientLayout";
 const geistSans = Geist({
@@ -30,6 +33,18 @@ export default function RootLayout({
         suppressHydrationWarning={true}
       >
         <ClientLayout>{children}</ClientLayout>
+        <ToastContainer
+        position="top-right"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick={false}
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="light"
+        />
       </body>
     </html>
   );

@@ -1,5 +1,5 @@
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
-
+	
 export async function register(data: { name: string;email: string; password: string; role: string }) {
   const res = await fetch(`${API_URL}/auth/register`, {
     method: 'POST',
