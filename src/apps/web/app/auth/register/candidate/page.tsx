@@ -1,10 +1,10 @@
 "use client";
 import { useState } from "react";
 import { User, Lock, Mail } from "lucide-react";
-import { register } from "../../../services/auth";
+import { register } from "../../../../services/auth";
 import { useRouter } from 'next/navigation';
 
-import LogoTagline from "../../../components/logoTagline";
+import LogoTagline from "../../../../components/logoTagline";
 import { toast } from 'react-toastify';
 export default function CandidateRegistrationPage() {
   const router = useRouter();
