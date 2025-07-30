@@ -3,15 +3,17 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { successResponse, errorResponse } = require('../utils/response');
 
-exports.register = async (req, res) => {
-  const { email, password, role } = req.body;
-  if (!email || !password || !role)
-    return errorResponse(res, 'Missing registration data', ['Email, password and role are required']);
+exports.registerCandidate = async (req, res) => {
+  const { fullname, email, password} = req.body;
+  if (!fullname || !email || !password) {
+    return errorResponse(res, 'Missing registration data', ['Full name, email, and password are required']);
+  }
 
   try {
     const existingUser = await prisma.users.findUnique({ where: { email } });
-    if (existingUser)
-      return errorResponse(res, 'Email already exists', ['Email is taken']);
+    if (existingUser) {
+      return errorResponse(res, 'Email already exists', []);
+    }
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
@@ -19,14 +21,65 @@ exports.register = async (req, res) => {
       data: {
         email,
         password_hash: hashedPassword,
-        role,
+        role: 'candidate',
         status: 'active'
       }
     });
 
-    successResponse(res, 'Registration successful', { userId: newUser.id });
+    await prisma.user_profiles.create({
+      data: {
+        user_id: newUser.id,
+        full_name: fullname,
+        created_at: new Date()
+      }
+    });
+
+    return successResponse(res, 'Registration successful', { user_id: newUser.id });
   } catch (err) {
-    errorResponse(res, 'Registration failed', [err.message], 500);
+    return errorResponse(res, 'Registration failed', [err.message], 500);
+  }
+};
+
+exports.registerCompany = async (req, res) => {
+  const { company_name, email, password, phone_number, tax_code, license_number, contact_email, address } = req.body;
+  if (!company_name || !email || !password || !phone_number || !tax_code || !license_number || !contact_email || !address) {
+    return errorResponse(res, 'Missing registration data', ['All fields are required']);
+  }
+
+  try {
+    const existingUser = await prisma.users.findUnique({ where: { email } });
+    if (existingUser) {
+      return errorResponse(res, 'Email already exists', []);
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    const newUser = await prisma.users.create({
+      data: {
+        email,
+        password_hash: hashedPassword,
+        role: 'company',
+        status: 'active',
+      }
+    });
+
+    await prisma.companies.create({
+      data: {
+        user_id: newUser.id,
+        company_name,
+        phone_number,
+        tax_code,
+        license_number,
+        contact_email,
+        address,
+        status: 'pending',
+        created_at: new Date(),
+      }
+    });
+
+    return successResponse(res, 'Registration successful', { userId: newUser.id, company_status: 'pending' });
+  } catch (err) {
+    return errorResponse(res, 'Registration failed', [err.message], 500);
   }
 };
 
@@ -38,26 +91,30 @@ exports.login = async (req, res) => {
   try {
     const user = await prisma.users.findUnique({ where: { email } });
     if (!user)
-      return errorResponse(res, 'Invalid credentials', ['Email or password is incorrect'], 401);
+      return errorResponse(res, 'Email or password is incorrect', [], 401);
 
     const isMatch = await bcrypt.compare(password, user.password_hash);
     if (!isMatch)
-      return errorResponse(res, 'Invalid credentials', ['Email or password is incorrect'], 401);
+      return errorResponse(res, 'Email or password is incorrect', [], 401);
 
     const token = jwt.sign(
       { id: user.id, email: user.email, role: user.role },
       process.env.JWT_SECRET,
-      { expiresIn: '7d' }
+      { expiresIn: '30d' }
     );
 
-    successResponse(res, 'Login successful', { token });
+    const user_profiles = await prisma.user_profiles.findUnique({ where: { user_id: user.id } });
+    if (!user_profiles)
+      return errorResponse(res, 'User profile not found', [], 404);
+
+    return successResponse(res, 'Login successful', { token, name: user_profiles.full_name, role: user.role });
   } catch (err) {
-    errorResponse(res, 'Login failed', [err.message], 500);
+    return errorResponse(res, 'Login failed', [err.message], 500);
   }
 };
 
 exports.logout = (req, res) => {
-  successResponse(res, 'Logout successful');
+  return successResponse(res, 'Logout successful');
 };
 
 exports.forgotPassword = async (req, res) => {
@@ -71,9 +128,9 @@ exports.forgotPassword = async (req, res) => {
       return errorResponse(res, 'Email not found', ['No account with this email']);
 
     // TODO: Generate token & send email
-    successResponse(res, 'Password reset request sent (demo only)');
+    return successResponse(res, 'Password reset request sent (demo only)');
   } catch (err) {
-    errorResponse(res, 'Error sending request', [err.message], 500);
+    return errorResponse(res, 'Error sending request', [err.message], 500);
   }
 };
 
@@ -89,8 +146,8 @@ exports.resetPassword = async (req, res) => {
       data: { password_hash: hashedPassword }
     });
 
-    successResponse(res, 'Password updated successfully');
+    return successResponse(res, 'Password updated successfully');
   } catch (err) {
-    errorResponse(res, 'Password update failed', [err.message], 500);
+    return errorResponse(res, 'Password update failed', [err.message], 500);
   }
 };
