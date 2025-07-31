@@ -11,8 +11,11 @@ export default function ClientLayout({
 }>) {
   const pathname = usePathname();
   const hideNav = [
-    "/auth/login",
+    "/auth/sign-in",
     "/auth/register",
+    "/auth/register/candidate",
+    "/auth/register/company",
+    "/auth/register/company/pending",
     "/forgot-password",
     "/forgot-password-second",
     "/forgot-password-third",
@@ -24,9 +27,12 @@ export default function ClientLayout({
 
   const hideSideBar =
     [
-      "/auth/login",
+      "/auth/sign-in",
       "/",
       "/auth/register",
+      "/auth/register/candidate",
+      "/auth/register/company",
+      "/auth/register/company/pending",
       "/forgot-password",
       "/forgot-password-second",
       "/forgot-password-third",

@@ -72,37 +72,37 @@ export default function SideBar() {
 
   const recruiterItems = [
     {
-      href: "/recruiter/dashboard",
+      href: "/company/dashboard",
       label: "Dashboard",
       icon: <TextSelect size={24} />,
     },
     {
-      href: "/recruiter/profile",
+      href: "/company/profile",
       label: "Profile",
       icon: <User size={24} />,
     },
     {
-      href: "/recruiter/jobs",
+      href: "/company/jobs",
       label: "My Jobs",
       icon: <ShoppingBag size={24} />,
     },
     {
-      href: "/recruiter/wallet",
+      href: "/company/wallet",
       label: "Wallet",
       icon: <Wallet size={24} />,
     },
     {
-      href: "/recruiter/change-password",
+      href: "/company/change-password",
       label: "Change Password",
       icon: <Lock size={24} />,
     },
     {
-      href: "/recruiter/notifications",
+      href: "/company/notifications",
       label: "Notifications",
       icon: <BellIcon size={24} />,
     },
     {
-      href: "/recruiter/reports",
+      href: "/company/reports",
       label: "Report History",
       icon: <TriangleAlert size={24} />,
     },

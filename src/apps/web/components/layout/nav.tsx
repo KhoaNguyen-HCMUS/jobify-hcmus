@@ -6,44 +6,44 @@ import { Menu, X } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { Bell } from "lucide-react";
 import SystemAnnouncement from "../systemAnnouncement";
-//import Announcement from "../announcement";
+import { useAuth } from "../../hooks/useAuth";
+import { logout } from "../../services/auth";
+import { useRouter } from "next/navigation";
+import { toast } from "react-toastify";
 
 export default function NavBar() {
   const [visible, setVisible] = useState(false);
   const popupRef = useRef(null);
   const buttonRef = useRef(null);
+  const { user, isAuthenticated, updateUser } = useAuth();
+  const router = useRouter();
 
-  // Tắt popup khi click ra ngoài
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
-      if (
-        popupRef.current &&
-        !popupRef.current.contains(event.target as Node) &&
-        buttonRef.current &&
-        !buttonRef.current.contains(event.target as Node)
-      ) {
-        setVisible(false);
-      }
+      // if (
+      //   popupRef.current &&
+      //   // !popupRef.current.contains(event.target as Node) &&
+      //   buttonRef.current &&
+      //   // !buttonRef.current.contains(event.target as Node)
+      // ) {
+      //   setVisible(false);
+      // }
     }
 
     window.addEventListener("click", handleClickOutside);
     return () => window.removeEventListener("click", handleClickOutside);
   }, []);
 
-  const [user, setUser] = useState<{
-    role: "candidate" | "hr" | "moderator";
-  } | null>(null);
-
-  useEffect(() => {
-    const storedUser = localStorage.getItem("user");
-    if (storedUser) {
-      try {
-        setUser(JSON.parse(storedUser));
-      } catch (err) {
-        console.error("Invalid user date in localStorage");
-      }
+  const handleLogout = async () => {
+    try {
+      await logout();
+      updateUser();
+      toast.success('Đăng xuất thành công!');
+      router.push('/auth/sign-in');
+    } catch (error) {
+      toast.error('Lỗi khi đăng xuất!');
     }
-  }, []);
+  };
 
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const pathname = usePathname();
@@ -56,21 +56,22 @@ export default function NavBar() {
   ];
 
   const candidateItems = [
+    { href: "/candidate/dashboard", label: "Dashboard" },
     { href: "/jobs", label: "Browse Jobs" },
-    { href: "/saved-jobs", label: "Saved" },
-    { href: "/applications", label: "Applications" },
     { href: "/recommended", label: "Recommended" },
     { href: "/support", label: "Support" },
     { href: "/about-us", label: "About Us" },
   ];
 
-  const hrItems = [
-    { href: "/recruiter/dashboard", label: "Dashboard" },
+  const companyItems = [
+    { href: "/company/dashboard", label: "Dashboard" },
+    { href: "/company/jobs", label: "My Jobs" },
+    { href: "/company/applications", label: "Applications" },
     { href: "/support", label: "Support" },
     { href: "/about-us", label: "About Us" },
   ];
 
-  const moderatorItems = [
+  const adminItems = [
     { href: "/operator/company-pending", label: "Approvals" },
     { href: "/operator/reports", label: "Reports" },
     { href: "/operator/system-settings", label: "Settings" },
@@ -79,12 +80,12 @@ export default function NavBar() {
 
   let navItems = guestItems;
 
-  if (user?.role === "candidate") {
+  if (isAuthenticated && user?.role === "candidate") {
     navItems = candidateItems;
-  } else if (user?.role === "hr") {
-    navItems = hrItems;
-  } else if (user?.role === "moderator") {
-    navItems = moderatorItems;
+  } else if (isAuthenticated && user?.role === "company") {
+    navItems = companyItems;
+  } else if (isAuthenticated && user?.role === "admin") {
+    navItems = adminItems;
   }
 
   return (
@@ -124,7 +125,7 @@ export default function NavBar() {
           </nav>
 
           <div className="hidden md:flex items-center space-x-6 relative">
-            {user ? (
+            {isAuthenticated && user ? (
               <>
                 <div className="hidden md:flex items-center space-x-6">
                   <button
@@ -144,13 +145,20 @@ export default function NavBar() {
                       <SystemAnnouncement />
                     </div>
                   </div>
-                  <div className="flex items-center py-2 px-4 bg-primary rounded-full">
+                  <div className="flex items-center space-x-2">
+                    
                     <Link
-                      href="/profile"
-                      className="block w-full px-4 py-1 text-center text-2xl bg-primary text-background rounded-lg font-medium"
+                      href={user.role === 'candidate' ? '/candidate/profile' : user.role === 'company' ? '/recruiter/profile' : '/profile'}
+                      className="px-4 py-2 bg-primary text-background rounded-lg font-medium hover:bg-primary/90 transition-colors"
                     >
                       Profile
                     </Link>
+                    <button
+                      onClick={handleLogout}
+                      className="cursor-pointer px-4 py-2 bg-red-500 text-white rounded-lg font-medium hover:bg-red-600 transition-colors"
+                    >
+                      Sign out
+                    </button>
                   </div>
                 </div>
               </>
@@ -163,7 +171,7 @@ export default function NavBar() {
                   Sign up
                 </Link>
                 <Link
-                  href="/auth/login"
+                  href="/auth/sign-in"
                   className="px-6 py-2 text-primary border-2 border-primary rounded-lg font-medium transition-all duration-300 hover:bg-primary hover:text-background hover:shadow-lg hover:shadow-primary/30 transform hover:-translate-y-0.5"
                 >
                   Sign in
@@ -197,7 +205,7 @@ export default function NavBar() {
                 </Link>
               ))}
 
-              {user ? (
+              {isAuthenticated && user ? (
                 <div className="flex flex-col gap-4 space-x-6">
                   <button
                     ref={buttonRef}
@@ -216,13 +224,20 @@ export default function NavBar() {
                       <SystemAnnouncement />
                     </div>
                   </div>
-                  <div className="flex items-center py-2 px-4 bg-primary rounded-full">
+                  <div className="flex flex-col gap-2">
+                    
                     <Link
                       href="/profile"
-                      className="block w-full px-4 py-1 text-center text-2xl bg-primary text-background rounded-lg font-medium"
+                      className="block w-full px-4 py-3 text-center bg-primary text-background rounded-lg font-medium hover:bg-primary/90"
                     >
                       Profile
                     </Link>
+                    <button
+                      onClick={handleLogout}
+                      className="block w-full px-4 py-3 text-center bg-red-500 text-white rounded-lg font-medium hover:bg-red-600"
+                    >
+                      Logout
+                    </button>
                   </div>
                 </div>
               ) : (
@@ -234,7 +249,7 @@ export default function NavBar() {
                     Sign up
                   </Link>
                   <Link
-                    href="/auth/login"
+                    href="/auth/sign-in"
                     className="block w-full px-4 py-3 text-center text-primary border-2 border-primary rounded-lg font-medium transition-all duration-300 hover:bg-primary hover:text-background"
                   >
                     Sign in
