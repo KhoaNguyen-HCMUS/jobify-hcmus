@@ -148,7 +148,7 @@ export default function NavBar() {
                   <div className="flex items-center space-x-2">
                     
                     <Link
-                      href={user.role === 'candidate' ? '/candidate/profile' : user.role === 'company' ? '/recruiter/profile' : '/profile'}
+                      href={user.role === 'candidate' ? '/candidate/profile' : user.role === 'company' ? '/company/profile' : '/profile'}
                       className="px-4 py-2 bg-primary text-background rounded-lg font-medium hover:bg-primary/90 transition-colors"
                     >
                       Profile

@@ -18,16 +18,18 @@ export default function SideBar() {
   const pathname = usePathname();
 
   const [user, setUser] = useState<{
-    role: "candidate" | "hr" | "moderator";
+    role: "candidate" | "company" | "recruiter" | "moderator";
   } | null>(null);
 
   useEffect(() => {
-    const storedUser = localStorage.getItem("user");
+    const storedUser = localStorage.getItem("authData");
     if (storedUser) {
       try {
-        setUser(JSON.parse(storedUser));
+        const userData = JSON.parse(storedUser);
+        console.log("User data from localStorage:", userData);
+        setUser(userData);
       } catch (err) {
-        console.error("Invalid user date in localStorage");
+        console.error("Invalid user data in localStorage");
       }
     }
   }, []);
@@ -153,12 +155,19 @@ export default function SideBar() {
     icon?: React.ReactElement;
   }[] = candidateItems;
 
+  console.log("Current user role:", user?.role);
+
   if (user?.role === "candidate") {
     sideBarItems = candidateItems;
-  } else if (user?.role === "hr") {
+    console.log("Using candidate items");
+  } else if (user?.role === "company" || user?.role === "recruiter") {
     sideBarItems = recruiterItems;
+    console.log("Using company/recruiter items");
   } else if (user?.role === "moderator") {
     sideBarItems = moderatorItems;
+    console.log("Using moderator items");
+  } else {
+    console.log("No matching role, using default candidate items");
   }
 
   if (!user) return null;
