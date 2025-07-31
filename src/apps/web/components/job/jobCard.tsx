@@ -11,6 +11,7 @@ interface JobCardProps {
     province: string;
     logo: string;
     name: string;
+    major: string;
     status?: string;
   };
 }
@@ -18,7 +19,7 @@ interface JobCardProps {
 export default function JobCard({ job }: JobCardProps) {
   return (
     <Link href={`/jobs/${job.id}`}>
-      <div className="shadow-md bg-neutral-light-20 rounded-2xl p-6 transition-transform duration-300 hover:-translate-y-2 hover:shadow-lg cursor-pointer">
+      <div className="bg-neutral-light-20 rounded-2xl p-6 transition-transform duration-300 hover:-translate-y-2 hover:shadow-lg cursor-pointer">
         <div className="flex items-center space-x-4 mb-4">
           <img
             src={job.logo}
