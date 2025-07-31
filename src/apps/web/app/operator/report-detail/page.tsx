@@ -3,6 +3,41 @@ import GoBack from "../../../components/goBack";
 import ReportUser from "../../../components/reportUser";
 import Reporter from "../../../components/reporter";
 
+const reportUsers = [
+  {
+    logo: "/logo1.png",
+    companyName: "Công ty ABC",
+    companyIndustry: "Công nghệ",
+    companyLocation: "Hà Nội",
+    companyReason: "Sai su that",
+  },
+  {
+    logo: "/logo2.png",
+    companyName: "Công ty XYZ",
+    companyIndustry: "Tài chính",
+    companyLocation: "TP.HCM",
+    companyReason: "Sai su that",
+  },
+];
+
+const reporters = [
+  {
+    logo: "/logo1.png",
+    candidateName: "Hinh Diem Xuan",
+    candidateIndustry: "Công nghệ",
+    candidateLocation: "Hà Nội",
+    candidateReason:
+      "This post advertises an investment program with unrealistic profit promises and requires an upfront payment before any detailed information is provided. These are typical signs of a Ponzi or pyramid scheme, aimed at defrauding users. There's no clear contact information or valid business license provided",
+  },
+  {
+    logo: "/logo2.png",
+    candidateName: "Nguyen Thi Nhu Quynh",
+    candidateIndustry: "Tài chính",
+    candidateLocation: "TP.HCM",
+    candidateReason: "Sai su that",
+  },
+];
+
 interface ReportProps {
   report: {
     reason: string;
@@ -24,14 +59,13 @@ export default function ReportDetailPage({ report }: ReportProps) {
           <JobDetail />
         </div>
       </div>
-      <ReportUser />
-      <Reporter />
-      <div>
-        <div className="text-lg bg-primary text-neutral-light-20 px-4 py-2 rounded-t-lg">
-          Report Reason
-        </div>
-        <div className="bg-highlight-40 rounded-b-lg p-4">{report?.reason}</div>
-      </div>
+      {reportUsers.map((report, index) => (
+        <ReportUser key={index} report={report} />
+      ))}
+
+      {reporters.map((report, index) => (
+        <Reporter key={index} report={report} />
+      ))}
       <div>
         <div className="text-lg bg-primary text-neutral-light-20 px-4 py-2 rounded-t-lg">
           Moderator's Notes
