@@ -6,31 +6,42 @@ import usePagination from "../../../hooks/usePagination";
 import Pagination from "../../../components/pagination";
 import { jobs } from "../../../components/fakeJob";
 import ProtectedRoute from "../../../components/ProtectedRoute";
+import { getProfile, Profile } from "../../../services/profile";
+import { useEffect, useState } from "react";
+import { toast } from "react-toastify";
 
-const dashboard = [
-  {
-    avt: "/avt.jpg",
-    name: "avt",
-    fullName: "Hinh Diem Xuan",
-    email: "Not update",
-    phone: "Not update",
-    location: "Not update",
-  },
-];
-
-interface DashboardProps {
-  dashboard: {
-    avt: string;
-    name: string;
-    fullName: string;
-    email: string;
-    phone: string;
-    location: string;
-  };
-}
-
-function CandidateDashboardContent({ dashboard }: DashboardProps) {
+function CandidateDashboardContent() {
   const { page, maxPage, current, next, prev } = usePagination(jobs, 2);
+  const [profile, setProfile] = useState<Profile | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  const fetchProfile = async () => {
+    try {
+      setLoading(true);
+      const response = await getProfile();
+      if (response.success && response.data) {
+        setProfile(response.data);
+      } else {
+        toast.error(response.message || 'Failed to load profile');
+      }
+    } catch (error) {
+      toast.error('Error loading profile data');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchProfile();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="w-full h-full flex items-center justify-center">
+        <div className="text-primary text-xl">Loading profile...</div>
+      </div>
+    );
+  }
 
   return (
     <div className="w-full h-full bg-neutral-light-60">
@@ -40,34 +51,36 @@ function CandidateDashboardContent({ dashboard }: DashboardProps) {
             <div className="flex flex-wrap">
               <div className="p-4">
                 <img
-                  src={dashboard?.avt}
-                  alt={dashboard?.name}
+                  src={profile?.profile_photo_url || "/avt.jpg"}
+                  alt={profile?.full_name || "Profile"}
                   className="w-40 h-44 object-contain rounded-2xl"
                 />
               </div>
               <div className="flex flex-col justify-center gap-4 p-4">
                 <span className="text-primary text-xl font-semibold">
-                  {dashboard?.fullName}
+                  {profile?.full_name || "Not updated"}
                 </span>
                 <div className="flex flex-col gap-2">
                   <span className="flex gap-2 text-primary">
                     <Mail size={24} />
-                    <span>{dashboard?.email}</span>
+                    <span>{profile?.phone || "Not updated"}</span>
                   </span>
                   <span className="flex gap-2 text-primary">
                     <Phone size={24} />
-                    <span>{dashboard?.email}</span>
+                    <span>{profile?.phone || "Not updated"}</span>
                   </span>
                   <span className="flex gap-2 text-primary">
                     <MapPin size={24} />
-                    <span>{dashboard?.email}</span>
+                    <span>{profile?.province && profile?.ward ? `${profile.province}, ${profile.ward}` : "Not updated"}</span>
                   </span>
                 </div>
               </div>
             </div>
-            <div className="p-4">
-              <FilePenLine size={24} className="text-primary cursor-pointer" />
-            </div>
+              <div className="p-4">
+               <a href="/candidate/profile">
+                 <FilePenLine size={24} className="text-primary cursor-pointer hover:text-primary-80 transition-colors" />
+               </a>
+             </div>
           </div>
           <div className="flex-1 bg-highlight-40 rounded-2xl shadow-lg">
             <div className="flex flex-col">
@@ -138,10 +151,10 @@ function CandidateDashboardContent({ dashboard }: DashboardProps) {
   );
 }
 
-export default function CandidateDashboardPage({ dashboard }: DashboardProps) {
+export default function CandidateDashboardPage() {
   return (
     <ProtectedRoute allowedRoles={['candidate']}>
-      <CandidateDashboardContent dashboard={dashboard} />
+      <CandidateDashboardContent />
     </ProtectedRoute>
   );
 }
