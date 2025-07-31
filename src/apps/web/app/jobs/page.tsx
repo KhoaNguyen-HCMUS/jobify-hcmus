@@ -1,12 +1,13 @@
 "use client";
 import JobItem from "../../components/job/jobItem";
 import KeywordSearch from "../../components/keywordSearch";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import CategoryGrid from "../../components/categoryGrid";
 import MainCategoryItem from "../../components/mainCategoryItem";
 import usePagination from "../../hooks/usePagination";
 import Pagination from "../../components/pagination";
-import { jobs } from "../../components/fakeJob";
+import { getAllJobs, Job } from "../../services/jobs";
+import { toast } from 'react-toastify';
 
 const mains = [
   {
@@ -66,12 +67,71 @@ const mains = [
     category: "Legal & Compliance",
   },
 ];
+
+const adaptJobForComponent = (job: Job) => {
+  const salaryText = job.is_salary_negotiable 
+    ? 'Negotiable' 
+    : `${parseInt(job.salary_min).toLocaleString()} - ${parseInt(job.salary_max).toLocaleString()}`;
+  
+  const postedDate = new Date(job.created_at);
+  const now = new Date();
+  const diffTime = Math.abs(now.getTime() - postedDate.getTime());
+  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+  
+  const postedAtText = diffDays === 1 ? '1 day ago' : `${diffDays} days ago`;
+
+  return {
+    id: job.id,
+    logo: "/logo.png",
+    name: job.title,
+    title: job.title,
+    company: "Company Name",
+    province: job.province,
+    experience: job.experience_level,
+    salary: salaryText,
+    postedAt: postedAtText,
+    status: job.approved_by ? "approved" : "pending"
+  };
+};
+
 export default function JobsPage() {
-  const { page, maxPage, current, next, prev } = usePagination(jobs, 9);
+  const [jobs, setJobs] = useState<Job[]>([]);
+  const [loading, setLoading] = useState(true);
+  const adaptedJobs = jobs.map(adaptJobForComponent);
+  const { page, maxPage, current, next, prev } = usePagination(adaptedJobs, 9);
 
   const [experience, setExperience] = useState("allExperience");
   const [salary, setSalary] = useState("allSalary");
   const [typeOfWork, setTypeOfWork] = useState("allTypeOfWork");
+
+  useEffect(() => {
+    const fetchJobs = async () => {
+      try {
+        setLoading(true);
+        const response = await getAllJobs();
+        if (response.success && response.data) {
+          setJobs(response.data);
+          console.log(response.data);
+        } else {
+          toast.error(response.message || 'Unable to load job list');
+        }
+      } catch (error) {
+        toast.error('Error loading data');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchJobs();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="bg-neutral-light-40 min-h-screen flex items-center justify-center">
+        <div className="text-primary text-xl">Loading...</div>
+      </div>
+    );
+  }
 
   return (
     <div className="bg-neutral-light-40">
@@ -89,7 +149,7 @@ export default function JobsPage() {
       </div>
       <div className="pt-4">
         <h2 className="font-bold text-3xl text-neutral-light-20 pl-10 py-2 w-full bg-primary">
-          <i>Jobs</i>
+          <i>Jobs ({jobs.length})</i>
         </h2>
         <div className="flex gap-2">
           <div className="flex-1 hidden md:block bg-neutral-light-20 shadow-2xs">
@@ -352,17 +412,25 @@ export default function JobsPage() {
             </div>
           </div>
           <div className="flex-3">
-            {current.map((job) => (
-              <JobItem key={job.id} job={job} />
-            ))}
-            <div className="py-4">
-              <Pagination
-                page={page}
-                maxPage={maxPage}
-                onNext={next}
-                onPrev={prev}
-              />
-            </div>
+            {current.length > 0 ? (
+              <>
+                {current.map((job) => (
+                  <JobItem key={job.id} job={job} />
+                ))}
+                <div className="py-4">
+                  <Pagination
+                    page={page}
+                    maxPage={maxPage}
+                    onNext={next}
+                    onPrev={prev}
+                  />
+                </div>
+              </>
+            ) : (
+              <div className="text-center py-8">
+                <p className="text-primary text-lg">No jobs available</p>
+              </div>
+            )}
           </div>
         </div>
       </div>

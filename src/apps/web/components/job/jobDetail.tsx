@@ -17,37 +17,10 @@ import {
 } from "lucide-react";
 import ApplyJobModal from "../../components/applyJobModal";
 import { useRouter } from "next/navigation";
-import { useParams } from "next/navigation";
-import { jobs } from "../../components/fakeJob";
+import { Job } from "../../services/jobs";
 
 interface JobDetailProps {
-  details?: {
-    title: string;
-    salary: string;
-    location: string;
-    experience: string;
-    deadline: string;
-    current: string;
-    max: string;
-    image: string;
-    companyName: string;
-    scale: string;
-    field: string;
-    jobDescription: string;
-    applicantRequirements: string;
-    benefit: string;
-    right: string;
-    workPlace: string;
-    workingTime: string;
-    applicationInformation: string;
-    rank: string;
-    education: string;
-    numberOfRecruiter: string;
-    formOfWork: string;
-    relatedOccupations: string;
-    requiredSkills: string;
-    area: string;
-  };
+  job?: Job;
   isHR?: boolean;
 }
 
@@ -55,44 +28,40 @@ const related = ["Sales", "Construction", "Python", "Design", "Marketing"];
 const areaList = ["Sales", "Construction", "Python", "Design", "Marketing"];
 const skills = ["Sales", "Construction", "Python", "Design", "Marketing"];
 
-export default function JobDetail({ details, isHR }: JobDetailProps) {
-  const params = useParams();
-  const id = Array.isArray(params.id) ? params.id[0] : params.id;
-
-  const [job, setJob] = useState<any>(null);
+export default function JobDetail({ job: propJob, isHR }: JobDetailProps) {
+  const [job, setJob] = useState<Job | null>(propJob || null);
 
   useEffect(() => {
-    const jobFound = jobs.find((j) => j.id === Number(id));
-    setJob(jobFound ?? null);
-  }, [id]);
+    if (propJob) {
+      setJob(propJob);
+    }
+  }, [propJob]);
 
   const router = useRouter();
 
   const [title, setTitle] = useState(job?.title || "");
   const [deadline, setDeadline] = useState(job?.deadline || "");
-  const [location, setLocation] = useState(job?.location || "");
-  const [salary, setSalary] = useState(job?.salary || "");
-  const [experience, setExperience] = useState(job?.experience || "");
-  const [rank, setRank] = useState(job?.rank || "");
-  const [education, setEducation] = useState(job?.education || "");
+  const [location, setLocation] = useState(job?.province || "");
+  const [salary, setSalary] = useState(job?.salary_min || "");
+  const [experience, setExperience] = useState(job?.experience_level || "");
+  const [rank, setRank] = useState(job?.position || "");
+  const [education, setEducation] = useState(job?.education_level || "");
   const [numberOfRecruits, setNumberOfRecruits] = useState(
-    job?.numberOfRecruiter || ""
+    job?.number_of_openings?.toString() || ""
   );
-  const [formOfWork, setFormOfWork] = useState(job?.formOfWork || "");
-  const [relatedOccupations, setRelatedOccupations] = useState(
-    job?.relatedOccupations || ""
-  );
-  const [skill, setSkill] = useState(job?.requiredSkills || "");
-  const [area, setArea] = useState(job?.area || "");
-  const [workingTime, setWorkingTime] = useState(job?.workingTime || "");
-  const [workPlace, setWorkPlace] = useState(job?.workPlace || "");
+  const [formOfWork, setFormOfWork] = useState(job?.job_type || "");
+  const [relatedOccupations, setRelatedOccupations] = useState("");
+  const [skill, setSkill] = useState(job?.skills || "");
+  const [area, setArea] = useState("");
+  const [workingTime, setWorkingTime] = useState(job?.working_hours || "");
+  const [workPlace, setWorkPlace] = useState(job?.work_place || "");
   const [jobDescription, setJobDescription] = useState(
-    job?.jobDescription || ""
+    job?.description || ""
   );
   const [applicantRequirements, setApplicantRequirements] = useState(
-    job?.applicantRequirements || ""
+    job?.requirements || ""
   );
-  const [benefit, setBenefit] = useState(job?.benefit || "");
+  const [benefit, setBenefit] = useState(job?.benefits || "");
 
   const isHrSafe = isHR ?? false;
 
@@ -120,7 +89,6 @@ export default function JobDetail({ details, isHR }: JobDetailProps) {
     setInput("");
   };
 
-  // RemoveItem
   const handleRemove = (
     item: string,
     selected: string[],
@@ -141,13 +109,27 @@ export default function JobDetail({ details, isHR }: JobDetailProps) {
     };
   }, [isOpen]);
 
+  if (!job) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-primary text-xl">Job not found</div>
+      </div>
+    );
+  }
+
+  const salaryText = job.is_salary_negotiable 
+    ? 'Negotiable' 
+    : `${parseInt(job.salary_min).toLocaleString()} - ${parseInt(job.salary_max).toLocaleString()}`;
+
+  const deadlineDate = job.deadline ? new Date(job.deadline).toLocaleDateString() : 'Not specified';
+
   return (
     <div className="flex flex-col gap-8">
       <div className="flex flex-wrap gap-8 px-6">
         <div className="flex-2 space-y-4">
           <div className="flex flex-col justify-between bg-neutral-light-20 shadow-xl rounded-3xl space-y-4 p-6">
             <div className="text-primary font-semibold text-2xl">
-              {job?.title}
+              {job.title}
             </div>
             <div className="flex flex-wrap gap-4 justify-between">
               <div className="flex items-center gap-2">
@@ -160,7 +142,7 @@ export default function JobDetail({ details, isHR }: JobDetailProps) {
                     Salary
                   </div>
                   <div className="text-primary-80 font-semibold">
-                    {job?.salary}
+                    {salaryText}
                   </div>
                 </div>
               </div>
@@ -174,7 +156,7 @@ export default function JobDetail({ details, isHR }: JobDetailProps) {
                     Location
                   </div>
                   <div className="text-primary-80 font-semibold">
-                    {job?.location}
+                    {job.province}, {job.ward}
                   </div>
                 </div>
               </div>
@@ -188,7 +170,7 @@ export default function JobDetail({ details, isHR }: JobDetailProps) {
                     Experience
                   </div>
                   <div className="text-primary-80 font-semibold">
-                    {job?.experience}
+                    {job.experience_level}
                   </div>
                 </div>
               </div>
@@ -199,7 +181,7 @@ export default function JobDetail({ details, isHR }: JobDetailProps) {
                   <Clock size={24} />
                 </div>
                 <span className="w-full pl-10 pr-4 py-2 text-lg font-semibold rounded-xl text-primary-80 ">
-                  Deadline: {job?.deadline}
+                  Deadline: {deadlineDate}
                 </span>
               </div>
               <div className="flex flex-wrap gap-4">
@@ -210,7 +192,7 @@ export default function JobDetail({ details, isHR }: JobDetailProps) {
                     disabled
                     className="px-6 py-2 bg-accent rounded-full text-background font-semibold text-lg cursor-not-allowed"
                   >
-                    Applied: {job?.current}/{job?.max}
+                    Applied: {job.applications_count}/{job.number_of_openings}
                   </button>
                 )}
                 <a
@@ -227,11 +209,11 @@ export default function JobDetail({ details, isHR }: JobDetailProps) {
           <div className="flex flex-col justify-between bg-neutral-light-20 shadow-xl rounded-3xl space-y-4 p-6">
             <div className="flex px-2">
               <img
-                src={job?.image}
-                alt={job?.companyName}
-                className="border-1 rounded-xs"
+                src="/logo.png"
+                alt="Company"
+                className="border-1 rounded-xs w-16 h-16 object-contain"
               />
-              <div className="text-primary">{job?.companyName}</div>
+              <div className="text-primary ml-4">Company Name</div>
             </div>
             <div className="px-4 space-y-3">
               <div className="flex gap-10">
@@ -239,21 +221,21 @@ export default function JobDetail({ details, isHR }: JobDetailProps) {
                   <Users size={24} className="text-primary" />
                   <span className="text-primary font-semibold">Scale: </span>
                 </div>
-                <span className="text-primary-80">{job?.scale}</span>
+                <span className="text-primary-80">Medium</span>
               </div>
               <div className="flex gap-10">
                 <div className="flex gap-2">
                   <BriefcaseBusiness size={24} className="text-primary" />
                   <span className="text-primary font-semibold">Field: </span>
                 </div>
-                <span className="text-primary-80">{job?.field}</span>
+                <span className="text-primary-80">Technology</span>
               </div>
               <div className="flex gap-3">
                 <div className="flex gap-2">
                   <MapPin size={24} className="text-primary" />
                   <span className="text-primary font-semibold">Location: </span>
                 </div>
-                <span className="text-primary-80">{job?.location}</span>
+                <span className="text-primary-80">{job.province}, {job.ward}</span>
               </div>
             </div>
             <div className="flex space-x-1 text-accent font-semibold justify-center">
@@ -275,33 +257,33 @@ export default function JobDetail({ details, isHR }: JobDetailProps) {
               <div className="flex flex-col justify-between px-6 space-y-4 mt-4">
                 <div className="">
                   <h2 className="font-semibold text-accent">Job Description</h2>
-                  <p className="text-primary">{job?.jobDescription}</p>
+                  <p className="text-primary">{job.description || 'No description available'}</p>
                 </div>
                 <div>
                   <h2 className="font-semibold text-accent">
                     Applicant Requirements
                   </h2>
-                  <p className="text-primary">{job?.applicantRequirements}</p>
+                  <p className="text-primary">{job.requirements || 'No requirements specified'}</p>
                 </div>
                 <div>
-                  <h2 className="font-semibold text-accent">Benefit</h2>
-                  <p className="text-primary">{job?.benefit}</p>
+                  <h2 className="font-semibold text-accent">Benefits</h2>
+                  <p className="text-primary">{job.benefits || 'No benefits specified'}</p>
                 </div>
                 <div>
-                  <h2 className="font-semibold text-accent">Right</h2>
-                  <p className="text-primary">{job?.right}</p>
+                  <h2 className="font-semibold text-accent">Responsibilities</h2>
+                  <p className="text-primary">{job.responsibilities || 'No responsibilities specified'}</p>
                 </div>
                 <div>
                   <h2 className="font-semibold text-accent">Work Place</h2>
-                  <p className="text-primary">{job?.workPlace}</p>
+                  <p className="text-primary">{job.work_place}</p>
                 </div>
                 <div>
                   <h2 className="font-semibold text-accent">Working Time</h2>
-                  <p className="text-primary">{job?.workingTime}</p>
+                  <p className="text-primary">{job.working_hours || 'Not specified'}</p>
                 </div>
                 <div>
                   <h2 className="font-semibold text-accent">Apply now!</h2>
-                  <p className="text-primary">{job?.applicationInformation}</p>
+                  <p className="text-primary">Click the Apply button above to submit your application.</p>
                 </div>
               </div>
               <div>
@@ -331,9 +313,9 @@ export default function JobDetail({ details, isHR }: JobDetailProps) {
                     />
                     <div className="flex flex-col justify-between">
                       <span className="text-secondary font-semibold">
-                        Ranks
+                        Position
                       </span>
-                      <span className="text-secondary-80">{job?.rank}</span>
+                      <span className="text-secondary-80">{job.position}</span>
                     </div>
                   </div>
                   <div className="flex px-4 gap-4">
@@ -346,7 +328,7 @@ export default function JobDetail({ details, isHR }: JobDetailProps) {
                         Education
                       </span>
                       <span className="text-secondary-80">
-                        {job?.education}
+                        {job.education_level}
                       </span>
                     </div>
                   </div>
@@ -357,10 +339,10 @@ export default function JobDetail({ details, isHR }: JobDetailProps) {
                     />
                     <div className="flex flex-col justify-between">
                       <span className="text-secondary font-semibold">
-                        Number of recruits
+                        Number of openings
                       </span>
                       <span className="text-secondary-80">
-                        {job?.numberOfRecruiter}
+                        {job.number_of_openings}
                       </span>
                     </div>
                   </div>
@@ -371,10 +353,10 @@ export default function JobDetail({ details, isHR }: JobDetailProps) {
                     />
                     <div className="flex flex-col">
                       <span className="text-secondary font-semibold">
-                        Form of work
+                        Job type
                       </span>
                       <span className="text-secondary-80">
-                        {job?.formOfWork}
+                        {job.job_type}
                       </span>
                     </div>
                   </div>
@@ -391,31 +373,31 @@ export default function JobDetail({ details, isHR }: JobDetailProps) {
                 <div className="flex flex-col space-y-4 mx-6 my-6">
                   <div className="flex flex-col space-y-2">
                     <span className="font-semibold text-xl text-accent">
-                      Related occupations
+                      Experience Level
                     </span>
                     <div className="grid grid-cols-2 gap-4 p-2">
                       <span className="bg-highlight-40 rounded-full px-4 py-2 text-center text-primary font-semibold">
-                        {job?.relatedOccupations}
+                        {job.experience_level}
                       </span>
                     </div>
                   </div>
                   <div className="flex flex-col space-y-2">
                     <span className="font-semibold text-xl text-accent">
-                      Required Skills
+                      Job Type
                     </span>
                     <div className="grid grid-cols-2 gap-4 p-2">
                       <span className="bg-highlight-40 rounded-full px-4 py-2 text-center text-primary font-semibold">
-                        {job?.requiredSkills}
+                        {job.job_type}
                       </span>
                     </div>
                   </div>
                   <div className="flex flex-col space-y-2">
                     <span className="font-semibold text-xl text-accent">
-                      Area
+                      Location
                     </span>
                     <div className="grid grid-cols-2 gap-4 p-2">
                       <span className="bg-highlight-40 rounded-full px-4 py-2 text-center text-primary font-semibold">
-                        {job?.area}
+                        {job.province}
                       </span>
                     </div>
                   </div>
@@ -432,7 +414,7 @@ export default function JobDetail({ details, isHR }: JobDetailProps) {
           <div className="flex gap-2 items-center">
             <span className="text-primary-80 ">Status:</span>
             <button className="bg-accent hover:bg-secondary text-neutral-light-20 px-6 py-2 rounded-full cursor-pointer">
-              Active
+              {job.status}
             </button>
           </div>
           <div className="flex gap-4">
@@ -535,7 +517,7 @@ export default function JobDetail({ details, isHR }: JobDetailProps) {
                                 htmlFor="rank"
                                 className="block text-sm font-bold text-primary"
                               >
-                                Ranks*:
+                                Position*:
                               </label>
                               <div className="relative">
                                 <input
@@ -543,7 +525,7 @@ export default function JobDetail({ details, isHR }: JobDetailProps) {
                                   type="text"
                                   value={rank}
                                   onChange={(e) => setRank(e.target.value)}
-                                  placeholder="Enter ranks"
+                                  placeholder="Enter position"
                                   className="w-full border border-primary-80 pl-4 pr-4 py-2 bg-neutral-light-20 rounded-xl text-primary-80 outline-none focus:ring-1 focus:bg-white transition-all duration-300"
                                   required
                                 />
@@ -554,7 +536,7 @@ export default function JobDetail({ details, isHR }: JobDetailProps) {
                                 htmlFor="numberOfRecruits"
                                 className="block text-sm font-bold text-primary"
                               >
-                                Number of recruits*:
+                                Number of openings*:
                               </label>
                               <div className="relative">
                                 <input
@@ -564,182 +546,10 @@ export default function JobDetail({ details, isHR }: JobDetailProps) {
                                   onChange={(e) =>
                                     setNumberOfRecruits(e.target.value)
                                   }
-                                  placeholder="Enter number of recruits"
+                                  placeholder="Enter number of openings"
                                   className="w-full border border-primary-80 pl-4 pr-4 py-2 bg-neutral-light-20 rounded-xl text-primary-80 outline-none focus:ring-1 focus:bg-white transition-all duration-300"
                                   required
                                 />
-                              </div>
-                            </div>
-                            <div className="flex flex-col w-full max-w-2xl">
-                              <label className="mb-1 text-sm font-bold text-primary">
-                                Related Occupation:
-                              </label>
-                              <div className="relative w-full border border-primary-80 bg-neutral-light-20 rounded-xl p-2">
-                                {/* Selected */}
-                                <div className="flex flex-wrap gap-2 mb-2">
-                                  {selectedRelatedOccupations.map(
-                                    (item, index) => (
-                                      <span
-                                        key={index}
-                                        className="px-4 py-1 bg-neutral-medium-60 text-secondary font-semibold rounded-full text-sm flex items-center gap-2"
-                                      >
-                                        {item}
-                                        <button
-                                          onClick={() =>
-                                            handleRemove(
-                                              item,
-                                              selectedRelatedOccupations,
-                                              setSelectedRelatedOccupations
-                                            )
-                                          }
-                                        >
-                                          <X size={18} />
-                                        </button>
-                                      </span>
-                                    )
-                                  )}
-                                </div>
-                                {/* Input */}
-                                <div className="relative">
-                                  <input
-                                    type="text"
-                                    value={relatedOccupations}
-                                    onChange={(e) =>
-                                      setRelatedOccupations(e.target.value)
-                                    }
-                                    placeholder="Add related occupation"
-                                    className="w-full pl-2 pb-2 bg-neutral-light-20 rounded-xl text-primary-80 outline-none"
-                                    onFocus={() =>
-                                      setOpenRelatedOccupation(true)
-                                    }
-                                  />
-                                  <button
-                                    type="button"
-                                    onClick={() =>
-                                      setOpenRelatedOccupation(
-                                        !openRelatedOccupation
-                                      )
-                                    }
-                                    className="absolute right-3 top-1/2 -translate-y-1/2 text-primary"
-                                  >
-                                    {openRelatedOccupation ? (
-                                      <ChevronUp size={20} />
-                                    ) : (
-                                      <ChevronDown size={20} />
-                                    )}
-                                  </button>
-                                </div>
-                                {/* Dropdown */}
-                                {openRelatedOccupation && (
-                                  <div className="absolute left-0 top-full mt-2 w-full border border-primary-80 rounded-xl bg-neutral-light-20 shadow-lg p-2 z-10 max-h-40 overflow-y-auto">
-                                    <div className="flex flex-wrap gap-2">
-                                      {related
-                                        .filter((item) =>
-                                          item
-                                            .toLowerCase()
-                                            .includes(
-                                              relatedOccupations.toLowerCase()
-                                            )
-                                        )
-                                        .map((item, index) => (
-                                          <span
-                                            key={index}
-                                            onClick={() =>
-                                              handleSelect(
-                                                item,
-                                                selectedRelatedOccupations,
-                                                setSelectedRelatedOccupations,
-                                                setRelatedOccupations
-                                              )
-                                            }
-                                            className="px-4 py-1 bg-neutral-medium-60 text-secondary font-semibold rounded-full text-sm cursor-pointer hover:bg-neutral-medium"
-                                          >
-                                            {item}
-                                          </span>
-                                        ))}
-                                    </div>
-                                  </div>
-                                )}
-                              </div>
-                            </div>
-                            <div className="flex flex-col w-full max-w-2xl">
-                              <label className="mb-1 text-sm font-bold text-primary">
-                                Area:
-                              </label>
-                              <div className="relative w-full border border-primary-80 bg-neutral-light-20 rounded-xl p-2">
-                                {/* Selected */}
-                                <div className="flex flex-wrap gap-2 mb-2">
-                                  {selectedAreas.map((item, index) => (
-                                    <span
-                                      key={index}
-                                      className="px-4 py-1 bg-neutral-medium-60 text-secondary font-semibold rounded-full text-sm flex items-center gap-2"
-                                    >
-                                      {item}
-                                      <button
-                                        onClick={() =>
-                                          handleRemove(
-                                            item,
-                                            selectedAreas,
-                                            setSelectedAreas
-                                          )
-                                        }
-                                      >
-                                        <X size={18} />
-                                      </button>
-                                    </span>
-                                  ))}
-                                </div>
-                                {/* Input */}
-                                <div className="relative">
-                                  <input
-                                    type="text"
-                                    value={area}
-                                    onChange={(e) => setArea(e.target.value)}
-                                    placeholder="Add area"
-                                    className="w-full pl-2 pb-2 bg-neutral-light-20 rounded-xl text-primary-80 outline-none"
-                                    onFocus={() => setOpenArea(true)}
-                                  />
-                                  <button
-                                    type="button"
-                                    onClick={() => setOpenArea(!openArea)}
-                                    className="absolute right-3 top-1/2 -translate-y-1/2 text-primary"
-                                  >
-                                    {openArea ? (
-                                      <ChevronUp size={20} />
-                                    ) : (
-                                      <ChevronDown size={20} />
-                                    )}
-                                  </button>
-                                </div>
-                                {/* Dropdown */}
-                                {openArea && (
-                                  <div className="absolute left-0 top-full mt-2 w-full border border-primary-80 rounded-xl bg-neutral-light-20 shadow-lg p-2 z-10 max-h-40 overflow-y-auto">
-                                    <div className="flex flex-wrap gap-2">
-                                      {areaList
-                                        .filter((item) =>
-                                          item
-                                            .toLowerCase()
-                                            .includes(area.toLowerCase())
-                                        )
-                                        .map((item, index) => (
-                                          <span
-                                            key={index}
-                                            onClick={() =>
-                                              handleSelect(
-                                                item,
-                                                selectedAreas,
-                                                setSelectedAreas,
-                                                setArea
-                                              )
-                                            }
-                                            className="px-4 py-1 bg-neutral-medium-60 text-secondary font-semibold rounded-full text-sm cursor-pointer hover:bg-neutral-medium"
-                                          >
-                                            {item}
-                                          </span>
-                                        ))}
-                                    </div>
-                                  </div>
-                                )}
                               </div>
                             </div>
                           </div>
@@ -805,7 +615,7 @@ export default function JobDetail({ details, isHR }: JobDetailProps) {
                                 htmlFor="formOfWork"
                                 className="block text-sm font-bold text-primary"
                               >
-                                Form of work*:
+                                Job type*:
                               </label>
                               <div className="relative">
                                 <input
@@ -815,110 +625,9 @@ export default function JobDetail({ details, isHR }: JobDetailProps) {
                                   onChange={(e) =>
                                     setFormOfWork(e.target.value)
                                   }
-                                  placeholder="Enter form of work"
+                                  placeholder="Enter job type"
                                   className="w-full border border-primary-80 pl-4 pr-4 py-2 bg-neutral-light-20 rounded-xl text-primary-80 outline-none focus:ring-1 focus:bg-white transition-all duration-300"
                                   required
-                                />
-                              </div>
-                            </div>
-                            <div className="flex flex-col w-full max-w-2xl">
-                              <label className="mb-1 text-sm font-bold text-primary">
-                                Skills:
-                              </label>
-                              <div className="relative w-full border border-primary-80 bg-neutral-light-20 rounded-xl p-2">
-                                {/* Selected */}
-                                <div className="flex flex-wrap gap-2 mb-2">
-                                  {selectedSkills.map((item, index) => (
-                                    <span
-                                      key={index}
-                                      className="px-4 py-1 bg-neutral-medium-60 text-secondary font-semibold rounded-full text-sm flex items-center gap-2"
-                                    >
-                                      {item}
-                                      <button
-                                        onClick={() =>
-                                          handleRemove(
-                                            item,
-                                            selectedSkills,
-                                            setSelectedSkills
-                                          )
-                                        }
-                                      >
-                                        <X size={18} />
-                                      </button>
-                                    </span>
-                                  ))}
-                                </div>
-                                {/* Input */}
-                                <div className="relative">
-                                  <input
-                                    type="text"
-                                    value={skill}
-                                    onChange={(e) => setSkill(e.target.value)}
-                                    placeholder="Add skills"
-                                    className="w-full pl-2 pb-2 bg-neutral-light-20 rounded-xl text-primary-80 outline-none"
-                                    onFocus={() => setOpenSkill(true)}
-                                  />
-                                  <button
-                                    type="button"
-                                    onClick={() => setOpenSkill(!openSkill)}
-                                    className="absolute right-3 top-1/2 -translate-y-1/2 text-primary"
-                                  >
-                                    {openSkill ? (
-                                      <ChevronUp size={20} />
-                                    ) : (
-                                      <ChevronDown size={20} />
-                                    )}
-                                  </button>
-                                </div>
-                                {/* Dropdown */}
-                                {openSkill && (
-                                  <div className="absolute left-0 top-full mt-2 w-full border border-primary-80 rounded-xl bg-neutral-light-20 shadow-lg p-2 z-10 max-h-40 overflow-y-auto">
-                                    <div className="flex flex-wrap gap-2">
-                                      {skills
-                                        .filter((item) =>
-                                          item
-                                            .toLowerCase()
-                                            .includes(skill.toLowerCase())
-                                        )
-                                        .map((item, index) => (
-                                          <span
-                                            key={index}
-                                            onClick={() =>
-                                              handleSelect(
-                                                item,
-                                                selectedSkills,
-                                                setSelectedSkills,
-                                                setSkill
-                                              )
-                                            }
-                                            className="px-4 py-1 bg-neutral-medium-60 text-secondary font-semibold rounded-full text-sm cursor-pointer hover:bg-neutral-medium"
-                                          >
-                                            {item}
-                                          </span>
-                                        ))}
-                                    </div>
-                                  </div>
-                                )}
-                              </div>
-                            </div>
-
-                            <div className="flex flex-col">
-                              <label
-                                htmlFor="workingTime"
-                                className="block text-sm font-bold text-primary"
-                              >
-                                Working time:
-                              </label>
-                              <div className="relative">
-                                <input
-                                  id="workingTime"
-                                  type="text"
-                                  value={workingTime}
-                                  onChange={(e) =>
-                                    setWorkingTime(e.target.value)
-                                  }
-                                  placeholder="Enter working time"
-                                  className="w-full border border-primary-80 pl-4 pr-4 py-2 bg-neutral-light-20 rounded-xl text-primary-80 outline-none focus:ring-1 focus:bg-white transition-all duration-300"
                                 />
                               </div>
                             </div>
@@ -985,7 +694,7 @@ export default function JobDetail({ details, isHR }: JobDetailProps) {
                             htmlFor="benefit"
                             className="block text-sm font-bold text-primary"
                           >
-                            Benefit:
+                            Benefits:
                           </label>
                           <div className="relative">
                             <textarea
@@ -993,7 +702,7 @@ export default function JobDetail({ details, isHR }: JobDetailProps) {
                               value={benefit}
                               onChange={(e) => setBenefit(e.target.value)}
                               className="w-full border border-primary-80 h-16 px-4 py-2 text-primary-80 focus:outline-none resize-none bg-neutral-light-20 rounded-xl focus:ring-1 focus:bg-white transition-all duration-300"
-                              placeholder="Enter benefit"
+                              placeholder="Enter benefits"
                             ></textarea>
                           </div>
                         </div>
