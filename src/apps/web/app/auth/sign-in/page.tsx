@@ -14,15 +14,31 @@ export default function LogInPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const res = await login({
-      email: email,
-      password: password,
-    });
-    if (res.success) {
-      router.push("/");
-    }
-    else {
-      toast.error(res.message);
+    try {
+      const res = await login({
+        email: email,
+        password: password,
+      });
+      console.log(res);
+      if (res.success) {
+        toast.success("Login successful!");
+        
+        const role = res.data?.role;
+        if (role === 'candidate') {
+          router.push("/");
+        } else if (role === 'company') {
+          router.push("/company/dashboard");
+        } else if (role === 'admin' || role === 'moderator') {
+          router.push("/operator/dashboard");
+        } else {
+          router.push("/"); 
+        }
+      } else {
+        toast.error(res.message || "Login failed!");
+      }
+    } catch (error) {
+      console.error("Error during login:", error);
+      toast.error("An error occurred during login. Please try again later.");
     }
   };
 

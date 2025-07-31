@@ -5,6 +5,7 @@ import JobCard from "../../../components/job/jobCard";
 import usePagination from "../../../hooks/usePagination";
 import Pagination from "../../../components/pagination";
 import { jobs } from "../../../components/fakeJob";
+import ProtectedRoute from "../../../components/ProtectedRoute";
 
 const dashboard = [
   {
@@ -28,7 +29,7 @@ interface DashboardProps {
   };
 }
 
-export default function CandidateDashboardPage({ dashboard }: DashboardProps) {
+function CandidateDashboardContent({ dashboard }: DashboardProps) {
   const { page, maxPage, current, next, prev } = usePagination(jobs, 2);
 
   return (
@@ -134,5 +135,13 @@ export default function CandidateDashboardPage({ dashboard }: DashboardProps) {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function CandidateDashboardPage({ dashboard }: DashboardProps) {
+  return (
+    <ProtectedRoute allowedRoles={['candidate']}>
+      <CandidateDashboardContent dashboard={dashboard} />
+    </ProtectedRoute>
   );
 }

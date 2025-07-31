@@ -1,186 +1,42 @@
 "use client";
-import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
+import FeaturedJob from "../components/job/featuredJob";
+import TopCompany from "../components/topCompany";
+import CategoryGrid from "../components/categoryGrid";
+import KeywordSearch from "../components/keywordSearch";
 
-import HomePage from "./home/page";
-import LogInPage from "./auth/login/page";
-import RegisterPage from "./auth/register/page";
-import JobsPage from "./jobs/page";
-import CandidateRegistrationPage from "./auth/register/candidate/page";
-import CompanyRegistrationPage from "./auth/register/company/page";
-import PendingApprovalPage from "./pending-approval/page";
-import ForgotPasswordPage from "./forgot-password/page";
-import ForgotPasswordSecondPage from "./forgot-password-second/page";
-import ForgotPasswordThirdPage from "./forgot-password-third/page";
-import Error404Page from "./not-found";
-import Error403Page from "./error-403/page";
-import SupportPage from "./support/page";
-import AboutUsPage from "./about-us/page";
-import RecommendedPage from "./recommended/page";
-import CandidateDashboardPage from "./candidate/dashboard/page";
-import CandidateProfilePage from "./candidate/profile/page";
-import CandidateProfileEditPage from "./candidate/profile/edit/page";
-import CandidateChangePasswordPage from "./candidate/change-password/page";
-import CandidateJobsSavedPage from "./candidate/saved-jobs/page";
-import CandidateJobsAppliedPage from "./candidate/jobs-applied/page";
-import CandidateNotificationsPage from "./candidate/notifications/page";
-import CandidateReportsPage from "./candidate/reports/page";
-import RecruiterDashboardPage from "./recruiter/dashboard/page";
-import RecruiterProfilePage from "./recruiter/profile/page";
-import RecruiterProfileEditPage from "./recruiter/profile/edit/page";
-import RecruiterJobsPage from "./recruiter/jobs/page";
-import RecruiterChangePasswordPage from "./recruiter/change-password/page";
-import RecruiterNotificationsPage from "./recruiter/notifications/page";
-import RecruiterReportsPage from "./recruiter/reports/page";
-import RecruiterWalletPage from "./recruiter/wallet/page";
-import RecruiterApplicationsPage from "./recruiter/applications/page";
-import OperatorCompanyPendingPage from "./operator/company-pending/page";
-import OperatorJobPendingPage from "./operator/job-pending/page";
-import OperatorReportsPage from "./operator/reports/page";
-import OperatorAnnouncementsPage from "./operator/announcements/page";
-import OperatorNotificationsPage from "./operator/notifications/page";
-import OperatorChangePasswordPage from "./operator/change-password/page";
-import OperatorUsersPage from "./operator/users/page";
-import OperatorLogsPage from "./operator/logs/page";
-import OperatorSystemSettingsPage from "./operator/system-settings/page";
-
-export default function App() {
-  const pathname = usePathname();
-  const [currentPath, setCurrentPath] = useState("/");
-
-  useEffect(() => {
-    setCurrentPath(pathname);
-  }, [pathname]);
-
-  const renderPage = () => {
-    switch (currentPath) {
-      case "/":
-        return <HomePage />;
-
-      case "/auth/login":
-        return <LogInPage />;
-
-      case "/auth/register":
-        return <RegisterPage />;
-
-      case "/jobs":
-        return <JobsPage />;
-
-      case "/register/candidate":
-        return <CandidateRegistrationPage />;
-
-      case "/register/company":
-        return <CompanyRegistrationPage />;
-
-      case "/pending-approval":
-        return <PendingApprovalPage />;
-
-      case "/forgot-password":
-        return <ForgotPasswordPage />;
-
-      case "/forgot-password-second":
-        return <ForgotPasswordSecondPage />;
-
-      case "/forgot-password-third":
-        return <ForgotPasswordThirdPage />;
-
-      case "/not-found":
-        return <Error404Page />;
-
-      case "/error-403":
-        return <Error403Page />;
-
-      case "/support":
-        return <SupportPage />;
-
-      case "/about-us":
-        return <AboutUsPage />;
-
-      case "/recommended":
-        return <RecommendedPage />;
-
-      case "/candidate/dashboard":
-        return <CandidateDashboardPage />;
-
-      case "/candidate/profile":
-        return <CandidateProfilePage />;
-
-      case "/candidate/profile/edit":
-        return <CandidateProfileEditPage />;
-
-      case "/candidate/change-password":
-        return <CandidateChangePasswordPage />;
-
-      case "/candidate/jobs-applied":
-        return <CandidateJobsAppliedPage />;
-
-      case "/candidate/saved-jobs":
-        return <CandidateJobsSavedPage />;
-
-      case "/candidate/notifications":
-        return <CandidateNotificationsPage />;
-
-      case "/candidate/reports":
-        return <CandidateReportsPage />;
-
-      case "/recruiter/dashboard":
-        return <RecruiterDashboardPage />;
-
-      case "/recruiter/profile":
-        return <RecruiterProfilePage />;
-
-      case "/recruiter/profile/edit":
-        return <RecruiterProfileEditPage />;
-
-      case "/recruiter/jobs":
-        return <RecruiterJobsPage />;
-
-      case "/recruiter/wallet":
-        return <RecruiterWalletPage />;
-
-      case "/recruiter/change-password":
-        return <RecruiterChangePasswordPage />;
-
-      case "/recruiter/notifications":
-        return <RecruiterNotificationsPage />;
-
-      case "/recruiter/reports":
-        return <RecruiterReportsPage />;
-
-      case "/recruiter/applications":
-        return <RecruiterApplicationsPage />;
-
-      case "/operator/company-pending":
-        return <OperatorCompanyPendingPage />;
-
-      case "/operator/job-pending":
-        return <OperatorJobPendingPage />;
-
-      case "/operator/reports":
-        return <OperatorReportsPage />;
-
-      case "/operator/announcements":
-        return <OperatorAnnouncementsPage />;
-
-      case "/operator/notifications":
-        return <OperatorNotificationsPage />;
-
-      case "/operator/change-password":
-        return <OperatorChangePasswordPage />;
-
-      case "/operator/users":
-        return <OperatorUsersPage />;
-
-      case "/operator/logs":
-        return <OperatorLogsPage />;
-
-      case "/operator/system-settings":
-        return <OperatorSystemSettingsPage />;
-
-      default:
-        return <HomePage />;
-    }
-  };
-
-  return <div className="w-full min-h-screen">{renderPage()}</div>;
+export default function HomePage() {
+  return (
+    <div className="w-full min-h-screen bg-accent-40">
+      <div className="mb-10">
+        <h1 className="font-bold text-7xl text-primary mb-10">
+          Find Opportunities <br /> That Fit You Best!
+        </h1>
+        <p className="text-2xl text-secondary ml-16">
+          From Startup Roles to Global Careers - Lat's Build Your Future
+          Together.
+        </p>
+      </div>
+      <div>
+        <KeywordSearch />
+        <div className="bg-neutral-light-40">
+          <h2 className="font-bold text-4xl text-primary pl-10 w-full mb-6 pt-6">
+            <i>New Jobs</i>
+          </h2>
+          <FeaturedJob />
+        </div>
+        <div className="bg-accent-20">
+          <h2 className="font-bold text-4xl text-primary pl-10 w-full mb-6 pt-6">
+            <i>Top Company</i>
+          </h2>
+          <TopCompany />
+        </div>
+        <div className="bg-accent-20">
+          <h2 className="font-bold text-4xl text-neutral-light-20 pl-10 py-6 w-full bg-primary mb-6">
+            <i>Top Outstanding Industries</i>
+          </h2>
+          <CategoryGrid />
+        </div>
+      </div>
+    </div>
+  );
 }

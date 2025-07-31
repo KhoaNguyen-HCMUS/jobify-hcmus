@@ -1,7 +1,7 @@
 "use client";
 import { useState } from "react";
 import { User, Lock, Mail } from "lucide-react";
-import { register } from "../../../../services/auth";
+import { registerCandidate } from "../../../../services/auth";
 import { useRouter } from 'next/navigation';
 
 import LogoTagline from "../../../../components/logoTagline";
@@ -16,19 +16,30 @@ export default function CandidateRegistrationPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const res = await register({  
-      name: fullName,
+    
+    if (password !== confirmPassword) {
+      toast.error("Passwords do not match");
+      return;
+    }
+    
+    if (!check) {
+      toast.error("Please agree to the Terms of Service");
+      return;
+    }
+    
+    const res = await registerCandidate({  
+      fullname: fullName,
       email: email,
       password: password,
       role: "candidate",
     });
+    
     if (res.success) {
       toast.success("Registration successful");
-      router.push("/sign-in");
+      router.push("/candidate/dashboard");
     } else {
       toast.error(res.message);
     }
-    console.log(res);
   };
   return (
     <div className="flex items-center justify-center w-full min-h-screen p-4 bg-linear-(--gradient-primary)">
@@ -120,7 +131,7 @@ export default function CandidateRegistrationPage() {
                 </div>
                 <input
                   id="confirmPassword"
-                  type="confirmPassword"
+                  type="password"
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   placeholder="Confirm your password"
