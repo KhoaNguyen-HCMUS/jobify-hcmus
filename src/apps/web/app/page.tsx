@@ -15,7 +15,7 @@ import ForgotPasswordThirdPage from "./forgot-password-third/page";
 import Error404Page from "./not-found";
 import Error403Page from "./error-403/page";
 import SupportPage from "./support/page";
-import AboutUsPage from "./about-us/page";
+import AboutUsPage from "./about/page";
 import RecommendedPage from "./recommended/page";
 import CandidateDashboardPage from "./candidate/dashboard/page";
 import CandidateProfilePage from "./candidate/profile/page";
@@ -93,7 +93,7 @@ export default function App() {
       case "/support":
         return <SupportPage />;
 
-      case "/about-us":
+      case "/about":
         return <AboutUsPage />;
 
       case "/recommended":

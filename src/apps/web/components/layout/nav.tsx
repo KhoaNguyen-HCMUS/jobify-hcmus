@@ -52,7 +52,7 @@ export default function NavBar() {
     { href: "/", label: "Home" },
     { href: "/jobs", label: "Browse Jobs" },
     { href: "/support", label: "Support" },
-    { href: "/about-us", label: "About Us" },
+    { href: "/about", label: "About Us" },
   ];
 
   const candidateItems = [
@@ -61,13 +61,13 @@ export default function NavBar() {
     { href: "/applications", label: "Applications" },
     { href: "/recommended", label: "Recommended" },
     { href: "/support", label: "Support" },
-    { href: "/about-us", label: "About Us" },
+    { href: "/about", label: "About Us" },
   ];
 
   const hrItems = [
     { href: "/recruiter/dashboard", label: "Dashboard" },
     { href: "/support", label: "Support" },
-    { href: "/about-us", label: "About Us" },
+    { href: "/about", label: "About Us" },
   ];
 
   const moderatorItems = [

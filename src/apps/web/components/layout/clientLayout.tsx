@@ -33,17 +33,16 @@ export default function ClientLayout({
       "/register/candidate",
       "/register/company",
       "/pending-approval",
-      "/about-us",
+      "/about",
       "/jobs",
-      "/company-detail",
-      "/job-detail",
       "/recommended",
       "/support",
       "/recruiter/applications",
       "/operator/report-detail",
     ].includes(pathname) ||
     pathname.startsWith("/jobs/") ||
-    pathname.startsWith("/reports/");
+    pathname.startsWith("/reports/") ||
+    pathname.startsWith("/companies/");
 
   return (
     <>

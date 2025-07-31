@@ -1,11 +1,11 @@
 import GoBack from "../../../components/goBack";
-import JobDetail from "../../../components/job/jobDetail";
+import CompanyDetail from "../../../components/company/companyDetail";
 
 export default function JobDetailPage() {
   return (
     <div className="flex flex-col mx-20 my-10 gap-4">
       <GoBack />
-      <JobDetail />
+      <CompanyDetail />
     </div>
   );
 }
