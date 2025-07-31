@@ -38,10 +38,10 @@ export default function NavBar() {
     try {
       await logout();
       updateUser();
-      toast.success('Đăng xuất thành công!');
+      toast.success('Logout successfully!');
       router.push('/auth/sign-in');
     } catch (error) {
-      toast.error('Lỗi khi đăng xuất!');
+      toast.error('Error when logout!');
     }
   };
 

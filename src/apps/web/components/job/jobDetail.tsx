@@ -125,6 +125,15 @@ export default function JobDetail({ job: propJob, isHR }: JobDetailProps) {
 
   return (
     <div className="flex flex-col gap-8">
+      <div className="flex items-center gap-4 px-6">
+        <button
+          onClick={() => router.back()}
+          className="flex items-center gap-2 px-4 py-2 bg-primary text-background rounded-lg hover:bg-primary-80 transition-colors"
+        >
+          <X size={20} />
+          Back
+        </button>
+      </div>
       <div className="flex flex-wrap gap-8 px-6">
         <div className="flex-2 space-y-4">
           <div className="flex flex-col justify-between bg-neutral-light-20 shadow-xl rounded-3xl space-y-4 p-6">
