@@ -30,6 +30,22 @@ export interface CompanyProfileResponse {
   };
 }
 
+export interface UpdateCompanyData {
+  company_name?: string;
+  website?: string;
+  tax_code?: string;
+  license_number?: string;
+  phone_number?: string;
+  email?: string;
+  description?: string;
+  address?: string;
+  industry?: string;
+  size?: string;
+  logo_url?: string;
+  cover_url?: string;
+  founded_year?: number;
+}
+
 export const getCompanyProfile = async (): Promise<CompanyProfileResponse> => {
   try {
     const token = getToken();
@@ -48,6 +64,36 @@ export const getCompanyProfile = async (): Promise<CompanyProfileResponse> => {
     return {
       success: false,
       message: 'Network connection error',
+    };
+  }
+};
+
+export const updateCompanyProfile = async (updateData: UpdateCompanyData): Promise<CompanyProfileResponse> => {
+  try {
+    const token = getToken();
+
+    if (!token) {
+      return {
+        success: false,
+        message: 'No authentication token found',
+      };
+    }
+
+    const response = await fetch(`${API_URL}/profile/company/me`, {
+      method: 'PUT',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(updateData),
+    });
+
+    const result = await response.json();
+    return result;
+  } catch (error) {
+    return {
+      success: false,
+      message: 'Failed to update company profile',
     };
   }
 }; 
