@@ -1,7 +1,7 @@
 "use client";
 import { useState } from "react";
 import { Plus, X } from "lucide-react";
-import { Education } from "../services/profile";
+import { Education } from "../services/candidateProfile";
 import { formatDateForInput } from "../utils/dateUtils";
 
 interface EducationProps {

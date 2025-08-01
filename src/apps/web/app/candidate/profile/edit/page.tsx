@@ -13,7 +13,7 @@ import {
   Calendar,
   ChevronDown,
 } from "lucide-react";
-import { getProfile, updateProfile, Profile, Experience, Education, UpdateProfileData } from "../../../../services/profile";
+import { getProfile, updateProfile, Profile, Experience, Education, UpdateProfileData } from "../../../../services/candidateProfile";
 import { getProvinces, getDistrictsByProvince, Province, District } from "../../../../services/location";
 import { toast } from "react-toastify";
 import ProtectedRoute from "../../../../components/ProtectedRoute";
@@ -57,8 +57,8 @@ function CandidateProfileEditContent() {
     try {
       setLoading(true);
       const response = await getProfile();
-      if (response.success && response.data) {
-        const profileData = response.data;
+      if (response.success && response.data?.profile) {
+        const profileData = response.data.profile;
         setProfile(profileData);
         
         // Set basic fields
@@ -227,14 +227,14 @@ function CandidateProfileEditContent() {
 
   if (loading) {
     return (
-      <div className="w-full h-full bg-neutral-light-60 flex items-center justify-center">
+      <div className="w-full h-full  min-h-screen bg-neutral-light-60 flex items-center justify-center">
         <div className="text-primary text-xl">Loading profile...</div>
       </div>
     );
   }
 
   return (
-    <div className="w-full h-full bg-neutral-light-60">
+    <div className="w-full h-full  min-h-screen bg-neutral-light-60">
       <div className="flex flex-col justify-between px-20 py-10 space-y-4">
         <div className="text-accent font-bold text-2xl">
           Edit Personal Information
@@ -297,15 +297,17 @@ function CandidateProfileEditContent() {
                   <div className="absolute left-4 top-1/2 transform -translate-y-1/2 text-primary">
                     <VenusAndMars size={18} />
                   </div>
-                  <input
+                  <select
                     id="gender"
-                    type="text"
                     value={gender}
                     onChange={(e) => setGender(e.target.value)}
-                    placeholder="Enter your gender"
                     className="w-full border border-primary-60 pl-12 pr-4 py-2 bg-neutral-light-20 rounded-xl text-primary-80 outline-none focus:ring-1 focus:primary focus:bg-white transition-all duration-300"
                     required
-                  />
+                  >
+                    <option value="">Select gender</option>
+                    <option value="Male">Male</option>
+                    <option value="Female">Female</option>
+                  </select>
                 </div>
               </div>
               <div className="flex flex-col px-4">

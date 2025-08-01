@@ -4,7 +4,7 @@ import PersonalInformation from "../../../components/personalInformation";
 import Skills from "../../../components/skills";
 import Education from "../../../components/education";
 import WorkExperience from "../../../components/workExperience";
-import { getProfile, Profile } from "../../../services/profile";
+import { getProfile, Profile } from "../../../services/candidateProfile";
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import ProtectedRoute from "../../../components/ProtectedRoute";
@@ -18,8 +18,8 @@ function CandidateProfileContent() {
     try {
       setLoading(true);
       const response = await getProfile();
-      if (response.success && response.data) {
-        setProfile(response.data);
+      if (response.success && response.data?.profile) {
+        setProfile(response.data.profile);
       } else {
         toast.error(response.message || 'Failed to load profile');
       }
@@ -36,7 +36,7 @@ function CandidateProfileContent() {
 
   if (loading) {
     return (
-      <div className="w-full h-full bg-neutral-light-60 flex items-center justify-center">
+      <div className="w-full h-full  min-h-screen bg-neutral-light-60 flex items-center justify-center">
         <div className="text-primary text-xl">Loading profile...</div>
       </div>
     );
@@ -44,7 +44,7 @@ function CandidateProfileContent() {
 
   if (!profile) {
     return (
-      <div className="w-full h-full bg-neutral-light-60 flex items-center justify-center">
+      <div className="w-full h-full min-h-screen bg-neutral-light-60 flex items-center justify-center">
         <div className="text-primary text-xl">Profile not found</div>
       </div>
     );
@@ -111,6 +111,8 @@ function CandidateProfileContent() {
               </div>
             </div>
             <div className="flex-1 flex flex-col gap-2">
+              <PersonalInformation title="Email" inFor={profile.email} />
+
               <a href={profile.linkedin_url}></a>
               <PersonalInformation title="LinkedIn" inFor={profile.linkedin_url} />
               <a href={profile.website}>
@@ -122,7 +124,6 @@ function CandidateProfileContent() {
             </div>
           </div>
           
-          {/* Simple Work Experience Section */}
           <div className="flex flex-wrap gap-8">
             <div className="flex-1">
               <h2 className="text-xl font-bold text-primary mb-4">Work Experience</h2>

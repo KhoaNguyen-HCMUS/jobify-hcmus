@@ -1,7 +1,7 @@
 "use client";
 import { useState } from "react";
 import { Plus, X } from "lucide-react";
-import { Experience } from "../services/profile";
+import { Experience } from "../services/candidateProfile";
 import { formatDateForInput } from "../utils/dateUtils";
 
 interface WorkExperienceProps {

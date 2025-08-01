@@ -51,12 +51,15 @@ export interface Profile {
   skills: string;
   experiences: Experience[];
   educations: Education[];
+  email: string;
 }
 
 export interface ProfileResponse {
   success: boolean;
   message: string;
-  data?: Profile;
+  data?: {
+    profile: Profile;
+  };
 }
 
 export interface UpdateProfileData {
@@ -104,7 +107,7 @@ export const getProfile = async (): Promise<ProfileResponse> => {
       };
     }
 
-    const response = await fetch(`${API_URL}/profile/me`, {
+    const response = await fetch(`${API_URL}/profile/candidate/me`, {
       method: 'GET',
       headers: {
         'Authorization': `Bearer ${token}`,
@@ -134,7 +137,7 @@ export const updateProfile = async (updateData: UpdateProfileData): Promise<Prof
     }
 
 
-    const response = await fetch(`${API_URL}/profile/me`, {
+    const response = await fetch(`${API_URL}/profile/candidate/me`, {
       method: 'PUT',
       headers: {
         'Authorization': `Bearer ${token}`,

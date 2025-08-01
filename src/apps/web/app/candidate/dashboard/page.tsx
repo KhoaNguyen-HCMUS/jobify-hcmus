@@ -6,7 +6,7 @@ import usePagination from "../../../hooks/usePagination";
 import Pagination from "../../../components/pagination";
 import { jobs } from "../../../components/fakeJob";
 import ProtectedRoute from "../../../components/ProtectedRoute";
-import { getProfile, Profile } from "../../../services/profile";
+import { getProfile, Profile } from "../../../services/candidateProfile";
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 
@@ -19,8 +19,8 @@ function CandidateDashboardContent() {
     try {
       setLoading(true);
       const response = await getProfile();
-      if (response.success && response.data) {
-        setProfile(response.data);
+      if (response.success && response.data?.profile) {
+        setProfile(response.data.profile);
       } else {
         toast.error(response.message || 'Failed to load profile');
       }
@@ -63,7 +63,7 @@ function CandidateDashboardContent() {
                 <div className="flex flex-col gap-2">
                   <span className="flex gap-2 text-primary">
                     <Mail size={24} />
-                    <span>{profile?.phone || "Not updated"}</span>
+                    <span>{profile?.email || "Not updated"}</span>
                   </span>
                   <span className="flex gap-2 text-primary">
                     <Phone size={24} />
@@ -76,11 +76,6 @@ function CandidateDashboardContent() {
                 </div>
               </div>
             </div>
-              <div className="p-4">
-               <a href="/candidate/profile">
-                 <FilePenLine size={24} className="text-primary cursor-pointer hover:text-primary-80 transition-colors" />
-               </a>
-             </div>
           </div>
           <div className="flex-1 bg-highlight-40 rounded-2xl shadow-lg">
             <div className="flex flex-col">
