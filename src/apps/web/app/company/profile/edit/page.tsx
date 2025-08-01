@@ -190,14 +190,9 @@ export default function RecruiterProfileEditPage() {
                   <div className="absolute left-4 top-1/2 transform -translate-y-1/2 text-primary">
                     <Mail size={18} />
                   </div>
-                  <input
-                    id="email"
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    placeholder="Enter email address"
-                    className="w-full border border-primary-60 pl-12 pr-4 py-2 bg-neutral-light-20 rounded-xl text-primary-80 outline-none focus:ring-1 focus:bg-white transition-all duration-300"
-                  />
+                  <div className="w-full  pl-12 pr-4 py-2 rounded-xl text-primary">
+                    {email || "No email available"}
+                  </div>
                 </div>
               </div>
             </div>
