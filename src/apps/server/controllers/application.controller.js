@@ -40,12 +40,7 @@ exports.cancelApplication = async (req, res) => {
 exports.getJobApplications = async (req, res) => {
   const { id } = req.params;
   try {
-    const applications = await prisma.job_applications.findMany({
-      where: { job_id: id },
-      include: {
-        users: true, 
-      },
-    });
+    const applications = await prisma.job_applications.findMany({ where: { job_id: id }, });
     return successResponse(res, 'Applications fetched successfully', applications);
   } catch (err) {
     console.error(err);
@@ -53,19 +48,11 @@ exports.getJobApplications = async (req, res) => {
   }
 };
 
-exports.getApplicationDetail = async (req, res) => {
+exports.getApplicationById = async (req, res) => {
   const { id } = req.params;
 
   try {
-    const application = await prisma.job_applications.findUnique({
-      where: { id },
-      include: {
-        users: true, 
-        file_uploads: true, 
-        job_posts: true,   
-        application_status_history: true, 
-      },
-    });
+    const application = await prisma.job_applications.findUnique({ where: { id }, });
 
     if (!application) {
       return errorResponse(res, 'Application not found', [], 404);
@@ -87,9 +74,7 @@ exports.updateApplicationStatus = async (req, res) => {
   }
 
   try {
-    const application = await prisma.job_applications.findUnique({
-      where: { id },
-    });
+    const application = await prisma.job_applications.findUnique({ where: { id } });
 
     if (!application) {
       return errorResponse(res, 'Application not found', [], 404);
