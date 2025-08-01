@@ -5,6 +5,8 @@ import JobCard from "../../../components/job/jobCard";
 import usePagination from "../../../hooks/usePagination";
 import Pagination from "../../../components/pagination";
 import { jobs } from "../../../components/fakeJob";
+import { DEFAULT_COVER_IMAGE } from "../../../constants/imgConstants";
+import { DEFAULT_AVATAR_IMAGE } from "../../../constants/imgConstants";
 
 interface CompanyProps {
   company: {
@@ -31,7 +33,6 @@ const Stat = ({
   <div className={`flex flex-col items-center font-bold text-[${color}]`}>
     <span
       className="w-16 h-16 flex items-center justify-center text-2xl rounded-full border-2 bg-neutral-light-20"
-      style={{ borderColor: color }}
     >
       {value}
     </span>
@@ -50,12 +51,12 @@ export default function RecruiterDashboardPage({ company }: CompanyProps) {
           <div className="flex flex-col">
             <div className="relative w-full h-56">
               <img
-                src={company?.coverImage}
+                src={company?.coverImage || DEFAULT_COVER_IMAGE}
                 alt="coverImage"
                 className="w-full h-full object-cover rounded-t-3xl"
               />
               <img
-                src={company?.logoImage}
+                src={company?.logoImage || DEFAULT_AVATAR_IMAGE}
                 alt="logo"
                 className="absolute object-contain top-28 left-10 w-20 sm:w-24 md:w-28 lg:w-32 aspect-square rounded-xl mx-auto"
               />
@@ -74,7 +75,12 @@ export default function RecruiterDashboardPage({ company }: CompanyProps) {
                       <Unlink2 />
                       <a href={company?.website}>{company?.website}</a>
                     </div>
-                    <a href="/company/profile/edit" className="px-4">
+                    <a
+                      href="/company/profile/edit"
+                      className="px-4"
+                      aria-label="Edit company profile"
+                      title="Edit company profile"
+                    >
                       <FilePenLine size={24} />
                     </a>
                   </div>
