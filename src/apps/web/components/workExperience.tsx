@@ -52,6 +52,8 @@ export default function WorkExperience({ experiences, onExperiencesChange }: Wor
             <button
               onClick={() => removeExperience(index)}
               className="text-red-500 hover:text-red-700"
+              title="Remove experience"
+              aria-label="Remove experience"
             >
               <X size={20} />
             </button>
@@ -89,21 +91,25 @@ export default function WorkExperience({ experiences, onExperiencesChange }: Wor
             </div>
             <div className="flex flex-col">
               <label className="block text-sm font-bold text-primary mb-2">Start Date</label>
-                                   <input
-                       type="date"
-                       value={formatDateForInput(exp.start_date)}
-                       onChange={(e) => updateExperience(index, 'start_date', e.target.value)}
-                       className="w-full border border-primary-60 px-4 py-2 bg-neutral-light-20 rounded-xl text-primary-80 outline-none focus:ring-1 focus:primary focus:bg-white transition-all duration-300"
-                     />
+              <input
+                type="date"
+                id={`exp-start-date-${index}`}
+                value={formatDateForInput(exp.start_date)}
+                onChange={(e) => updateExperience(index, 'start_date', e.target.value)}
+                className="w-full border border-primary-60 px-4 py-2 bg-neutral-light-20 rounded-xl text-primary-80 outline-none focus:ring-1 focus:primary focus:bg-white transition-all duration-300"
+                aria-label="Experience start date"
+              />
             </div>
             <div className="flex flex-col">
               <label className="block text-sm font-bold text-primary mb-2">End Date</label>
-                                   <input
-                       type="date"
-                       value={formatDateForInput(exp.end_date)}
-                       onChange={(e) => updateExperience(index, 'end_date', e.target.value)}
-                       className="w-full border border-primary-60 px-4 py-2 bg-neutral-light-20 rounded-xl text-primary-80 outline-none focus:ring-1 focus:primary focus:bg-white transition-all duration-300"
-                     />
+              <input
+                type="date"
+                id={`exp-end-date-${index}`}
+                value={formatDateForInput(exp.end_date)}
+                onChange={(e) => updateExperience(index, 'end_date', e.target.value)}
+                className="w-full border border-primary-60 px-4 py-2 bg-neutral-light-20 rounded-xl text-primary-80 outline-none focus:ring-1 focus:primary focus:bg-white transition-all duration-300"
+                aria-label="Experience end date"
+              />
             </div>
             <div className="flex items-center gap-2">
               <input

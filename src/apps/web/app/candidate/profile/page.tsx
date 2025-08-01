@@ -89,8 +89,14 @@ function CandidateProfileContent() {
           <div className="flex flex-wrap">
             <div className="flex-1 flex flex-col gap-2">
               <PersonalInformation title="Industry" inFor={profile.industry} />
-              <a href={profile.github_url}>
-              <PersonalInformation title="GitHub" inFor={profile.github_url} />
+              <a 
+                href={profile.github_url} 
+                target="_blank" 
+                rel="noopener noreferrer"
+                title="Visit GitHub profile"
+                aria-label="Visit GitHub profile"
+              >
+                <PersonalInformation title="GitHub" inFor={profile.github_url} />
               </a>
               <div className="flex flex-col gap-2">
                 <span className="text-primary text-lg">
@@ -113,9 +119,22 @@ function CandidateProfileContent() {
             <div className="flex-1 flex flex-col gap-2">
               <PersonalInformation title="Email" inFor={profile.email} />
 
-              <a href={profile.linkedin_url}></a>
-              <PersonalInformation title="LinkedIn" inFor={profile.linkedin_url} />
-              <a href={profile.website}>
+              <a 
+                href={profile.linkedin_url} 
+                target="_blank" 
+                rel="noopener noreferrer"
+                title="Visit LinkedIn profile"
+                aria-label="Visit LinkedIn profile"
+              >
+                <PersonalInformation title="LinkedIn" inFor={profile.linkedin_url} />
+              </a>
+              <a 
+                href={profile.website}
+                target="_blank" 
+                rel="noopener noreferrer"
+                title="Visit personal website"
+                aria-label="Visit personal website"
+              >
                 <PersonalInformation
                   title="Personal website"
                   inFor={profile.website}
@@ -154,7 +173,6 @@ function CandidateProfileContent() {
               </div>
             </div>
 
-            {/* Simple Education Section */}
             <div className="flex-1">
               <h2 className="text-xl font-bold text-primary mb-4">Education</h2>
               <div className="space-y-4">
@@ -186,9 +204,15 @@ function CandidateProfileContent() {
           </div>
         </div>
         <div className="flex">
-          <div className="bg-accent hover:bg-secondary cursor-pointer text-neutral-light-20 font-semibold rounded-2xl px-6 py-2">
-            <a href="/candidate/profile/edit">Edit</a>
-          </div>
+          <a 
+            href="/candidate/profile/edit"
+            title="Edit profile"
+            aria-label="Edit profile"
+          >
+            <div className="bg-accent hover:bg-secondary cursor-pointer text-neutral-light-20 font-semibold rounded-2xl px-6 py-2">
+              Edit
+            </div>
+          </a>
         </div>
       </div>
     </div>

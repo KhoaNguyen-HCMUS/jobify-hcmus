@@ -51,6 +51,8 @@ export default function EducationComponent({ educations, onEducationsChange }: E
             <button
               onClick={() => removeEducation(index)}
               className="text-red-500 hover:text-red-700"
+              title="Remove education"
+              aria-label="Remove education"
             >
               <X size={20} />
             </button>
@@ -98,21 +100,25 @@ export default function EducationComponent({ educations, onEducationsChange }: E
             </div>
             <div className="flex flex-col">
               <label className="block text-sm font-bold text-primary mb-2">Start Date</label>
-                                   <input
-                       type="date"
-                       value={formatDateForInput(edu.start_date)}
-                       onChange={(e) => updateEducation(index, 'start_date', e.target.value)}
-                       className="w-full border border-primary-60 px-4 py-2 bg-neutral-light-20 rounded-xl text-primary-80 outline-none focus:ring-1 focus:primary focus:bg-white transition-all duration-300"
-                     />
+              <input
+                type="date"
+                id={`start-date-${index}`}
+                value={formatDateForInput(edu.start_date)}
+                onChange={(e) => updateEducation(index, 'start_date', e.target.value)}
+                className="w-full border border-primary-60 px-4 py-2 bg-neutral-light-20 rounded-xl text-primary-80 outline-none focus:ring-1 focus:primary focus:bg-white transition-all duration-300"
+                aria-label="Education start date"
+              />
             </div>
             <div className="flex flex-col">
               <label className="block text-sm font-bold text-primary mb-2">End Date</label>
-                                   <input
-                       type="date"
-                       value={formatDateForInput(edu.end_date)}
-                       onChange={(e) => updateEducation(index, 'end_date', e.target.value)}
-                       className="w-full border border-primary-60 px-4 py-2 bg-neutral-light-20 rounded-xl text-primary-80 outline-none focus:ring-1 focus:primary focus:bg-white transition-all duration-300"
-                     />
+              <input
+                type="date"
+                id={`end-date-${index}`}
+                value={formatDateForInput(edu.end_date)}
+                onChange={(e) => updateEducation(index, 'end_date', e.target.value)}
+                className="w-full border border-primary-60 px-4 py-2 bg-neutral-light-20 rounded-xl text-primary-80 outline-none focus:ring-1 focus:primary focus:bg-white transition-all duration-300"
+                aria-label="Education end date"
+              />
             </div>
           </div>
           <div className="mt-4">
