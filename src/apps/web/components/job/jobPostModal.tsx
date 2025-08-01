@@ -5,6 +5,7 @@ import { postNewJob } from "../../services/jobs";
 import { getToken } from "../../utils/auth";
 import { getProvinces, getDistrictsByProvince, Province, District } from "../../services/location";
 import { EXPERIENCE_LEVELS, EDUCATION_LEVELS, JOB_TYPES } from "../../constants/jobConstants";
+import { getAllIndustries, Industry, getIndustriesByCategory, IndustryCategory, debugIndustriesStructure, testHierarchicalLogic } from "../../services/industries";
 import { toast } from "react-toastify";
 
 interface JobPostModalProps {
@@ -37,8 +38,10 @@ export default function JobPostModal({ isOpen, onClose }: JobPostModalProps) {
   const [selectedProvince, setSelectedProvince] = useState("");
   const [selectedDistrict, setSelectedDistrict] = useState("");
 
-
-
+  const [industries, setIndustries] = useState<Industry[]>([]);
+  const [industryCategories, setIndustryCategories] = useState<IndustryCategory[]>([]);
+  const [selectedIndustry, setSelectedIndustry] = useState("");
+  const [selectedSubIndustry, setSelectedSubIndustry] = useState("");
 
   const [isLoading, setIsLoading] = useState(false);
 
@@ -70,6 +73,23 @@ export default function JobPostModal({ isOpen, onClose }: JobPostModalProps) {
     loadDistricts();
   }, [selectedProvince, provinces]);
 
+  useEffect(() => {
+    const loadIndustries = async () => {
+      const response = await getAllIndustries();
+      if (response.success && response.data) {
+        setIndustries(response.data);
+        debugIndustriesStructure(response.data); // Debug dữ liệu
+        const categories = getIndustriesByCategory(response.data);
+        setIndustryCategories(categories);
+      }
+    };
+    loadIndustries();
+  }, []);
+
+  useEffect(() => {
+    setSelectedSubIndustry("");
+  }, [selectedIndustry]);
+
   const handleSelect = (
     item: string,
     selected: string[],
@@ -91,7 +111,7 @@ export default function JobPostModal({ isOpen, onClose }: JobPostModalProps) {
   };
 
   const handleSubmit = async (status: "draft" | "pending") => {
-    if (!title || !deadline || !salaryMin || !salaryMax || !positions || !numberOfRecruits || !formOfWork || !selectedProvince || !selectedDistrict || !experience || !education) {
+    if (!title || !deadline || !salaryMin || !salaryMax || !positions || !numberOfRecruits || !formOfWork || !selectedProvince || !selectedDistrict || !experience || !education || !selectedIndustry) {
       alert("Please fill in all required fields!");
       return;
     }
@@ -123,7 +143,7 @@ export default function JobPostModal({ isOpen, onClose }: JobPostModalProps) {
         requirements: applicantRequirements,
         responsibilities: jobDescription, 
         benefits: benefit,
-        industry_id: "04185086-9fac-4476-aea5-1d3d8d848b2f", 
+        industry_id: selectedSubIndustry || selectedIndustry, 
         currency: "VND",
         cost_coin: 10,
         status: status,
@@ -159,6 +179,8 @@ export default function JobPostModal({ isOpen, onClose }: JobPostModalProps) {
         setBenefit("");
         setSelectedProvince("");
         setSelectedDistrict("");
+        setSelectedIndustry("");
+        setSelectedSubIndustry("");
       } else {
         toast.error("Failed to post job: " + response.message);
       }
@@ -260,6 +282,30 @@ export default function JobPostModal({ isOpen, onClose }: JobPostModalProps) {
                         {EXPERIENCE_LEVELS.map((level) => (
                           <option key={level} value={level}>
                             {level}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                    </div>
+                    <div className="flex flex-col">
+                    <label
+                      htmlFor="industry"
+                      className="block text-sm font-bold text-primary"
+                    >
+                      Industry*:
+                    </label>
+                    <div className="relative">
+                      <select
+                        id="industry"
+                        value={selectedIndustry}
+                        onChange={(e) => setSelectedIndustry(e.target.value)}
+                        className="w-full border border-primary-80 pl-4 pr-4 py-2 bg-neutral-light-20 rounded-xl text-primary-80 outline-none focus:ring-1 focus:bg-white transition-all duration-300"
+                        required
+                      >
+                        <option value="">Select industry category</option>
+                        {industryCategories.map((category) => (
+                          <option key={category.id} value={category.id}>
+                            {category.name}
                           </option>
                         ))}
                       </select>
@@ -400,6 +446,35 @@ export default function JobPostModal({ isOpen, onClose }: JobPostModalProps) {
                       </select>
                     </div>
                   </div>
+                  
+                  <div className="flex flex-col">
+                    <label
+                      htmlFor="subIndustry"
+                      className="block text-sm font-bold text-primary"
+                    >
+                      Specialization (Optional):
+                    </label>
+                    <div className="relative">
+                      <select
+                        id="subIndustry"
+                        value={selectedSubIndustry}
+                        onChange={(e) => setSelectedSubIndustry(e.target.value)}
+                        className="w-full border border-primary-80 pl-4 pr-4 py-2 bg-neutral-light-20 rounded-xl text-primary-80 outline-none focus:ring-1 focus:bg-white transition-all duration-300"
+                        disabled={!selectedIndustry}
+                      >
+                        <option value="">Select specialization (optional)</option>
+                        {selectedIndustry && industryCategories
+                          .find(cat => cat.id === selectedIndustry)
+                          ?.children.map((subIndustry) => (
+                            <option key={subIndustry.id} value={subIndustry.id}>
+                              {subIndustry.name}
+                            </option>
+                          ))}
+                      </select>
+                    </div>
+                  </div>
+
+                  
                   <div className="flex flex-col">
                     <label
                       htmlFor="formOfWork"
@@ -424,6 +499,8 @@ export default function JobPostModal({ isOpen, onClose }: JobPostModalProps) {
                       </select>
                     </div>
                   </div>
+                  
+                  
                   <div className="flex flex-col">
                     <label
                       htmlFor="skills"
