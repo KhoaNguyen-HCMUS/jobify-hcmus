@@ -83,4 +83,24 @@ export const getJobById = async (id: string): Promise<JobResponse> => {
       message: 'Network connection error',
     };
   }
+};
+
+export const postNewJob = async (data: any, token: string): Promise<JobResponse> => {
+  try {
+    const response = await fetch(`${API_URL}/jobs`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+      },
+      body: JSON.stringify(data),
+    });
+    const result = await response.json();
+    return result;
+  } catch (error) {
+    return {
+      success: false,
+      message: 'Network connection error',
+    };
+  }
 }; 

@@ -35,10 +35,14 @@ export const getProvinces = async (): Promise<ProvinceResponse> => {
     const response = await fetch(`${API_URL}/p/`);
     const data = await response.json();
     
+    const sortedProvinces = data.sort((a: Province, b: Province) => 
+      a.name.localeCompare(b.name, 'vi')
+    );
+    
     return {
       success: true,
       message: 'Provinces fetched successfully',
-      data: data
+      data: sortedProvinces
     };
   } catch (error) {
     return {
@@ -53,10 +57,15 @@ export const getDistrictsByProvince = async (provinceCode: number): Promise<Dist
     const response = await fetch(`${API_URL}/p/${provinceCode}?depth=2`);
     const data = await response.json();
     
+    const districts = data.districts || [];
+    const sortedDistricts = districts.sort((a: District, b: District) => 
+      a.name.localeCompare(b.name, 'vi')
+    );
+    
     return {
       success: true,
       message: 'Districts fetched successfully',
-      data: data.districts || []
+      data: sortedDistricts
     };
   } catch (error) {
     return {
