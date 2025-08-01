@@ -6,6 +6,7 @@ import { getToken } from "../../utils/auth";
 import { getProvinces, getDistrictsByProvince, Province, District } from "../../services/location";
 import { EXPERIENCE_LEVELS, EDUCATION_LEVELS, JOB_TYPES } from "../../constants/jobConstants";
 import { getAllIndustries, Industry, getIndustriesByCategory, IndustryCategory } from "../../services/industries";
+import { getCompanyProfile, CompanyProfile } from "../../services/company";
 import { toast } from "react-toastify";
 
 interface JobPostModalProps {
@@ -42,6 +43,8 @@ export default function JobPostModal({ isOpen, onClose }: JobPostModalProps) {
   const [industryCategories, setIndustryCategories] = useState<IndustryCategory[]>([]);
   const [selectedIndustry, setSelectedIndustry] = useState("");
   const [selectedSubIndustry, setSelectedSubIndustry] = useState("");
+
+  const [companyProfile, setCompanyProfile] = useState<CompanyProfile | null>(null);
 
   const [isLoading, setIsLoading] = useState(false);
 
@@ -84,6 +87,34 @@ export default function JobPostModal({ isOpen, onClose }: JobPostModalProps) {
     };
     loadIndustries();
   }, []);
+
+  useEffect(() => {
+    const loadCompanyProfile = async () => {
+        const response = await getCompanyProfile();
+        if (response.success && response.data) {
+          setCompanyProfile(response.data.companyProfiles);
+        }
+    };
+    if (isOpen) {
+      loadCompanyProfile();
+    }
+  }, [isOpen]);
+
+  useEffect(() => {
+    if (companyProfile) {
+      if (companyProfile.address && !workPlace) {
+        setWorkPlace(companyProfile.address);
+      }
+      
+      if (!workingTime) {
+        setWorkingTime("Monday - Friday, 8:00 AM - 5:00 PM");
+      }
+      
+      if (companyProfile.description ) {
+        setJobDescription(`Join our team at ${companyProfile.company_name}`);
+      }
+    }
+  }, [companyProfile, workPlace, workingTime, jobDescription]);
 
   useEffect(() => {
     setSelectedSubIndustry("");
@@ -180,6 +211,7 @@ export default function JobPostModal({ isOpen, onClose }: JobPostModalProps) {
         setSelectedDistrict("");
         setSelectedIndustry("");
         setSelectedSubIndustry("");
+        setCompanyProfile(null);
       } else {
         toast.error("Failed to post job: " + response.message);
       }
@@ -217,6 +249,18 @@ export default function JobPostModal({ isOpen, onClose }: JobPostModalProps) {
           </div>
           <div className="px-4 pb-4">
             <div className="flex flex-col rounded-b-2xl gap-2">
+              {companyProfile && (
+                <div className="bg-primary-20 p-3 rounded-xl mb-2">
+                  <p className="text-primary font-semibold text-sm">
+                    Posting job for: <span className="text-secondary">{companyProfile.company_name}</span>
+                  </p>
+                  {companyProfile.address && (
+                    <p className="text-primary-60 text-xs mt-1">
+                      Address: {companyProfile.address}
+                    </p>
+                  )}
+                </div>
+              )}
               <div className="flex flex-col">
                 <label
                   htmlFor="title"
