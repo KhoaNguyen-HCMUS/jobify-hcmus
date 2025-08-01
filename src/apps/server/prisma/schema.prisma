@@ -60,6 +60,7 @@ model companies {
   status            String              @db.VarChar(50)
   created_at        DateTime            @default(now()) @db.Timestamp(6)
   updated_at        DateTime            @default(now()) @db.Timestamp(6)
+  cover_url         String?             @db.VarChar
   coin_transactions coin_transactions[]
   users             users               @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
   company_wallets   company_wallets?
@@ -72,13 +73,6 @@ model company_wallets {
   coin_balance Int
   updated_at   DateTime  @default(now()) @db.Timestamp(6)
   companies    companies @relation(fields: [company_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
-}
-
-model currency_exchange_rates {
-  id         String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-  currency   String   @unique @db.VarChar(10)
-  coin_rate  Decimal  @db.Decimal
-  updated_at DateTime @default(now()) @db.Timestamp(6)
 }
 
 model educations {
