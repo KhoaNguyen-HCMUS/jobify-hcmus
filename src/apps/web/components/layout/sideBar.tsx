@@ -18,7 +18,7 @@ export default function SideBar() {
   const pathname = usePathname();
 
   const [user, setUser] = useState<{
-    role: "candidate" | "company" | "recruiter" | "moderator";
+    role: "candidate" | "company" | "moderator" | "admin";
   } | null>(null);
 
   useEffect(() => {
@@ -160,10 +160,10 @@ export default function SideBar() {
   if (user?.role === "candidate") {
     sideBarItems = candidateItems;
     console.log("Using candidate items");
-  } else if (user?.role === "company" || user?.role === "recruiter") {
+  } else if (user?.role === "company") {
     sideBarItems = recruiterItems;
     console.log("Using company/recruiter items");
-  } else if (user?.role === "moderator") {
+  } else if (user?.role === "moderator" || user?.role === "admin") {
     sideBarItems = moderatorItems;
     console.log("Using moderator items");
   } else {

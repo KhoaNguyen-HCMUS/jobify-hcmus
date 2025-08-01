@@ -74,7 +74,7 @@ export default function RecruiterDashboardPage({ company }: CompanyProps) {
                       <Unlink2 />
                       <a href={company?.website}>{company?.website}</a>
                     </div>
-                    <a href="/recruiter/profile/edit" className="px-4">
+                    <a href="/company/profile/edit" className="px-4">
                       <FilePenLine size={24} />
                     </a>
                   </div>
@@ -99,7 +99,7 @@ export default function RecruiterDashboardPage({ company }: CompanyProps) {
           <div className="flex-1 bg-neutral-light-60 rounded-2xl overflow-hidden">
             <div className="flex flex-wrap justify-between px-4 py-2 bg-primary text-white">
               <div className="text-xl font-semibold">Notification</div>
-              <a href="/recruiter/notifications" className="font-semibold">
+              <a href="/company/notifications" className="font-semibold">
                 See All
               </a>
             </div>
@@ -110,7 +110,7 @@ export default function RecruiterDashboardPage({ company }: CompanyProps) {
         <div>
           <div className="flex flex-wrap justify-between bg-primary rounded-t-3xl px-6 py-2">
             <div className=" text-accent-20 font-semibold text-xl">My Jobs</div>
-            <a href="/recruiter/jobs">
+            <a href="/company/jobs">
               <span className="text-highlight-40 font-semibold">See All</span>
             </a>
           </div>
