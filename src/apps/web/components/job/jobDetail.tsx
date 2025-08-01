@@ -301,7 +301,7 @@ export default function JobDetail({ job: propJob, isHR }: JobDetailProps) {
                     <ApplyJobModal />
                   </div>
                 ) : (
-                  <button></button>
+                  <button >Do sth</button>
                 )}
               </div>
             </div>
