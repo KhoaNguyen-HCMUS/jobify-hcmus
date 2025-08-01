@@ -17,7 +17,10 @@ exports.getMyProfile = async (req, res) => {
       return errorResponse(res, 'Profile not found', [], 404);
     }
 
-    return successResponse(res, 'Profile fetched successfully', profile);
+    const email = req.user.email;
+    profile.email = email;
+
+    return successResponse(res, 'Profile fetched successfully', { profile });
   } catch (error) {
     console.error(error);
     return errorResponse(res, 'Failed to fetch profile', [error.message], 500);
@@ -38,6 +41,7 @@ exports.updateMyProfile = async (req, res) => {
       ward,
       address_detail,
       industry,
+      skills,
       website,
       linkedin_url,
       github_url,
@@ -67,6 +71,7 @@ exports.updateMyProfile = async (req, res) => {
       ward,
       address_detail,
       industry,
+      skills,
       website,
       linkedin_url,
       github_url,
@@ -122,7 +127,10 @@ exports.getCompanyProfiles = async (req, res) => {
       return errorResponse(res, 'Company profile not found', [], 404);
     }
 
-    return successResponse(res, 'Company profiles fetched successfully', companyProfiles);
+    const email = req.user.email;
+    companyProfiles.email = email;
+
+    return successResponse(res, 'Company profiles fetched successfully', { companyProfiles });
   } catch (error) {
     console.error(error);
     return errorResponse(res, 'Failed to fetch company profiles', [error.message], 500);
@@ -143,6 +151,7 @@ exports.updateCompanyProfile = async (req, res) => {
       industry,
       size,
       logo_url,
+      cover_url,
       founded_year} = req.body;
     
     const companyProfile = await prisma.companies.findUnique({
@@ -170,6 +179,7 @@ exports.updateCompanyProfile = async (req, res) => {
         industry,
         size,
         logo_url,
+        cover_url,
         founded_year,
         status: 'pending',
         updated_at: new Date(),
@@ -183,25 +193,42 @@ exports.updateCompanyProfile = async (req, res) => {
   }
 };
 
-exports.getProfileById = async (req, res) => {
-  try {
-    const { id } = req.params;
+exports.getCandidateProfileById = async (req, res) => {
+  const { id } = req.params;
 
+  try {
     const profile = await prisma.user_profiles.findUnique({
       where: { user_id: id },
       include: {
         experiences: true,
-        educations: true
+        educations: true,
       },
     });
 
     if (!profile) {
-      return errorResponse(res, 'Profile not found', [], 404);
+      return errorResponse(res, 'Candidate profile not found', [], 404);
     }
 
-    return successResponse(res, 'Profile fetched successfully', profile);
+    return successResponse(res, 'Candidate profile fetched successfully', profile);
   } catch (error) {
     console.error(error);
-    return errorResponse(res, 'Failed to fetch profile', [error.message], 500);
+    return errorResponse(res, 'Failed to fetch candidate profile', [error.message], 500);
+  }
+};
+
+exports.getCompanyProfileById = async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const companyProfile = await prisma.companies.findUnique({ where: { id }, });
+
+    if (!companyProfile) {
+      return errorResponse(res, 'Company profile not found', [], 404);
+    }
+
+    return successResponse(res, 'Company profile fetched successfully', companyProfile);
+  } catch (error) {
+    console.error(error);
+    return errorResponse(res, 'Failed to fetch company profile', [error.message], 500);
   }
 };
