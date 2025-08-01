@@ -111,6 +111,78 @@ exports.updateMyProfile = async (req, res) => {
   }
 };
 
+exports.getCompanyProfiles = async (req, res) => {
+  try {
+    const userId = req.user.id;
+
+    const companyProfiles = await prisma.companies.findUnique({
+      where: { user_id: userId }
+    });
+    if (!companyProfiles) {
+      return errorResponse(res, 'Company profile not found', [], 404);
+    }
+
+    return successResponse(res, 'Company profiles fetched successfully', companyProfiles);
+  } catch (error) {
+    console.error(error);
+    return errorResponse(res, 'Failed to fetch company profiles', [error.message], 500);
+  }
+};
+
+exports.updateCompanyProfile = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const { 
+      company_name,
+      website,
+      tax_code,
+      license_number,
+      phone_number,
+      description,
+      address,
+      industry,
+      size,
+      logo_url,
+      founded_year} = req.body;
+    
+    const companyProfile = await prisma.companies.findUnique({
+      where: { user_id: userId },
+      select: {
+        id: true,
+        user_id: true,
+      }
+    });
+
+    if (!companyProfile) {
+      return errorResponse(res, 'Company profile not found', [], 404);
+    }
+
+    await prisma.companies.update({
+      where: { user_id: userId },
+      data: {
+        company_name,
+        website,
+        tax_code,
+        license_number,
+        phone_number,
+        description,
+        address,
+        industry,
+        size,
+        logo_url,
+        founded_year,
+        status: 'pending',
+        updated_at: new Date(),
+      }
+    });
+
+    return successResponse(res, 'Company profile updated successfully');
+  } catch (error) {
+    console.error(error);
+    return errorResponse(res, 'Failed to update company profile', [error.message], 500);
+  }
+};
+
 exports.getProfileById = async (req, res) => {
   try {
     const { id } = req.params;
