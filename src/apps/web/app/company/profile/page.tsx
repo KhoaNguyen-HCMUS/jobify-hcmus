@@ -2,7 +2,7 @@
 import { MapPin, Briefcase, Mail, Phone, Globe, Building, Users } from "lucide-react";
 import CompanyInformation from "../../../components/companyInformation";
 import Industry from "../../../components/industry";
-import { getCompanyProfile, CompanyProfile } from "../../../services/company";
+import { getCompanyProfile, CompanyProfile } from "../../../services/companyProfile";
 import { useState, useEffect } from "react";
 import {DEFAULT_COVER_IMAGE, DEFAULT_AVATAR_IMAGE} from "../../../constants/imgConstants";
 

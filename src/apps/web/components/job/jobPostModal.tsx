@@ -6,7 +6,7 @@ import { getToken } from "../../utils/auth";
 import { getProvinces, getDistrictsByProvince, Province, District } from "../../services/location";
 import { EXPERIENCE_LEVELS, EDUCATION_LEVELS, JOB_TYPES } from "../../constants/jobConstants";
 import { getAllIndustries, Industry, getIndustriesByCategory, IndustryCategory } from "../../services/industries";
-import { getCompanyProfile, CompanyProfile } from "../../services/company";
+import { getCompanyProfile, CompanyProfile } from "../../services/companyProfile";
 import { toast } from "react-toastify";
 
 interface JobPostModalProps {

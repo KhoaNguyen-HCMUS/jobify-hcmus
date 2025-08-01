@@ -8,7 +8,7 @@ import Pagination from "../../../components/pagination";
 import { jobs } from "../../../components/fakeJob";
 import { DEFAULT_COVER_IMAGE } from "../../../constants/imgConstants";
 import { DEFAULT_AVATAR_IMAGE } from "../../../constants/imgConstants";
-import { getCompanyProfile, CompanyProfile } from "../../../services/company";
+import { getCompanyProfile, CompanyProfile } from "../../../services/companyProfile";
 
 interface CompanyProps {
   company: {
