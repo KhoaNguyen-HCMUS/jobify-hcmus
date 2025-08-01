@@ -50,11 +50,10 @@ model companies {
   website           String?             @db.VarChar(255)
   tax_code          String              @db.VarChar(50)
   license_number    String              @db.VarChar(50)
-  contact_email     String              @db.VarChar(255)
-  phone_number      String              @db.VarChar(20)
+  phone_number      String?             @db.VarChar(20)
   description       String?
-  address           String              @db.VarChar(255)
-  industry          String?             @db.VarChar(100)
+  address           String?             @db.VarChar(255)
+  industry          String?
   size              String?             @db.VarChar(50)
   logo_url          String?             @db.VarChar(500)
   founded_year      Int?
@@ -144,17 +143,6 @@ model job_applications {
   file_uploads               file_uploads?                @relation(fields: [resume_file_id], references: [id], onUpdate: NoAction)
 }
 
-model job_categories {
-  id                   String           @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-  name                 String           @unique @db.VarChar(100)
-  description          String
-  parent_id            String?          @db.Uuid
-  created_at           DateTime         @default(now()) @db.Timestamp(6)
-  job_categories       job_categories?  @relation("job_categoriesTojob_categories", fields: [parent_id], references: [id], onUpdate: NoAction)
-  other_job_categories job_categories[] @relation("job_categoriesTojob_categories")
-  job_posts            job_posts[]
-}
-
 model job_matches {
   id            String    @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
   user_id       String    @db.Uuid
@@ -189,7 +177,7 @@ model job_posts {
   requirements                       String
   responsibilities                   String
   benefits                           String
-  category_id                        String             @db.Uuid
+  industry_id                        String             @db.Uuid
   currency                           String             @db.VarChar(10)
   status                             String             @db.VarChar(50)
   cost_coin                          Int
@@ -199,24 +187,14 @@ model job_posts {
   approved_at                        DateTime?          @db.Timestamp(6)
   created_at                         DateTime           @default(now()) @db.Timestamp(6)
   updated_at                         DateTime           @default(now()) @db.Timestamp(6)
+  skills                             String
   job_applications                   job_applications[]
   job_matches                        job_matches[]
   users_job_posts_approved_byTousers users?             @relation("job_posts_approved_byTousers", fields: [approved_by], references: [id], onUpdate: NoAction)
-  job_categories                     job_categories     @relation(fields: [category_id], references: [id], onDelete: SetNull, onUpdate: NoAction)
   companies                          companies          @relation(fields: [company_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
   users_job_posts_created_byTousers  users              @relation("job_posts_created_byTousers", fields: [created_by], references: [id], onDelete: SetNull, onUpdate: NoAction)
-  job_skills                         job_skills[]
+  industries                         industries         @relation(fields: [industry_id], references: [id], onDelete: SetNull, onUpdate: NoAction)
   saved_jobs                         saved_jobs[]
-}
-
-model job_skills {
-  id          String    @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-  job_id      String    @db.Uuid
-  skill_id    String    @db.Uuid
-  is_required Boolean   @default(true)
-  created_at  DateTime  @default(now()) @db.Timestamp(6)
-  job_posts   job_posts @relation(fields: [job_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
-  skills      skills    @relation(fields: [skill_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
 }
 
 model notifications {
@@ -253,15 +231,6 @@ model saved_jobs {
   created_at DateTime  @default(now()) @db.Timestamp(6)
   job_posts  job_posts @relation(fields: [job_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
   users      users     @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
-}
-
-model skills {
-  id          String        @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-  name        String        @unique @db.VarChar(100)
-  category    String        @db.VarChar(100)
-  created_at  DateTime      @default(now()) @db.Timestamp(6)
-  job_skills  job_skills[]
-  user_skills user_skills[]
 }
 
 model system_announcements {
@@ -302,25 +271,16 @@ model user_profiles {
   province          String?       @db.VarChar(100)
   ward              String?       @db.VarChar(100)
   address_detail    String?       @db.VarChar(255)
-  industry          String?       @db.VarChar(100)
+  industry          String?
   website           String?       @db.VarChar(255)
   linkedin_url      String?       @db.VarChar(255)
   github_url        String?       @db.VarChar(255)
   created_at        DateTime      @default(now()) @db.Timestamp(6)
   updated_at        DateTime      @default(now()) @db.Timestamp(6)
+  skills            String?
   educations        educations[]
   experiences       experiences[]
   users             users         @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
-}
-
-model user_skills {
-  id                String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-  user_id           String   @db.Uuid
-  skill_id          String   @db.Uuid
-  proficiency_level Int
-  created_at        DateTime @default(now()) @db.Timestamp(6)
-  skills            skills   @relation(fields: [skill_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
-  users             users    @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
 }
 
 model users {
@@ -351,5 +311,16 @@ model users {
   system_announcements                   system_announcements[]
   system_settings                        system_settings[]
   user_profiles                          user_profiles?
-  user_skills                            user_skills[]
+}
+
+model industries {
+  id               String       @id(map: "job_categories_pkey") @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  name             String       @unique(map: "job_categories_name_key") @db.VarChar(100)
+  description      String
+  parent_id        String?      @db.Uuid
+  created_at       DateTime     @default(now()) @db.Timestamp(6)
+  status           String       @db.VarChar(50)
+  industries       industries?  @relation("industriesToindustries", fields: [parent_id], references: [id], onUpdate: NoAction, map: "job_categories_parent_id_fkey")
+  other_industries industries[] @relation("industriesToindustries")
+  job_posts        job_posts[]
 }
