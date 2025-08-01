@@ -3,6 +3,7 @@ import { CircleDollarSign, Coins, CoinsIcon, DollarSign } from "lucide-react";
 import CoinBalance from "../../../components/coinBalance";
 import Transaction from "../../../components/transaction";
 import { useState, useEffect } from "react";
+import ProtectedRoute from "../../../components/ProtectedRoute";
 
 interface CoinsProps {
   coin: {
@@ -19,7 +20,7 @@ type Bundle = {
 
 const coins = [{ current: "1", real: "1,000" }];
 
-export default function RecruiterWalletPage() {
+function RecruiterWalletContent() {
   const [isOpen, setIsOpen] = useState(false);
   const [isOpenNext, setIsOpenNext] = useState(false);
   const [coinAmount, setCoinAmount] = useState(0);
@@ -98,103 +99,83 @@ export default function RecruiterWalletPage() {
                       onClick={(e) => e.stopPropagation()}
                       className="w-3/5 max-h-[90vh] overflow-y-auto bg-neutral-light-20 rounded-2xl relative p-4"
                     >
-                      <div className="flex flex-col gap-4">
-                        <span className="text-primary text-3xl font-bold text-center">
+                      <div className="flex flex-col justify-center px-10 space-y-4">
+                        <span className="text-primary font-bold text-center text-3xl">
                           Purchase Coins
                         </span>
-                        <div className="flex flex-col gap-2 px-20">
-                          <span className="text-secondary font-semibold text-xl">
-                            Coin bundles:
+                        <div className="flex gap-10">
+                          <span className="flex-2 text-secondary text-xl font-semibold border-b border-primary-60">
+                            Select Bundle
                           </span>
-                          <div className="flex flex-wrap justify-between gap-4">
+                          <span className="flex-1 text-secondary text-xl font-semibold">
+                            Custom Amount
+                          </span>
+                        </div>
+                        <div className="flex gap-10">
+                          <div className="flex-2 flex flex-col gap-2">
                             {bundles.map((bundle, index) => (
-                              <button
+                              <div
                                 key={index}
                                 onClick={() => handleBundleSelect(bundle)}
-                                className={`flex flex-col bg-accent text-highlight-60 rounded-lg px-8 py-4 gap-2 transition-all cursor-pointer ${
-                                  selectedBundle?.coins === bundle.coins
-                                    ? "ring-2 ring-secondary bg-secondary"
-                                    : "hover:bg-secondary"
+                                className={`cursor-pointer border-2 rounded-lg p-4 ${
+                                  selectedBundle === bundle
+                                    ? "border-accent bg-accent-20"
+                                    : "border-primary-60 hover:border-accent"
                                 }`}
                               >
-                                <div className="flex flex-col border border-primary-40 rounded-md px-8 py-4 gap-2">
-                                  <Coins size={24} className="text-[#FCCA00]" />
-                                  <span className=" font-bold">
-                                    {bundle.coins}
-                                  </span>
+                                <div className="flex justify-between items-center">
+                                  <div className="flex gap-2 items-center">
+                                    <span className="text-accent font-bold text-xl">
+                                      {bundle.coins}
+                                    </span>
+                                    <CircleDollarSign
+                                      size={26}
+                                      className="text-[#FCCA00]"
+                                    />
+                                  </div>
+                                  <div className="flex gap-2 items-center">
+                                    <span className="text-primary-80 font-semibold">
+                                      {bundle.price}
+                                    </span>
+                                    <span className="text-primary-60 font-bold">
+                                      VNĐ
+                                    </span>
+                                  </div>
                                 </div>
-                                <div className="flex gap-2">
-                                  <b className="text-accent-60">VNĐ</b>
-                                  <span className="text-neutral-light-20">
-                                    {bundle.price}
-                                  </span>
-                                </div>
-                              </button>
+                              </div>
                             ))}
                           </div>
-                          <div className="flex flex-wrap gap-2 text-xl text-primary">
-                            <div className="flex-1 flex flex-col py-4">
-                              <div className="flex">
-                                <span className="flex-1">
-                                  Current coin price:
-                                </span>
-                                <span className="flex-1 flex gap-2 text-accent font-bold items-center">
-                                  {coin.current}
-                                  <CircleDollarSign
-                                    size={22}
-                                    className="text-[#FCCA00]"
-                                  />
-                                </span>
-                              </div>
-                              <div className="flex">
-                                <span className="flex-1">
-                                  In real currency:{" "}
-                                </span>
-                                <span className="flex-1 text-accent font-bold">
-                                  {coin.real}{" "}
-                                  <b className="text-primary-80">VNĐ</b>
-                                </span>
-                              </div>
+                          <div className="flex-1 flex flex-col gap-2">
+                            <div className="flex gap-2 items-center">
+                              <span className="text-primary-80 font-semibold">
+                                Amount:
+                              </span>
+                              <input
+                                type="number"
+                                value={coinAmount}
+                                onChange={(e) => setCoinAmount(parseInt(e.target.value) || 0)}
+                                className="w-20 border border-primary-60 px-2 py-1 rounded text-center"
+                                min="1"
+                              />
+                              <CircleDollarSign
+                                size={20}
+                                className="text-[#FCCA00]"
+                              />
                             </div>
-                            <div className="flex justify-between items-center border border-primary-60 p-3 rounded">
-                              <div className="flex flex-col">
-                                <div className="text-primary-80">
-                                  <label htmlFor="coinAmount">
-                                    Coin Amount:
-                                  </label>
-                                  <input
-                                    id="coinAmount"
-                                    type="number"
-                                    min={0}
-                                    className="ml-2 max-w-36 text-right bg-highlight-60 rounded-full px-2 py-1 font-bold"
-                                    value={coinAmount}
-                                    onChange={(e) => {
-                                      const amount = parseInt(
-                                        e.target.value || "0"
-                                      );
-                                      setCoinAmount(amount);
-                                      // Clear selected bundle if manual input doesn't match
-                                      const matchingBundle = bundles.find(
-                                        (b) => b.coins === amount
-                                      );
-                                      setSelectedBundle(matchingBundle || null);
-                                    }}
-                                  />
-                                </div>
-                                <div className="flex justify-between font-semibold w-full">
-                                  <span className="text-primary-80 mr-2">
-                                    Total Payment:
-                                  </span>
-                                  <span className="text-accent font-bold">
-                                    {calculateTotal()}{" "}
-                                    <b className="text-primary-80">VNĐ</b>
-                                  </span>
-                                </div>
-                              </div>
+                            <div className="flex gap-2 items-center">
+                              <span className="text-primary-80 font-semibold">
+                                Total:
+                              </span>
+                              <span className="text-accent font-bold">
+                                {calculateTotal()}
+                              </span>
+                              <span className="text-primary-60 font-bold">
+                                VNĐ
+                              </span>
                             </div>
                           </div>
                         </div>
-                        <div className="flex gap-4 justify-center font-semibold">
+                        <div className="flex justify-center gap-4">
                           <button
                             onClick={() => setIsOpen(false)}
                             className="cursor-pointer rounded-full bg-secondary-60 hover:bg-secondary text-neutral-light-20 px-6 py-2"
@@ -205,7 +186,7 @@ export default function RecruiterWalletPage() {
                             onClick={() => setIsOpenNext(true)}
                             className="cursor-pointer rounded-full bg-accent hover:bg-secondary text-neutral-light-20 px-6 py-2"
                           >
-                            Buy
+                            Continue
                           </button>
                           {isOpenNext && (
                             <div className="fixed inset-0 bg-primary-80 z-50 flex items-center justify-center">
@@ -303,5 +284,13 @@ export default function RecruiterWalletPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function RecruiterWalletPage() {
+  return (
+    <ProtectedRoute allowedRoles={['company']}>
+      <RecruiterWalletContent />
+    </ProtectedRoute>
   );
 }

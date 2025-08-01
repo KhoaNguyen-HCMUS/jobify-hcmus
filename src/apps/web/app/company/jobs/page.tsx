@@ -7,8 +7,9 @@ import Pagination from "../../../components/pagination";
 import KeyWord from "../../../components/keyWord";
 import { jobs } from "../../../components/fakeJob";
 import JobPostModal from "../../../components/job/jobPostModal";
+import ProtectedRoute from "../../../components/ProtectedRoute";
 
-export default function RecruiterJobsSavedPage() {
+function RecruiterJobsContent() {
   const { page, maxPage, current, next, prev } = usePagination(jobs, 8);
 
   const [isOpen, setIsOpen] = useState(false);
@@ -48,5 +49,13 @@ export default function RecruiterJobsSavedPage() {
       
       <JobPostModal isOpen={isOpen} onClose={() => setIsOpen(false)} />
     </div>
+  );
+}
+
+export default function RecruiterJobsSavedPage() {
+  return (
+    <ProtectedRoute allowedRoles={['company']}>
+      <RecruiterJobsContent />
+    </ProtectedRoute>
   );
 }

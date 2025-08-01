@@ -5,8 +5,9 @@ import Industry from "../../../components/industry";
 import { getCompanyProfile, CompanyProfile } from "../../../services/companyProfile";
 import { useState, useEffect } from "react";
 import {DEFAULT_COVER_IMAGE, DEFAULT_AVATAR_IMAGE} from "../../../constants/imgConstants";
+import ProtectedRoute from "../../../components/ProtectedRoute";
 
-export default function RecruiterProfilePage() {
+function RecruiterProfileContent() {
   const [companyProfile, setCompanyProfile] = useState<CompanyProfile | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -162,5 +163,13 @@ export default function RecruiterProfilePage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function RecruiterProfilePage() {
+  return (
+    <ProtectedRoute allowedRoles={['company']}>
+      <RecruiterProfileContent />
+    </ProtectedRoute>
   );
 }

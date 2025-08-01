@@ -1,9 +1,18 @@
 import ChangePassword from "../../../components/changePassword";
+import ProtectedRoute from "../../../components/ProtectedRoute";
 
-export default function RecruiterChangePasswordPage() {
+function RecruiterChangePasswordContent() {
   return (
     <div>
       <ChangePassword />;
     </div>
+  );
+}
+
+export default function RecruiterChangePasswordPage() {
+  return (
+    <ProtectedRoute allowedRoles={['company']}>
+      <RecruiterChangePasswordContent />
+    </ProtectedRoute>
   );
 }

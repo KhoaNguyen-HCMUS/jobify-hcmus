@@ -2,6 +2,7 @@
 import ReportHistory from "../../../components/reportHistory";
 import usePagination from "../../../hooks/usePagination";
 import Pagination from "../../../components/pagination";
+import ProtectedRoute from "../../../components/ProtectedRoute";
 
 interface ReportProps {
   report: { title: string; text: string; time: string };
@@ -40,7 +41,7 @@ const reports = [
   },
 ];
 
-export default function RecruiterReportsPage({ report }: ReportProps) {
+function RecruiterReportsContent({ report }: ReportProps) {
   const { page, maxPage, current, next, prev } = usePagination(reports, 5);
 
   return (
@@ -67,5 +68,13 @@ export default function RecruiterReportsPage({ report }: ReportProps) {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function RecruiterReportsPage({ report }: ReportProps) {
+  return (
+    <ProtectedRoute allowedRoles={['company']}>
+      <RecruiterReportsContent report={report} />
+    </ProtectedRoute>
   );
 }

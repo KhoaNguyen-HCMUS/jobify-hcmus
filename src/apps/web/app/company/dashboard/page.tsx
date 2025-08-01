@@ -9,6 +9,7 @@ import { jobs } from "../../../components/fakeJob";
 import { DEFAULT_COVER_IMAGE } from "../../../constants/imgConstants";
 import { DEFAULT_AVATAR_IMAGE } from "../../../constants/imgConstants";
 import { getCompanyProfile, CompanyProfile } from "../../../services/companyProfile";
+import ProtectedRoute from "../../../components/ProtectedRoute";
 
 interface CompanyProps {
   company: {
@@ -42,7 +43,7 @@ const Stat = ({
   </div>
 );
 
-export default function RecruiterDashboardPage({ company }: CompanyProps) {
+function RecruiterDashboardContent({ company }: CompanyProps) {
   const { page, maxPage, current, next, prev } = usePagination(jobs, 4);
   const [companyProfile, setCompanyProfile] = useState<CompanyProfile | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -68,7 +69,7 @@ export default function RecruiterDashboardPage({ company }: CompanyProps) {
     <div className="w-full h-full bg-neutral-light-60">
       <div className="flex flex-col px-6 lg:px-20 py-10 gap-10">
         {isLoading ? (
-          <div className="flex justify-center items-center h-64">
+          <div className="flex min-h-screen justify-center items-center h-64">
             <div className="text-primary text-lg">Loading company profile...</div>
           </div>
         ) : (
@@ -166,5 +167,13 @@ export default function RecruiterDashboardPage({ company }: CompanyProps) {
         )}
       </div>
     </div>
+  );
+}
+
+export default function RecruiterDashboardPage({ company }: CompanyProps) {
+  return (
+    <ProtectedRoute allowedRoles={['company']}>
+      <RecruiterDashboardContent company={company} />
+    </ProtectedRoute>
   );
 }

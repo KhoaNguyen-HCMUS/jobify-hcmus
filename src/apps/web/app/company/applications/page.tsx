@@ -14,6 +14,8 @@ import Skills from "../../../components/skills";
 import Education from "../../../components/education";
 import WorkExperience from "../../../components/workExperience";
 
+import ProtectedRoute from "../../../components/ProtectedRoute";
+
 interface ApplicationsProps {
   app: {
     id: string;
@@ -188,7 +190,7 @@ const edu = [
   },
 ];
 
-export default function RecruiterApplicationsPage({ app }: ApplicationsProps) {
+function RecruiterApplicationsContent({ app }: ApplicationsProps) {
   const router = useRouter();
 
   const [experience, setExperience] = useState("allExperience");
@@ -807,5 +809,13 @@ export default function RecruiterApplicationsPage({ app }: ApplicationsProps) {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function RecruiterApplicationsPage({ app }: ApplicationsProps) {
+  return (
+    <ProtectedRoute allowedRoles={['company']}>
+      <RecruiterApplicationsContent app={app} />
+    </ProtectedRoute>
   );
 }

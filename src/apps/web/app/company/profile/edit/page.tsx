@@ -4,8 +4,9 @@ import { MapPin, Briefcase, Globe, Building, Barcode, Phone, Mail, Users, Calend
 import { getCompanyProfile, updateCompanyProfile, CompanyProfile, UpdateCompanyData } from "../../../../services/companyProfile";
 import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
+import ProtectedRoute from "../../../../components/ProtectedRoute";
 
-export default function RecruiterProfileEditPage() {
+function RecruiterProfileEditContent() {
   const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -363,5 +364,13 @@ export default function RecruiterProfileEditPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function RecruiterProfileEditPage() {
+  return (
+    <ProtectedRoute allowedRoles={['company']}>
+      <RecruiterProfileEditContent />
+    </ProtectedRoute>
   );
 }

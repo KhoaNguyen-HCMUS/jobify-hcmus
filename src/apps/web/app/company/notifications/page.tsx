@@ -2,6 +2,7 @@
 import Noti from "../../../components/noti";
 import usePagination from "../../../hooks/usePagination";
 import Pagination from "../../../components/pagination";
+import ProtectedRoute from "../../../components/ProtectedRoute";
 
 interface NotificationProps {
   noti: {
@@ -69,7 +70,7 @@ const notification = [
   },
 ];
 
-export default function RecruiterNotificationsPage({
+function RecruiterNotificationsContent({
   noti,
 }: NotificationProps) {
   const { page, maxPage, current, next, prev } = usePagination(notification, 5);
@@ -101,5 +102,15 @@ export default function RecruiterNotificationsPage({
         </div>
       </div>
     </div>
+  );
+}
+
+export default function RecruiterNotificationsPage({
+  noti,
+}: NotificationProps) {
+  return (
+    <ProtectedRoute allowedRoles={['company']}>
+      <RecruiterNotificationsContent noti={noti} />
+    </ProtectedRoute>
   );
 }
