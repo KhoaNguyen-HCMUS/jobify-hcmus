@@ -4,6 +4,7 @@ const { successResponse, errorResponse } = require('../utils/response');
 exports.getJobs = async (req, res) => {
   try {
     const jobs = await prisma.job_posts.findMany({ where: { status: 'active' } });
+
     return successResponse(res, 'Jobs fetched successfully', jobs);
   } catch (err) {
     console.error(err);
@@ -11,7 +12,24 @@ exports.getJobs = async (req, res) => {
   }
 };
 
-exports.getJobDetail = async (req, res) => {
+exports.getCompanyJobs = async (req, res) => {
+  const userId = req.user.id;
+  try {
+    const company = await prisma.companies.findUnique({ where: { user_id: userId } });
+    if (!company) { 
+      return errorResponse(res, 'Company not found', [], 404);
+    }
+
+    const jobs = await prisma.job_posts.findMany({ where: { company_id: company.id } });
+
+    return successResponse(res, 'Company jobs fetched successfully', jobs);
+  } catch (err) {
+    console.error(err);
+    return errorResponse(res, 'Failed to fetch company jobs', [err.message], 500);
+  }
+};
+
+exports.getJobById = async (req, res) => {
   const { id } = req.params;
   try {
     const job = await prisma.job_posts.findUnique({ where: { id } });
@@ -26,7 +44,7 @@ exports.getJobDetail = async (req, res) => {
 exports.createJob = async (req, res) => {
   try {
     const user = req.user;
-    const company = await prisma.companies.findUnique({ where: { user_id: user.id }, });
+    const company = await prisma.companies.findUnique({ where: { user_id: user.id } });
 
     if (!company) {
       return errorResponse(res, 'Company not found', ['Company profile does not exist'], 404);
@@ -89,7 +107,7 @@ exports.createJob = async (req, res) => {
         skills,
         currency,
         cost_coin,
-        status: 'pending',          
+        status: 'pending',         
       },
     });
 
@@ -111,7 +129,7 @@ exports.updateJob = async (req, res) => {
     }
 
     if (user.role === 'company') {
-      const company = await prisma.companies.findUnique({ where: { user_id: user.id }, });
+      const company = await prisma.companies.findUnique({ where: { user_id: user.id } });
 
       if (!company || company.id !== existingJob.company_id) {
         return errorResponse(res, 'You are not authorized to update this job post', [], 403);
@@ -196,9 +214,7 @@ exports.deleteJob = async (req, res) => {
     }
 
     if (user.role === 'company') {
-      const company = await prisma.companies.findUnique({
-        where: { user_id: user.id },
-      });
+      const company = await prisma.companies.findUnique({ where: { user_id: user.id } });
 
       if (!company || job.company_id !== company.id) {
         return errorResponse(res, 'You are not authorized to delete this job', [], 403);
@@ -328,28 +344,47 @@ exports.getRecommendedJobs = async (req, res) => {
 };
 
 exports.getIndustry = async (req, res) => {
+  try {
+    const industries = await prisma.industries.findMany();
+
+    return successResponse(res, 'Industries fetched successfully', industries);
+  } catch (err) {
+    console.error(err);
+    return errorResponse(res, 'Failed to fetch industries', [err.message], 500);
+  }
+};
+
+exports.getIndustryById = async (req, res) => {
+  const { id } = req.params;
+  try {
+    const industry = await prisma.industries.findUnique({ where: { id } });
+
+    if (!industry) {
+      return errorResponse(res, 'Industry not found', [], 404);
+    }
+
+    return successResponse(res, 'Industry fetched successfully', industry);
+  } catch (err) {
+    console.error(err);
+    return errorResponse(res, 'Failed to fetch industry', [err.message], 500);
+  }
+};
+
+exports.createIndustry = async (req, res) => {
   const { name, parent_id } = req.body;
 
   try {
-    if (!name) {
-      return errorResponse(res, 'Industry name is required', [], 400);
-    }
-
-    const existingIndustry = await prisma.job_categories.findUnique({
-      where: { name },
-    });
+    const existingIndustry = await prisma.industries.findUnique({ where: { name } });
 
     if (existingIndustry) {
-      return successResponse(res, 'Industry found', existingIndustry.id);
+      return errorResponse(res, 'Industry already exists', [], 400);
     }
 
-    const newIndustry = await prisma.job_categories.create({
-      data: { name, parent_id: parent_id || null },
-    });
+    const newIndustry = await prisma.industries.create({ data: { name, parent_id: parent_id || null } });
 
-    return successResponse(res, 'Industry created successfully', newIndustry.id, 201);
+    return successResponse(res, 'Industry created successfully', newIndustry, 201);
   } catch (err) {
     console.error(err);
     return errorResponse(res, 'Failed to create industry', [err.message], 500);
   }
-}
+};

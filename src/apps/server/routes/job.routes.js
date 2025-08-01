@@ -10,14 +10,14 @@ router.post('/', authenticateToken, authorizeRoles(['company']), jobController.c
 router.get('/saved', authenticateToken, jobController.getSavedJobs);
 router.get('/recommended', authenticateToken, jobController.getRecommendedJobs);
 
-router.get('/:id', jobController.getJobDetail);
-router.put('/:id', authenticateToken, authorizeRoles(['company', 'admin', 'moderator']), jobController.updateJob);
-router.delete('/:id', authenticateToken, authorizeRoles(['company', 'admin', 'moderator']), jobController.deleteJob);
+router.get('/:id', jobController.getJobById);
+router.put('/:id', authenticateToken, authorizeRoles(['admin', 'moderator', 'company']), jobController.updateJob);
+router.delete('/:id', authenticateToken, authorizeRoles(['admin', 'moderator', 'company']), jobController.deleteJob);
 router.post('/:id/save', authenticateToken, jobController.saveJob);
 router.delete('/:id/save', authenticateToken, jobController.unsaveJob);
 
-router.post('/:id/apply', authenticateToken, applicationController.applyJob);
-router.delete('/:id/apply', authenticateToken, applicationController.cancelApplication);
-router.get('/:id/applications', authenticateToken, applicationController.getJobApplications);
+router.post('/:id/apply', authenticateToken, authorizeRoles(['candidate']), applicationController.applyJob);
+router.delete('/:id/apply', authenticateToken, authorizeRoles(['candidate']), applicationController.cancelApplication);
+router.get('/:id/applications', authenticateToken, authorizeRoles(['admin', 'moderator', 'company']), applicationController.getJobApplications);
 
 module.exports = router;
