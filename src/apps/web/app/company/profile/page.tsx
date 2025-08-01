@@ -154,9 +154,11 @@ export default function RecruiterProfilePage() {
               {companyProfile.status}
             </div>
           </div>
+          <a href="/company/profile/edit">
           <div className="bg-primary-80 hover:bg-accent cursor-pointer text-neutral-light-20 font-semibold rounded-2xl px-6 py-2">
-            <a href="/company/profile/edit">Edit</a>
+            Edit
           </div>
+          </a>
         </div>
       </div>
     </div>

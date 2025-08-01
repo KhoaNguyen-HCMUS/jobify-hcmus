@@ -1,22 +1,115 @@
 "use client";
-import { useState } from "react";
-import { MapPin, Briefcase, Globe, Building, Barcode } from "lucide-react";
+import { useState, useEffect } from "react";
+import { MapPin, Briefcase, Globe, Building, Barcode, Phone, Mail, Users, Calendar } from "lucide-react";
+import { getCompanyProfile, updateCompanyProfile, CompanyProfile, UpdateCompanyData } from "../../../../services/companyProfile";
+import { toast } from "react-toastify";
+import { useRouter } from "next/navigation";
 
 export default function RecruiterProfileEditPage() {
+  const router = useRouter();
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [companyProfile, setCompanyProfile] = useState<CompanyProfile | null>(null);
+
   const [companyName, setCompanyName] = useState("");
   const [website, setWebsite] = useState("");
   const [taxCode, setTaxCode] = useState("");
   const [businessLicenseNumber, setBusinessLicenseNumber] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState("");
+  const [email, setEmail] = useState("");
   const [description, setDescription] = useState("");
   const [address, setAddress] = useState("");
   const [industry, setIndustry] = useState("");
-  const [profession, setProfession] = useState("");
+  const [size, setSize] = useState("");
+  const [foundedYear, setFoundedYear] = useState("");
+
+  useEffect(() => {
+    const loadCompanyProfile = async () => {
+      try {
+        setLoading(true);
+        const response = await getCompanyProfile();
+        if (response.success && response.data?.companyProfiles) {
+          const profile = response.data.companyProfiles;
+          setCompanyProfile(profile);
+          
+          setCompanyName(profile.company_name || "");
+          setWebsite(profile.website || "");
+          setTaxCode(profile.tax_code || "");
+          setBusinessLicenseNumber(profile.license_number || "");
+          setPhoneNumber(profile.phone_number || "");
+          setEmail(profile.email || "");
+          setDescription(profile.description || "");
+          setAddress(profile.address || "");
+          setIndustry(profile.industry || "");
+          setSize(profile.size || "");
+          setFoundedYear(profile.founded_year ? profile.founded_year.toString() : "");
+        } else {
+          toast.error(response.message || 'Failed to load company profile');
+        }
+      } catch (error) {
+        toast.error('Error loading company profile');
+        console.error(error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadCompanyProfile();
+  }, []);
+
+  const handleSubmit = async () => {
+    try {
+      setSaving(true);
+      
+      const updateData: UpdateCompanyData = {
+        company_name: companyName.trim() || undefined,
+        website: website.trim() || undefined,
+        tax_code: taxCode.trim() || undefined,
+        license_number: businessLicenseNumber.trim() || undefined,
+        phone_number: phoneNumber.trim() || undefined,
+        email: email.trim() || undefined,
+        description: description.trim() || undefined,
+        address: address.trim() || undefined,
+        industry: industry.trim() || undefined,
+        size: size.trim() || undefined,
+        founded_year: foundedYear ? parseInt(foundedYear) : undefined,
+      };
+
+      Object.keys(updateData).forEach(key => {
+        if (updateData[key as keyof UpdateCompanyData] === undefined) {
+          delete updateData[key as keyof UpdateCompanyData];
+        }
+      });
+
+      const response = await updateCompanyProfile(updateData);
+      
+      if (response.success) {
+        toast.success('Company profile updated successfully!');
+        router.push('/company/profile');
+      } else {
+        toast.error(response.message || 'Failed to update company profile');
+      }
+    } catch (error) {
+      toast.error('Error updating company profile');
+      console.error(error);
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="w-full h-full min-h-screen bg-neutral-light-60 flex items-center justify-center">
+        <div className="text-primary text-xl">Loading company profile...</div>
+      </div>
+    );
+  }
 
   return (
-    <div className="w-full h-full bg-neutral-light-60">
+    <div className="w-full h-full min-h-screen bg-neutral-light-60">
       <div className="flex flex-col justify-between px-20 py-10 space-y-4">
         <div className="text-accent font-bold text-2xl">
-          Company Information
+          Edit Company Information
         </div>
         <div className="flex flex-col gap-4 p-4">
           <div className="flex flex-wrap">
@@ -37,7 +130,7 @@ export default function RecruiterProfileEditPage() {
                     type="text"
                     value={companyName}
                     onChange={(e) => setCompanyName(e.target.value)}
-                    placeholder="Enter name"
+                    placeholder="Enter company name"
                     className="w-full border border-primary-60 pl-12 pr-4 py-2 bg-neutral-light-20 rounded-xl text-primary-80 outline-none focus:ring-1 focus:bg-white transition-all duration-300"
                     required
                   />
@@ -45,7 +138,7 @@ export default function RecruiterProfileEditPage() {
               </div>
               <div className="flex flex-col">
                 <label
-                  htmlFor="taxCodeName"
+                  htmlFor="taxCode"
                   className="block text-sm font-bold text-primary ml-4"
                 >
                   Tax Code*:
@@ -65,6 +158,48 @@ export default function RecruiterProfileEditPage() {
                   />
                 </div>
               </div>
+              <div className="flex flex-col">
+                <label
+                  htmlFor="phoneNumber"
+                  className="block text-sm font-bold text-primary ml-4"
+                >
+                  Phone Number:
+                </label>
+                <div className="relative">
+                  <div className="absolute left-4 top-1/2 transform -translate-y-1/2 text-primary">
+                    <Phone size={18} />
+                  </div>
+                  <input
+                    id="phoneNumber"
+                    type="text"
+                    value={phoneNumber}
+                    onChange={(e) => setPhoneNumber(e.target.value)}
+                    placeholder="Enter phone number"
+                    className="w-full border border-primary-60 pl-12 pr-4 py-2 bg-neutral-light-20 rounded-xl text-primary-80 outline-none focus:ring-1 focus:bg-white transition-all duration-300"
+                  />
+                </div>
+              </div>
+              <div className="flex flex-col">
+                <label
+                  htmlFor="email"
+                  className="block text-sm font-bold text-primary ml-4"
+                >
+                  Email:
+                </label>
+                <div className="relative">
+                  <div className="absolute left-4 top-1/2 transform -translate-y-1/2 text-primary">
+                    <Mail size={18} />
+                  </div>
+                  <input
+                    id="email"
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="Enter email address"
+                    className="w-full border border-primary-60 pl-12 pr-4 py-2 bg-neutral-light-20 rounded-xl text-primary-80 outline-none focus:ring-1 focus:bg-white transition-all duration-300"
+                  />
+                </div>
+              </div>
             </div>
             <div className="flex-1 flex flex-col gap-2">
               <div className="flex flex-col px-4">
@@ -72,7 +207,7 @@ export default function RecruiterProfileEditPage() {
                   htmlFor="website"
                   className="block text-sm font-bold text-primary ml-4"
                 >
-                  Company WebSite*:
+                  Company Website:
                 </label>
                 <div className="relative">
                   <div className="absolute left-4 top-1/2 transform -translate-y-1/2 text-primary">
@@ -80,12 +215,11 @@ export default function RecruiterProfileEditPage() {
                   </div>
                   <input
                     id="website"
-                    type="text"
+                    type="url"
                     value={website}
                     onChange={(e) => setWebsite(e.target.value)}
-                    placeholder="Enter website link"
+                    placeholder="Enter website URL"
                     className="w-full border border-primary-60 pl-12 pr-4 py-2 bg-neutral-light-20 rounded-xl text-primary-80 outline-none focus:ring-1 focus:bg-white transition-all duration-300"
-                    required
                   />
                 </div>
               </div>
@@ -111,6 +245,50 @@ export default function RecruiterProfileEditPage() {
                   />
                 </div>
               </div>
+              <div className="flex flex-col px-4">
+                <label
+                  htmlFor="size"
+                  className="block text-sm font-bold text-primary ml-4"
+                >
+                  Company Size:
+                </label>
+                <div className="relative">
+                  <div className="absolute left-4 top-1/2 transform -translate-y-1/2 text-primary">
+                    <Users size={18} />
+                  </div>
+                  <input
+                    id="size"
+                    type="text"
+                    value={size}
+                    onChange={(e) => setSize(e.target.value)}
+                    placeholder="Enter company size (e.g., 50-100 employees)"
+                    className="w-full border border-primary-60 pl-12 pr-4 py-2 bg-neutral-light-20 rounded-xl text-primary-80 outline-none focus:ring-1 focus:bg-white transition-all duration-300"
+                  />
+                </div>
+              </div>
+              <div className="flex flex-col px-4">
+                <label
+                  htmlFor="foundedYear"
+                  className="block text-sm font-bold text-primary ml-4"
+                >
+                  Founded Year:
+                </label>
+                <div className="relative">
+                  <div className="absolute left-4 top-1/2 transform -translate-y-1/2 text-primary">
+                    <Calendar size={18} />
+                  </div>
+                  <input
+                    id="foundedYear"
+                    type="number"
+                    value={foundedYear}
+                    onChange={(e) => setFoundedYear(e.target.value)}
+                    placeholder="Enter founded year"
+                    min="1900"
+                    max={new Date().getFullYear()}
+                    className="w-full border border-primary-60 pl-12 pr-4 py-2 bg-neutral-light-20 rounded-xl text-primary-80 outline-none focus:ring-1 focus:bg-white transition-all duration-300"
+                  />
+                </div>
+              </div>
             </div>
           </div>
           <div className="flex flex-col gap-2 px-4">
@@ -121,13 +299,12 @@ export default function RecruiterProfileEditPage() {
               Description:
             </label>
             <div className="relative">
-              <input
+              <textarea
                 id="description"
-                type="text"
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
-                placeholder="Enter description"
-                className="w-full border border-primary-60 pl-4 pr-4 py-2 h-16 bg-neutral-light-20 rounded-xl text-primary-80 outline-none focus:ring-1 focus:bg-white transition-all duration-300"
+                placeholder="Enter company description"
+                className="w-full border border-primary-60 pl-4 pr-4 py-2 h-24 bg-neutral-light-20 rounded-xl text-primary-80 outline-none focus:ring-1 focus:bg-white transition-all duration-300 resize-none"
               />
             </div>
           </div>
@@ -136,7 +313,7 @@ export default function RecruiterProfileEditPage() {
               htmlFor="address"
               className="block text-sm font-bold text-primary ml-4"
             >
-              Address*:
+              Address:
             </label>
             <div className="relative">
               <div className="absolute left-4 top-1/2 transform -translate-y-1/2 text-primary">
@@ -147,113 +324,47 @@ export default function RecruiterProfileEditPage() {
                 type="text"
                 value={address}
                 onChange={(e) => setAddress(e.target.value)}
-                placeholder="Enter address"
+                placeholder="Enter company address"
                 className="w-full border border-primary-60 pl-12 pr-4 py-2 bg-neutral-light-20 rounded-xl text-primary-80 outline-none focus:ring-1 focus:bg-white transition-all duration-300"
-                required
               />
             </div>
           </div>
-          <div className="flex flex-wrap">
-            <div className="flex-1 flex flex-col gap-2 px-4">
-              <div className="flex flex-col">
-                <label
-                  htmlFor="industry"
-                  className="block text-sm font-bold text-primary ml-4"
-                >
-                  Industry*:
-                </label>
-                <div className="relative">
-                  <div className="absolute left-4 top-1/2 transform -translate-y-1/2 text-primary">
-                    <Briefcase size={18} />
-                  </div>
-                  <input
-                    id="industry"
-                    type="text"
-                    value={industry}
-                    onChange={(e) => setIndustry(e.target.value)}
-                    placeholder="Add industries"
-                    className="w-full border border-primary-60 pl-12 pr-4 py-2 bg-neutral-light-20 rounded-xl text-primary-80 outline-none focus:ring-1 focus:bg-white transition-all duration-300"
-                    required
-                  />
-                </div>
+          <div className="flex flex-col gap-2 px-4">
+            <label
+              htmlFor="industry"
+              className="block text-sm font-bold text-primary ml-4"
+            >
+              Industry:
+            </label>
+            <div className="relative">
+              <div className="absolute left-4 top-1/2 transform -translate-y-1/2 text-primary">
+                <Briefcase size={18} />
               </div>
-              <div className="flex flex-col">
-                <label
-                  htmlFor="profession"
-                  className="block text-sm font-bold text-primary ml-4"
-                >
-                  Profession*:
-                </label>
-                <div className="border-x-1 border-b-1 border-primary-60 rounded-2xl">
-                  <div className="relative ">
-                    <div className="absolute left-4 top-1/2 transform -translate-y-1/2 text-primary">
-                      <Briefcase size={18} />
-                    </div>
-                    <input
-                      id="profession"
-                      type="text"
-                      value={profession}
-                      onChange={(e) => setProfession(e.target.value)}
-                      placeholder="Add profession"
-                      className="w-full border border-primary-60 pl-12 pr-4 py-2 bg-neutral-light-20 rounded-xl text-primary-80 outline-none focus:ring-1 focus:bg-white transition-all duration-300"
-                      required
-                    />
-                  </div>
-                  <div className="flex flex-col gap-2  bg-neutral-medium-20 my-2">
-                    <div className="flex flex-wrap gap-2 px-4">
-                      <span className="text-primary">Industry: </span>
-                      <input
-                        id="profession"
-                        type="text"
-                        value={profession}
-                        onChange={(e) => setProfession(e.target.value)}
-                        placeholder="Add profession"
-                        className="w-96 border border-primary-60-60 pl-4 pr-4 py-2 bg-neutral-light-20 rounded-full text-primary-80 outline-none focus:ring-1 focus:bg-white transition-all duration-300"
-                        required
-                      />
-                    </div>
-                  </div>
-                  <div className="flex flex-wrap gap-4 px-4 pb-2">
-                    <div className="hover:bg-accent bg-primary-60 hover:text-neutral-light-60 cursor-pointer text-neutral-light-20 font-semibold rounded-full px-8 py-2">
-                      <span>Cancel</span>
-                    </div>
-                    <div className="bg-accent hover:text-accent hover:bg-neutral-light-60 cursor-pointer border border-accent text-neutral-light-20 font-semibold rounded-full px-8 py-2">
-                      <span>Add</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div className="flex-1 flex flex-col gap-2">
-              <b className="text-primary">Update your logo*:</b>
-
-              <label className="relative w-60 h-60 border border-primary-60 rounded-lg flex items-center justify-center cursor-pointer hover:bg-highlight-20">
-                <input
-                  type="file"
-                  accept="image/*"
-                  className="absolute inset-0 opacity-0 cursor-pointer"
-                  onChange={(e) => {
-                    const file = e.target.files?.[0];
-                    if (file) {
-                    }
-                  }}
-                />
-                <img
-                  src="/logo-light.png"
-                  alt="upload icon"
-                  className="w-60 h-60 opacity-40"
-                />
-              </label>
+              <input
+                id="industry"
+                type="text"
+                value={industry}
+                onChange={(e) => setIndustry(e.target.value)}
+                placeholder="Enter industry (comma separated for multiple)"
+                className="w-full border border-primary-60 pl-12 pr-4 py-2 bg-neutral-light-20 rounded-xl text-primary-80 outline-none focus:ring-1 focus:bg-white transition-all duration-300"
+              />
             </div>
           </div>
         </div>
         <div className="flex flex-wrap gap-4">
-          <div className="hover:bg-accent hover:text-neutral-light-60 cursor-pointer text-accent border border-accent font-semibold rounded-2xl px-6 py-2">
-            <a href="/recruiter/profile">Cancel</a>
-          </div>
-          <div className="bg-accent hover:text-accent hover:bg-neutral-light-60 cursor-pointer border border-accent text-neutral-light-20 font-semibold rounded-2xl px-6 py-2">
-            <a href="/recruiter/profile">Save</a>
-          </div>
+          <button
+            onClick={() => router.push('/company/profile')}
+            className="hover:bg-accent hover:text-neutral-light-60 cursor-pointer text-accent border border-accent font-semibold rounded-2xl px-6 py-2"
+          >
+            Cancel
+          </button>
+          <button
+            onClick={handleSubmit}
+            disabled={saving}
+            className="bg-accent hover:text-accent hover:bg-neutral-light-60 cursor-pointer border border-accent text-neutral-light-20 font-semibold rounded-2xl px-6 py-2 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {saving ? 'Saving...' : 'Save'}
+          </button>
         </div>
       </div>
     </div>
