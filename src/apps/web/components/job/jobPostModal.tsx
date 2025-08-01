@@ -5,7 +5,7 @@ import { postNewJob } from "../../services/jobs";
 import { getToken } from "../../utils/auth";
 import { getProvinces, getDistrictsByProvince, Province, District } from "../../services/location";
 import { EXPERIENCE_LEVELS, EDUCATION_LEVELS, JOB_TYPES } from "../../constants/jobConstants";
-import { getAllIndustries, Industry, getIndustriesByCategory, IndustryCategory, debugIndustriesStructure, testHierarchicalLogic } from "../../services/industries";
+import { getAllIndustries, Industry, getIndustriesByCategory, IndustryCategory } from "../../services/industries";
 import { toast } from "react-toastify";
 
 interface JobPostModalProps {
@@ -78,7 +78,6 @@ export default function JobPostModal({ isOpen, onClose }: JobPostModalProps) {
       const response = await getAllIndustries();
       if (response.success && response.data) {
         setIndustries(response.data);
-        debugIndustriesStructure(response.data); // Debug dữ liệu
         const categories = getIndustriesByCategory(response.data);
         setIndustryCategories(categories);
       }

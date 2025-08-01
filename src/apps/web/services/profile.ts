@@ -133,7 +133,6 @@ export const updateProfile = async (updateData: UpdateProfileData): Promise<Prof
       };
     }
 
-	console.log(updateData);
 
     const response = await fetch(`${API_URL}/profile/me`, {
       method: 'PUT',

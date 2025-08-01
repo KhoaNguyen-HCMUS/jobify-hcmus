@@ -38,7 +38,6 @@ export interface AuthResponse {
 
 export const registerCandidate = async (data: RegisterCandidateData): Promise<AuthResponse> => {
   try {
-          console.log(data);
     const response = await fetch(`${API_URL}/auth/register/candidate`, {
       method: 'POST',
       headers: {
