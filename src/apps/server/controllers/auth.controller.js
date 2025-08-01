@@ -41,8 +41,8 @@ exports.registerCandidate = async (req, res) => {
 };
 
 exports.registerCompany = async (req, res) => {
-  const { company_name, email, password, phone_number, tax_code, license_number, contact_email, address } = req.body;
-  if (!company_name || !email || !password || !phone_number || !tax_code || !license_number || !contact_email || !address) {
+  const { company_name, email, password, tax_code, license_number } = req.body;
+  if (!company_name || !email || !password || !tax_code || !license_number) {
     return errorResponse(res, 'Missing registration data', ['All fields are required']);
   }
 
@@ -67,11 +67,8 @@ exports.registerCompany = async (req, res) => {
       data: {
         user_id: newUser.id,
         company_name,
-        phone_number,
         tax_code,
         license_number,
-        contact_email,
-        address,
         status: 'pending',
         created_at: new Date(),
       }
@@ -97,17 +94,31 @@ exports.login = async (req, res) => {
     if (!isMatch)
       return errorResponse(res, 'Email or password is incorrect', [], 401);
 
+    if (user.status !== 'active') {
+      return errorResponse(res, 'Account not active, please contact support to activate your account', [], 403);
+    }
+    
     const token = jwt.sign(
       { id: user.id, email: user.email, role: user.role },
       process.env.JWT_SECRET,
       { expiresIn: '30d' }
     );
 
-    const user_profiles = await prisma.user_profiles.findUnique({ where: { user_id: user.id } });
-    if (!user_profiles)
-      return errorResponse(res, 'User profile not found', [], 404);
+  let name = '';
 
-    return successResponse(res, 'Login successful', { token, name: user_profiles.full_name, role: user.role });
+  if (['admin', 'moderator', 'candidate'].includes(user.role)) {
+    const profile = await prisma.user_profiles.findUnique({ where: { user_id: user.id } });
+    if (!profile)
+      return errorResponse(res, 'User profile not found', [], 404);
+    name = profile.full_name;
+  } else if (user.role === 'company') {
+    const company = await prisma.companies.findUnique({ where: { user_id: user.id } });
+    if (!company)
+      return errorResponse(res, 'Company profile not found', [], 404);
+    name = company.company_name;
+  }
+
+    return successResponse(res, 'Login successful', { token, name, role: user.role });
   } catch (err) {
     return errorResponse(res, 'Login failed', [err.message], 500);
   }
