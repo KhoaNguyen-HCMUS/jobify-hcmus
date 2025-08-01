@@ -5,6 +5,7 @@ import { postNewJob } from "../../services/jobs";
 import { getToken } from "../../utils/auth";
 import { getProvinces, getDistrictsByProvince, Province, District } from "../../services/location";
 import { EXPERIENCE_LEVELS, EDUCATION_LEVELS, JOB_TYPES } from "../../constants/jobConstants";
+import { toast } from "react-toastify";
 
 interface JobPostModalProps {
   isOpen: boolean;
@@ -18,6 +19,7 @@ export default function JobPostModal({ isOpen, onClose }: JobPostModalProps) {
   const [location, setLocation] = useState("");
   const [salaryMin, setSalaryMin] = useState("");
   const [salaryMax, setSalaryMax] = useState("");
+  const [isSalaryNegotiable, setIsSalaryNegotiable] = useState(false);
   const [experience, setExperience] = useState("");
   const [positions, setpositions] = useState("");
   const [education, setEducation] = useState("");
@@ -109,7 +111,7 @@ export default function JobPostModal({ isOpen, onClose }: JobPostModalProps) {
         work_place: workPlace || selectedDistrict || selectedProvince || "Ho Chi Minh",
         salary_min: parseInt(salaryMin.replace(/\D/g, "")) || 0, 
         salary_max: parseInt(salaryMax.replace(/\D/g, "")) || 0, 
-        is_salary_negotiable: false,
+        is_salary_negotiable: isSalaryNegotiable,
         experience_level: experience,
         position: positions,
         education_level: education,
@@ -121,7 +123,7 @@ export default function JobPostModal({ isOpen, onClose }: JobPostModalProps) {
         requirements: applicantRequirements,
         responsibilities: jobDescription, 
         benefits: benefit,
-        category_id: "cc610e7f-6ac8-4835-952e-52914e4e3704", 
+        industry_id: "04185086-9fac-4476-aea5-1d3d8d848b2f", 
         currency: "VND",
         cost_coin: 10,
         status: status,
@@ -131,13 +133,19 @@ export default function JobPostModal({ isOpen, onClose }: JobPostModalProps) {
       const response = await postNewJob(jobData, token);
       
       if (response.success) {
-        alert(status === "draft" ? "Successfully saved draft!" : "Successfully posted job!");
+        if (status === "draft") {
+          toast.success("Job saved as draft successfully!");
+        }
+        if (status === "pending") {
+          toast.success("Job posted successfully!");
+        }
         onClose();
         setTitle("");
         setDeadline("");
         setLocation("");
         setSalaryMin("");
         setSalaryMax("");
+        setIsSalaryNegotiable(false);
         setExperience("");
         setpositions("");
         setEducation("");
@@ -152,11 +160,11 @@ export default function JobPostModal({ isOpen, onClose }: JobPostModalProps) {
         setSelectedProvince("");
         setSelectedDistrict("");
       } else {
-        alert(`Error: ${response.message}`);
+        toast.error("Failed to post job: " + response.message);
       }
     } catch (error) {
+      toast.error("Error posting job, please try again later.");
       console.error("Error posting job:", error);
-      alert("Error posting job!");
     } finally {
       setIsLoading(false);
     }
@@ -167,7 +175,7 @@ export default function JobPostModal({ isOpen, onClose }: JobPostModalProps) {
   return (
     <div
       onClick={onClose}
-      className="fixed inset-0 bg-gray-700 z-50 flex items-center justify-center"
+      className="fixed inset-0 bg-primary-80/70 z-50 flex items-center justify-center"
     >
       <div
         onClick={(e) => e.stopPropagation()}
@@ -233,6 +241,30 @@ export default function JobPostModal({ isOpen, onClose }: JobPostModalProps) {
                       </select>
                     </div>
                   </div>
+                    <div className="flex flex-col">
+                    <label
+                      htmlFor="experience"
+                      className="block text-sm font-bold text-primary"
+                    >
+                      Experience Level*:
+                    </label>
+                    <div className="relative">
+                      <select
+                        id="experience"
+                        value={experience}
+                        onChange={(e) => setExperience(e.target.value)}
+                        className="w-full border border-primary-80 pl-4 pr-4 py-2 bg-neutral-light-20 rounded-xl text-primary-80 outline-none focus:ring-1 focus:bg-white transition-all duration-300"
+                        required
+                      >
+                        <option value="">Select experience level</option>
+                        {EXPERIENCE_LEVELS.map((level) => (
+                          <option key={level} value={level}>
+                            {level}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  </div>
                   <div className="flex flex-col">
                     <label
                       htmlFor="deadline"
@@ -252,44 +284,8 @@ export default function JobPostModal({ isOpen, onClose }: JobPostModalProps) {
                       />
                     </div>
                   </div>
-                  <div className="flex flex-col">
-                    <label
-                      htmlFor="salaryMin"
-                      className="block text-sm font-bold text-primary"
-                    >
-                      Salary Min*:
-                    </label>
-                    <div className="relative">
-                      <input
-                        id="salaryMin"
-                        type="text"
-                        value={salaryMin}
-                        onChange={(e) => setSalaryMin(e.target.value)}
-                        placeholder="Enter salary min"
-                        className="w-full border border-primary-80 pl-4 pr-4 py-2 bg-neutral-light-20 rounded-xl text-primary-80 outline-none focus:ring-1 focus:bg-white transition-all duration-300"
-                        required
-                      />
-                    </div>
-                  </div>
-                  <div className="flex flex-col">
-                    <label
-                      htmlFor="salaryMax"
-                      className="block text-sm font-bold text-primary"
-                    >
-                      Salary Max*:
-                    </label>
-                    <div className="relative">
-                      <input
-                        id="salaryMax"
-                        type="text"
-                        value={salaryMax}
-                        onChange={(e) => setSalaryMax(e.target.value)}
-                        placeholder="Enter salary max"
-                        className="w-full border border-primary-80 pl-4 pr-4 py-2 bg-neutral-light-20 rounded-xl text-primary-80 outline-none focus:ring-1 focus:bg-white transition-all duration-300"
-                        required
-                      />
-                    </div>
-                  </div>
+                  
+                  
                   <div className="flex flex-col">
                     <label
                       htmlFor="positions"
@@ -330,6 +326,26 @@ export default function JobPostModal({ isOpen, onClose }: JobPostModalProps) {
                       />
                     </div>
                   </div>
+
+                  <div className="flex flex-col">
+                    <label
+                      htmlFor="salaryMin"
+                      className="block text-sm font-bold text-primary"
+                    >
+                      Salary Min*:
+                    </label>
+                    <div className="relative">
+                      <input
+                        id="salaryMin"
+                        type="text"
+                        value={salaryMin}
+                        onChange={(e) => setSalaryMin(e.target.value)}
+                        placeholder="Enter salary min"
+                        className="w-full border border-primary-80 pl-4 pr-4 py-2 bg-neutral-light-20 rounded-xl text-primary-80 outline-none focus:ring-1 focus:bg-white transition-all duration-300"
+                        required
+                      />
+                    </div>
+                  </div>
                   
                 </div>
                 <div className="flex-1 flex flex-col gap-2">
@@ -359,30 +375,7 @@ export default function JobPostModal({ isOpen, onClose }: JobPostModalProps) {
                       </select>
                     </div>
                   </div>
-                  <div className="flex flex-col">
-                    <label
-                      htmlFor="experience"
-                      className="block text-sm font-bold text-primary"
-                    >
-                      Experience Level*:
-                    </label>
-                    <div className="relative">
-                      <select
-                        id="experience"
-                        value={experience}
-                        onChange={(e) => setExperience(e.target.value)}
-                        className="w-full border border-primary-80 pl-4 pr-4 py-2 bg-neutral-light-20 rounded-xl text-primary-80 outline-none focus:ring-1 focus:bg-white transition-all duration-300"
-                        required
-                      >
-                        <option value="">Select experience level</option>
-                        {EXPERIENCE_LEVELS.map((level) => (
-                          <option key={level} value={level}>
-                            {level}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-                  </div>
+                
                   <div className="flex flex-col">
                     <label
                       htmlFor="education"
@@ -468,6 +461,41 @@ export default function JobPostModal({ isOpen, onClose }: JobPostModalProps) {
                       />
                     </div>
                   </div>
+                  <div className="flex flex-col">
+                    <label
+                      htmlFor="salaryMax"
+                      className="block text-sm font-bold text-primary"
+                    >
+                      Salary Max*:
+                    </label>
+                    <div className="relative">
+                      <input
+                        id="salaryMax"
+                        type="text"
+                        value={salaryMax}
+                        onChange={(e) => setSalaryMax(e.target.value)}
+                        placeholder="Enter salary max"
+                        className="w-full border border-primary-80 pl-4 pr-4 py-2 bg-neutral-light-20 rounded-xl text-primary-80 outline-none focus:ring-1 focus:bg-white transition-all duration-300"
+                        required
+                      />
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <input
+                      id="isSalaryNegotiable"
+                      type="checkbox"
+                      checked={isSalaryNegotiable}
+                      onChange={(e) => setIsSalaryNegotiable(e.target.checked)}
+                      className="w-4 h-4 text-secondary bg-neutral-light-20 border-primary-80 rounded focus:ring-secondary focus:ring-2"
+                    />
+                    <label
+                      htmlFor="isSalaryNegotiable"
+                      className="text-sm font-medium text-primary cursor-pointer"
+                    >
+                      Salary is negotiable
+                    </label>
+                  </div>
+
                 </div>
               </div>
               <div className="flex flex-col">
