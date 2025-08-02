@@ -21,6 +21,9 @@ export default function HomePage() {
         <div className="bg-neutral-light-40">
           <h2 className="font-bold text-4xl text-primary pl-10 w-full mb-6 pt-6">
             <i>New Jobs</i>
+            <a href="/jobs" className="text-accent underline hover:text-accent/80 text-xl ml-4">
+              See all
+            </a>
           </h2>
           <FeaturedJob />
         </div>
