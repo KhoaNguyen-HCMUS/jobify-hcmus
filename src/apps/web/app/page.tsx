@@ -25,12 +25,6 @@ export default function HomePage() {
           <FeaturedJob />
         </div>
         <div className="bg-accent-20">
-          <h2 className="font-bold text-4xl text-primary pl-10 w-full mb-6 pt-6">
-            <i>Top Company</i>
-          </h2>
-          <TopCompany />
-        </div>
-        <div className="bg-accent-20">
           <h2 className="font-bold text-4xl text-neutral-light-20 pl-10 py-6 w-full bg-primary mb-6">
             <i>Top Outstanding Industries</i>
           </h2>
