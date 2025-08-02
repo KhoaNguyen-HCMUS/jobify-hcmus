@@ -49,6 +49,14 @@ export interface JobResponse {
   data?: Job;
 }
 
+export interface SaveJobResponse {
+  success: boolean;
+  message: string;
+  data?: {
+    saved: boolean;
+  };
+}
+
 export const getAllJobs = async (): Promise<JobsResponse> => {
   try {
     const response = await fetch(`${API_URL}/jobs`, {
@@ -105,6 +113,98 @@ export const getJobsByCompany = async (): Promise<JobsResponse> => {
       success: false,
       message: 'Network connection error',
     };
+  }
+};
+
+export const getSavedJobs = async (): Promise<JobsResponse> => {
+  try {
+    const token = getToken();
+    if (!token) {
+      return {
+        success: false,
+        message: 'Authentication required',
+      };
+    }
+
+    const response = await fetch(`${API_URL}/jobs/saved`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+      },
+    });
+
+    const result = await response.json();
+    return result;
+  } catch (error) {
+    return {
+      success: false,
+      message: 'Network connection error',
+    };
+  }
+};
+
+export const saveJob = async (jobId: string): Promise<SaveJobResponse> => {
+  try {
+    const token = getToken();
+    if (!token) {
+      return {
+        success: false,
+        message: 'Authentication required',
+      };
+    }
+
+    const response = await fetch(`${API_URL}/jobs/${jobId}/save`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+      },
+    });
+
+    const result = await response.json();
+    return result;
+  } catch (error) {
+    return {
+      success: false,
+      message: 'Network connection error',
+    };
+  }
+};
+
+export const unsaveJob = async (jobId: string): Promise<SaveJobResponse> => {
+  try {
+    const token = getToken();
+    if (!token) {
+      return {
+        success: false,
+        message: 'Authentication required',
+      };
+    }
+
+    const response = await fetch(`${API_URL}/jobs/${jobId}/save`, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+      },
+    });
+
+    const result = await response.json();
+    return result;
+  } catch (error) {
+    return {
+      success: false,
+      message: 'Network connection error',
+    };
+  }
+};
+
+export const toggleSaveJob = async (jobId: string, isCurrentlySaved: boolean): Promise<SaveJobResponse> => {
+  if (isCurrentlySaved) {
+    return await unsaveJob(jobId);
+  } else {
+    return await saveJob(jobId);
   }
 };
 
