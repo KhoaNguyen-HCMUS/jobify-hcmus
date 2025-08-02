@@ -33,6 +33,7 @@ export interface Job {
   created_at: string;
   updated_at: string;
   skills: string;
+  company_name: string;
 }
 
 export interface JobsResponse {
