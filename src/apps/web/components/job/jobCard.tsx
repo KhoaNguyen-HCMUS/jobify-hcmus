@@ -52,7 +52,7 @@ export default function JobCard({ job }: JobCardProps) {
           <span className="text-primary-80 font-semibold px-4 py-2 bg-accent-20 rounded-full">
             {job.province}
           </span>
-          {/* <JobStatusBadge status={job.status} /> */}
+          <JobStatusBadge status={job.status} />
           <span className="text-primary-80">
             <Heart size={24} />
           </span>

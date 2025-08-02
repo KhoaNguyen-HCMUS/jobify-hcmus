@@ -1,3 +1,4 @@
+import { getToken } from "../utils/auth";
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 export interface Job {
@@ -73,6 +74,27 @@ export const getJobById = async (id: string): Promise<JobResponse> => {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
+      },
+    });
+
+    const result = await response.json();
+    return result;
+  } catch (error) {
+    return {
+      success: false,
+      message: 'Network connection error',
+    };
+  }
+};
+
+export const getJobsByCompany = async (): Promise<JobsResponse> => {
+  try {
+    const token = getToken();
+    const response = await fetch(`${API_URL}/company/jobs`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
       },
     });
 
