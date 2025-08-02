@@ -13,24 +13,36 @@ import {
   CircleX,
   ChevronDown,
   ChevronUp,
-  X,
+  ArrowLeft,
+  Heart,
 } from "lucide-react";
 import ApplyJobModal from "../../components/applyJobModal";
 import { useRouter } from "next/navigation";
 import { Job } from "../../services/jobs";
+import { useSaveJob } from "../../hooks/useSaveJob";    
+import { getUserRole } from "../../utils/auth";
 
 interface JobDetailProps {
   job?: Job;
   isHR?: boolean;
 }
 
-const related = ["Sales", "Construction", "Python", "Design", "Marketing"];
-const areaList = ["Sales", "Construction", "Python", "Design", "Marketing"];
-const skills = ["Sales", "Construction", "Python", "Design", "Marketing"];
 
 export default function JobDetail({ job: propJob, isHR }: JobDetailProps) {
   const [job, setJob] = useState<Job | null>(propJob || null);
+  const [isSaved, setIsSaved] = useState(false);
+  const { handleSaveJob, isSaving } = useSaveJob();
+  const userRole = getUserRole();
 
+
+  const handleSaveClick = async () => {
+    if (!job) return;
+    
+    const newSavedState = await handleSaveJob(job.id, isSaved);
+    if (newSavedState !== isSaved) {
+      setIsSaved(newSavedState);
+    }
+  };
   useEffect(() => {
     if (propJob) {
       setJob(propJob);
@@ -130,7 +142,7 @@ export default function JobDetail({ job: propJob, isHR }: JobDetailProps) {
           onClick={() => router.back()}
           className="flex items-center gap-2 px-4 py-2 bg-primary text-background rounded-lg hover:bg-primary-80 transition-colors"
         >
-          <X size={20} />
+          <ArrowLeft size={20} />
           Back
         </button>
       </div>
@@ -204,12 +216,23 @@ export default function JobDetail({ job: propJob, isHR }: JobDetailProps) {
                     Applied: {job.applications_count}/{job.number_of_openings}
                   </button>
                 )}
-                <a
-                  href="/save"
-                  className="px-6 py-2 bg-accent rounded-full text-background font-semibold text-lg transition-all duration-300 hover:shadow-lg hover:shadow-primary/30 transform hover:-translate-y-0.5"
-                >
-                  Save
-                </a>
+                {userRole === 'candidate' && (
+                  <button
+                    onClick={handleSaveClick}
+                    disabled={isSaving}
+                    className={`px-6 py-2 rounded-full font-semibold text-lg transition-all duration-300 hover:shadow-lg hover:shadow-primary/30 transform hover:-translate-y-0.5 flex items-center gap-2 ${
+                      isSaved 
+                        ? 'bg-red-500 text-white hover:bg-red-600' 
+                        : 'bg-accent text-background hover:bg-accent/90'
+                    } ${isSaving ? 'opacity-50 cursor-not-allowed' : ''}`}
+                  >
+                    <Heart 
+                      size={20} 
+                      className={isSaved ? 'fill-white' : ''}
+                    />
+                    {isSaved ? 'Saved' : 'Save'}
+                  </button>
+                )}
               </div>
             </div>
           </div>
