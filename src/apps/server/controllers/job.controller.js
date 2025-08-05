@@ -4,8 +4,16 @@ const { successResponse, errorResponse } = require('../utils/response');
 exports.getJobs = async (req, res) => {
   try {
     const jobs = await prisma.job_posts.findMany({ where: { status: 'active' } });
+    if (!jobs || jobs.length === 0) {
+      return errorResponse(res, 'No active jobs found', [], 404);
+    }
 
-    return successResponse(res, 'Jobs fetched successfully', jobs);
+    const jobsWithCompany = await Promise.all(jobs.map(async (job) => {
+      const company = await prisma.companies.findUnique({ where: { id: job.company_id }, select: { company_name: true } });
+      return { ...job, company_name: company ? company.company_name : 'Unknown' };
+    }));
+
+    return successResponse(res, 'Jobs fetched successfully', jobsWithCompany);
   } catch (err) {
     console.error(err);
     return errorResponse(res, 'Failed to fetch jobs', [err.message], 500);
@@ -34,7 +42,11 @@ exports.getJobById = async (req, res) => {
   try {
     const job = await prisma.job_posts.findUnique({ where: { id } });
     if (!job) return errorResponse(res, 'Job not found', [], 404);
-    return successResponse(res, 'Job detail fetched successfully', job);
+
+    const company = await prisma.companies.findUnique({ where: { id: job.company_id } });
+    if (!company) return errorResponse(res, 'Company not found', [], 404);
+
+    return successResponse(res, 'Job detail fetched successfully', { company, job });
   } catch (err) {
     console.error(err);
     return errorResponse(res, 'Failed to fetch job detail', [err.message], 500);
@@ -297,12 +309,20 @@ exports.getSavedJobs = async (req, res) => {
 
   try {
     const savedJobIds = await prisma.saved_jobs.findMany({ where: { user_id: userId }, select: { job_id: true } });
+    if (!savedJobIds || savedJobIds.length === 0) {
+      return errorResponse(res, 'No saved jobs found', [], 404);
+    }
 
     const jobIds = savedJobIds.map(item => item.job_id);
 
     const jobs = await prisma.job_posts.findMany({ where: { id: { in: jobIds } } });
 
-    return successResponse(res, 'Saved jobs fetched successfully', jobs);
+    const jobsWithCompany = await Promise.all(jobs.map(async (job) => {
+      const company = await prisma.companies.findUnique({ where: { id: job.company_id }, select: { company_name: true } });
+      return { ...job, company_name: company ? company.company_name : 'Unknown' };
+    }));
+
+    return successResponse(res, 'Saved jobs fetched successfully', jobsWithCompany);
   } catch (err) {
     console.error(err);
     return errorResponse(res, 'Failed to fetch saved jobs', [err.message], 500);
@@ -313,33 +333,55 @@ exports.getRecommendedJobs = async (req, res) => {
   const userId = req.user.id;
 
   try {
-    // Lấy danh sách job_id từ bảng job_matches
     const matchedJobIds = await prisma.job_matches.findMany({
       where: { user_id: userId, is_dismissed: false },
       orderBy: { match_score: 'desc' },
       select: { job_id: true },
     });
+    if (!matchedJobIds || matchedJobIds.length === 0) {
+      return errorResponse(res, 'No recommended jobs found', [], 404);
+    }
 
     const jobIds = matchedJobIds.map(item => item.job_id);
 
-    // Truy vấn full thông tin job_posts tương ứng
-    const jobs = await prisma.job_posts.findMany({
-      where: { id: { in: jobIds } },
-      include: {
-        companies: true,
-        job_categories: true,
-        job_skills: {
-          include: {
-            skills: true,
-          },
-        },
-      },
-    });
+    const jobs = await prisma.job_posts.findMany({ where: { id: { in: jobIds } } });
 
-    return successResponse(res, 'Recommended jobs fetched successfully', jobs);
+    const jobsWithCompany = await Promise.all(jobs.map(async (job) => {
+      const company = await prisma.companies.findUnique({ where: { id: job.company_id }, select: { company_name: true } });
+      return { ...job, company_name: company ? company.company_name : 'Unknown' };
+    }));
+
+    return successResponse(res, 'Recommended jobs fetched successfully', jobsWithCompany);
   } catch (err) {
     console.error(err);
     return errorResponse(res, 'Failed to fetch recommended jobs', [err.message], 500);
+  }
+};
+
+exports.getAppliedJobs = async (req, res) => {
+  const userId = req.user.id;
+  try {
+    const appliedJobIds = await prisma.job_applications.findMany({
+      where: { candidate_id: userId },
+      select: { job_id: true },
+    });
+    if (!appliedJobIds || appliedJobIds.length === 0) {
+      return errorResponse(res, 'No applied jobs found', [], 404);
+    }
+
+    const jobIds = appliedJobIds.map(item => item.job_id);
+
+    const jobs = await prisma.job_posts.findMany({ where: { id: { in: jobIds } } });
+    
+    const jobsWithCompany = await Promise.all(jobs.map(async (job) => {
+      const company = await prisma.companies.findUnique({ where: { id: job.company_id }, select: { company_name: true } });
+      return { ...job, company_name: company ? company.company_name : 'Unknown' };
+    }));
+
+    return successResponse(res, 'Applied jobs fetched successfully', jobsWithCompany);
+  } catch (err) {
+    console.error(err);
+    return errorResponse(res, 'Failed to fetch applied jobs', [err.message], 500);
   }
 };
 
