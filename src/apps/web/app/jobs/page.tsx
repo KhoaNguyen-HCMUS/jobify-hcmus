@@ -1,7 +1,7 @@
 "use client";
 import JobItem from "../../components/job/jobItem";
 import KeywordSearch from "../../components/keywordSearch";
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import CategoryGrid from "../../components/categoryGrid";
 import MainCategoryItem from "../../components/mainCategoryItem";
 import usePagination from "../../hooks/usePagination";
@@ -37,7 +37,7 @@ const adaptJobForComponent = (job: Job) => {
   };
 };
 
-export default function JobsPage() {
+function JobsPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   
@@ -435,5 +435,17 @@ export default function JobsPage() {
         <CategoryGrid />
       </div>
     </div>
+  );
+}
+
+export default function JobsPage() {
+  return (
+    <Suspense fallback={
+      <div className="bg-neutral-light-40 min-h-screen flex items-center justify-center">
+        <div className="text-primary text-xl">Loading...</div>
+      </div>
+    }>
+      <JobsPageContent />
+    </Suspense>
   );
 }

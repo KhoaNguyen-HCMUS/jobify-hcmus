@@ -1,7 +1,7 @@
 "use client";
 import JobCard from "../../components/job/jobCard";
 import KeywordSearch from "../../components/keywordSearch";
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { ChevronDown } from "lucide-react";
 import usePagination from "../../hooks/usePagination";
 import Pagination from "../../components/pagination";
@@ -26,7 +26,7 @@ const adaptJobForComponent = (job: Job) => {
   };
 };
 
-export default function RecommendedPage() {
+function RecommendedPageContent() {
   const searchParams = useSearchParams();
   const [jobs, setJobs] = useState<Job[]>([]);
   const [loading, setLoading] = useState(true);
@@ -162,5 +162,17 @@ export default function RecommendedPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function RecommendedPage() {
+  return (
+    <Suspense fallback={
+      <div className="bg-neutral-light-40 min-h-screen flex items-center justify-center">
+        <div className="text-primary text-xl">Loading...</div>
+      </div>
+    }>
+      <RecommendedPageContent />
+    </Suspense>
   );
 }
