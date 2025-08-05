@@ -4,7 +4,11 @@ import { Search, MapPin, ChevronDown } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { getProvinces, Province } from "../services/location";
 
-export default function KeywordSearch() {
+interface KeywordSearchProps {
+  targetUrl?: string;
+}
+
+export default function KeywordSearch({ targetUrl = '/jobs' }: KeywordSearchProps) {
   const router = useRouter();
   const [keyword, setKeyword] = useState("");
   const [selectedProvince, setSelectedProvince] = useState("");
@@ -42,7 +46,7 @@ export default function KeywordSearch() {
     }
     
     const queryString = params.toString();
-    const url = queryString ? `/jobs?${queryString}` : '/jobs';
+    const url = queryString ? `${targetUrl}?${queryString}` : targetUrl;
     router.push(url);
   };
 
@@ -89,7 +93,7 @@ export default function KeywordSearch() {
                 <>
                   <div 
                     className="p-3 hover:bg-gray-100 cursor-pointer border-b"
-                    onClick={() => handleProvinceSelect({ code: 0, name: "All locations" })}
+                    onClick={() => setSelectedProvince("All locations")}
                   >
                     All locations
                   </div>
