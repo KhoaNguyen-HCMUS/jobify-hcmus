@@ -40,7 +40,6 @@ export default function FeaturedJob() {
 
   return (
     <div>
-      <LocationFilter />
       <div className="mx-7">
         <div className="w-full grid grid-cols-1 md:grid-cols-3 gap-4">
           {current.map((job) => (

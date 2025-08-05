@@ -15,7 +15,9 @@ export interface CompanyProfile {
   industry: string | null;
   size: string | null;
   logo_url: string | null;
+  logo_id: string | null;
   cover_url: string | null;
+  cover_id: string | null;
   founded_year: number | null;
   status: string;
   created_at: string;

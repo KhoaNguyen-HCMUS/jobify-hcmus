@@ -1,12 +1,12 @@
 "use client";
 import { useState, useEffect } from "react";
 import JobDetail from "../../../components/job/jobDetail";
-import { getJobById, Job } from "../../../services/jobs";
+import { getJobById, JobDetailData } from "../../../services/jobs";
 import { toast } from 'react-toastify';
 import { useParams } from "next/navigation";
 
 export default function JobDetailPage() {
-  const [job, setJob] = useState<Job | null>(null);
+  const [jobDetailData, setJobDetailData] = useState<JobDetailData | null>(null);
   const [loading, setLoading] = useState(true);
   const { id } = useParams();
 
@@ -16,7 +16,7 @@ export default function JobDetailPage() {
         setLoading(true);
         const response = await getJobById(id as string);
         if (response.success && response.data) {
-          setJob(response.data);
+          setJobDetailData(response.data);
         } else {
           toast.error(response.message || 'Unable to load job details');
         }
@@ -28,7 +28,7 @@ export default function JobDetailPage() {
     };
 
     fetchJob();
-  }, []);
+  }, [id]);
 
   if (loading) {
     return (
@@ -38,7 +38,7 @@ export default function JobDetailPage() {
     );
   }
 
-  if (!job) {
+  if (!jobDetailData) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-primary text-xl">Job not found</div>
@@ -46,5 +46,5 @@ export default function JobDetailPage() {
     );
   }
 
-  return <JobDetail job={job} isHR={false} />;
+  return <JobDetail jobDetailData={jobDetailData} isHR={false} />;
 }

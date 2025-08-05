@@ -49,7 +49,8 @@ export default function ClientLayout({
       "/operator/report-detail",
     ].includes(pathname) ||
     pathname.startsWith("/jobs/") ||
-    pathname.startsWith("/reports/");
+    pathname.startsWith("/reports/") ||
+    pathname.startsWith("/company-detail/");
 
   return (
     <>

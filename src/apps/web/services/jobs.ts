@@ -1,4 +1,5 @@
 import { getToken } from "../utils/auth";
+import { CompanyProfile } from "./companyProfile";
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 export interface Job {
@@ -34,7 +35,12 @@ export interface Job {
   created_at: string;
   updated_at: string;
   skills: string;
-  company_name: string;
+  company_name?: string;
+}
+
+export interface JobDetailData {
+  company: CompanyProfile;
+  job: Job;
 }
 
 export interface JobsResponse {
@@ -47,6 +53,12 @@ export interface JobResponse {
   success: boolean;
   message: string;
   data?: Job;
+}
+
+export interface JobDetailResponse {
+  success: boolean;
+  message: string;
+  data?: JobDetailData;
 }
 
 export interface SaveJobResponse {
@@ -76,7 +88,7 @@ export const getAllJobs = async (): Promise<JobsResponse> => {
   }
 };
 
-export const getJobById = async (id: string): Promise<JobResponse> => {
+export const getJobById = async (id: string): Promise<JobDetailResponse> => {
   try {
     const response = await fetch(`${API_URL}/jobs/${id}`, {
       method: 'GET',

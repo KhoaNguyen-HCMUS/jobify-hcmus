@@ -27,7 +27,7 @@ const adaptJobForComponent = (job: Job) => {
     logo: "/logo.png",
     name: job.title,
     title: job.title,
-    company_name: job.company_name,
+    company_name: job.company_name || "Unknown Company",
     province: job.province,
     experience: job.experience_level,
     salary: salaryText,

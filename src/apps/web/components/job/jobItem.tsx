@@ -51,7 +51,7 @@ export default function Job({ job }: JobItemProps) {
                   </span>
 
                   <span className="bg-accent-20 text-primary-80 font-semibold rounded-full px-3 py-0.5 text-xs">
-                    {job.is_salary_negotiable ? "Negotiable" : "Fixed Salary"}
+                    {job.is_salary_negotiable ? "Negotiable" : "Fixed "}
                   </span>
 
 
