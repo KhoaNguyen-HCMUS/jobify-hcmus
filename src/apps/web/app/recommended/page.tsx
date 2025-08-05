@@ -518,9 +518,9 @@ export default function RecommendedPage() {
               </div>
               <div className="px-6 pb-4">
                 <div className="w-full grid grid-cols-1 md:grid-cols-2 gap-x-20 gap-y-10 p-4">
-                  {current.map((job) => (
+                  {/* {current.map((job) => (
                     <JobCard key={job.id} job={job} />
-                  ))}
+                  ))} */}
                 </div>
                 <Pagination
                   page={page}

@@ -292,9 +292,9 @@ export default function CompanyDetailPage() {
               <div>
                 <div className="mx-7">
                   <div className="w-full grid grid-cols-1 md:grid-cols-2 gap-x-20 gap-y-10">
-                    {current.map((job) => (
+                    {/* {current.map((job) => (
                       <JobCard key={job.id} job={job} />
-                    ))}
+                    ))} */}
                   </div>
                   <div className="py-4">
                     <Pagination

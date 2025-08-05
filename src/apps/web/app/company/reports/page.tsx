@@ -41,7 +41,7 @@ const reports = [
   },
 ];
 
-function RecruiterReportsContent({ report }: ReportProps) {
+function RecruiterReportsContent() {
   const { page, maxPage, current, next, prev } = usePagination(reports, 5);
 
   return (
@@ -71,10 +71,10 @@ function RecruiterReportsContent({ report }: ReportProps) {
   );
 }
 
-export default function RecruiterReportsPage({ report }: ReportProps) {
+export default function RecruiterReportsPage() {
   return (
     <ProtectedRoute allowedRoles={['company']}>
-      <RecruiterReportsContent report={report} />
+      <RecruiterReportsContent  />
     </ProtectedRoute>
   );
 }

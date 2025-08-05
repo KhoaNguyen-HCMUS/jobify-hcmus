@@ -40,7 +40,7 @@ const reports = [
   },
 ];
 
-export default function RecruiterReportsPage({ report }: ReportProps) {
+export default function RecruiterReportsPage() {
   const { page, maxPage, current, next, prev } = usePagination(reports, 5);
 
   return (

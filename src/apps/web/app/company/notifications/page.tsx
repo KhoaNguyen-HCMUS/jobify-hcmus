@@ -4,14 +4,6 @@ import usePagination from "../../../hooks/usePagination";
 import Pagination from "../../../components/pagination";
 import ProtectedRoute from "../../../components/ProtectedRoute";
 
-interface NotificationProps {
-  noti: {
-    title: string;
-    text: string;
-    time: string;
-  };
-}
-
 const notification = [
   {
     title: "Welcome to Jobify!",
@@ -70,9 +62,7 @@ const notification = [
   },
 ];
 
-function RecruiterNotificationsContent({
-  noti,
-}: NotificationProps) {
+function RecruiterNotificationsContent() {
   const { page, maxPage, current, next, prev } = usePagination(notification, 5);
 
   return (
@@ -105,12 +95,10 @@ function RecruiterNotificationsContent({
   );
 }
 
-export default function RecruiterNotificationsPage({
-  noti,
-}: NotificationProps) {
+export default function RecruiterNotificationsPage() {
   return (
     <ProtectedRoute allowedRoles={['company']}>
-      <RecruiterNotificationsContent noti={noti} />
+      <RecruiterNotificationsContent />
     </ProtectedRoute>
   );
 }

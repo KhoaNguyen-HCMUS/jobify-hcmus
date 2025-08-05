@@ -1,12 +1,18 @@
 interface ReportProps {
   report: {
-    logo: string;
     candidateName: string;
     candidateIndustry: string;
     candidateLocation: string;
+    reason: string;
+    moderatorNote: string;
+    moderator: string;
+    reportStatus: string;
+    logo: string;
+    companyName: string;
+    companyIndustry: string;
+    companyLocation: string;
   };
 }
-
 export default function Reporter({ report }: ReportProps) {
   return (
     <div>

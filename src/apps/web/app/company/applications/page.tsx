@@ -16,31 +16,6 @@ import WorkExperience from "../../../components/workExperience";
 
 import ProtectedRoute from "../../../components/ProtectedRoute";
 
-interface ApplicationsProps {
-  app: {
-    id: string;
-    title: string;
-    name: string;
-    industry: string;
-    major: string;
-    gender: string;
-    phone: string;
-    email: string;
-    fileCV: string;
-    intro: string;
-    github: string;
-    linkedIn: string;
-    website: string;
-    letter: string;
-    location: string;
-    CV: string;
-    profile: string;
-    applicationStatus: string;
-    date: string;
-    note: string;
-  };
-}
-
 const titles = [
   "Chuyên Viên Kinh Doanh",
   "Nhân Viên Tư Vấn",
@@ -114,9 +89,9 @@ const websites = [
 ];
 const letters = [
   "I am excited to apply for this position.",
-  "I believe I’m a great fit for your team.",
+  "I believe I'm a great fit for your team.",
   "My background and skills align with your needs.",
-  "I’m looking forward to contributing to your company.",
+  "I'm looking forward to contributing to your company.",
   "I hope to bring value through my experience.",
 ];
 const industries = [
@@ -171,26 +146,38 @@ const skills = [{ skill: "Python" }, { skill: "C++" }, { skill: "C#" }];
 
 const work = [
   {
-    title: "Software Engineer",
-    company: "Tech Solution Inc.",
-    timeRange: "March 2022 - Present",
+    company_name: "Tech Solution Inc.",
+    job_title: "Software Engineer",
+    description: "Làm việc với Node.js và PostgreSQL",
+    location: "Hà Nội",
+    start_date: "2022-03-01",
+    end_date: null,
+    is_current: false
   },
 ];
 
 const edu = [
   {
-    title: "Software Engineer",
-    institution: "Tech Solution Inc.",
-    timeRange: "March 2022 - Present",
+    institution: "ĐH Bách Khoa",
+    degree: "Cử nhân",
+    field_of_study: "Khoa học máy tính",
+    start_date: "2021-09-01",
+    end_date: "2025-05-01",
+    grade: "3.5",
+    description: "Tốt nghiệp loại khá"
   },
   {
-    title: "Software Engineer",
-    institution: "Tech Solution Inc.",
-    timeRange: "March 2022 - Present",
+    institution: "HCMUS",
+    degree: "Thạc sĩ",
+    field_of_study: "Khoa học máy tính",
+    start_date: "2022-11-11",
+    end_date: "2025-11-11",
+    grade: "3.9",
+    description: "Thạc sĩ Khoa Học máy tính xuất sắc nhất"
   },
 ];
 
-function RecruiterApplicationsContent({ app }: ApplicationsProps) {
+function RecruiterApplicationsContent() {
   const router = useRouter();
 
   const [experience, setExperience] = useState("allExperience");
@@ -209,39 +196,13 @@ function RecruiterApplicationsContent({ app }: ApplicationsProps) {
 
   const selectedCandidate = apps.find((c) => c.id === selectedCandidateId);
 
-  // const [skills, setSkills] = useState<{ skill: string }[]>([]);
-  // const [work, setWork] = useState<
-  //   { title: string; company: string; timeRange: string }[]
-  // >([]);
-  // const [edu, setEdu] = useState<
-  //   { title: string; institution: string; timeRange: string }[]
-  // >([]);
-
-  // useEffect(() => {
-  //   if (selectedCandidateId) {
-  //     fetch(`jobs/:id/applications/${selectedCandidateId}`)
-  //       .then((res) => {
-  //         if (!res.ok) throw Error("Failed to fetch");
-  //         return res.json();
-  //       })
-  //       .then((data) => {
-  //         setSkills(data.skills || []);
-  //         setWork(data.work || []);
-  //         setEdu(data.edu || []);
-  //       })
-  //       .catch((err) => {
-  //         console.error("Error fetching candidate data:", err);
-  //         setSkills([]);
-  //         setWork([]);
-  //         setEdu([]);
-  //       });
-  //   }
-  // }, [selectedCandidateId]);
-
   const [letter, setLetter] = useState(
     selectedCandidate?.letter ||
       "Hello, my name is Hinh Diem Xuan, a recent graduate in Software Engineering – IT from University of Science.I have a strong foundation in programming, databases, and web development, with hands-on project experience. I'm passionate about technology, eager to learn, and looking forward to contributing to impactful projects in a professional environment"
   );
+
+  const [workExperiences, setWorkExperiences] = useState(work);
+  const [educations, setEducations] = useState(edu);
 
   return (
     <div className="flex gap-2 bg-neutral-light-60">
@@ -750,13 +711,15 @@ function RecruiterApplicationsContent({ app }: ApplicationsProps) {
                               <span>WORK EXPERIENCE</span>
                             </div>
                             <div className="flex flex-col border-t border-primary-40">
-                              {work?.map((works, idx) => (
-                                <WorkExperience
-                                  key={idx}
-                                  title={works.title}
-                                  company={works.company}
-                                  timeRange={works.timeRange}
-                                />
+                              {workExperiences?.map((works, idx) => (
+                                <div key={idx} className="p-2">
+                                  <div className="font-semibold text-primary">{works.job_title}</div>
+                                  <div className="text-primary-80">{works.company_name}</div>
+                                  <div className="text-primary-80 text-sm">
+                                    {works.start_date} - {works.is_current ? 'Present' : works.end_date}
+                                  </div>
+                                  <div className="text-primary-80 text-sm">{works.location}</div>
+                                </div>
                               ))}
                             </div>
                           </div>
@@ -766,13 +729,15 @@ function RecruiterApplicationsContent({ app }: ApplicationsProps) {
                               <span>EDUCATION</span>
                             </div>
                             <div className="flex flex-col border-t border-primary-40">
-                              {edu?.map((education, idx) => (
-                                <Education
-                                  key={idx}
-                                  title={education.title}
-                                  institution={education.institution}
-                                  timeRange={education.timeRange}
-                                />
+                              {educations?.map((education, idx) => (
+                                <div key={idx} className="p-2">
+                                  <div className="font-semibold text-primary">{education.degree} - {education.field_of_study}</div>
+                                  <div className="text-primary-80">{education.institution}</div>
+                                  <div className="text-primary-80 text-sm">
+                                    {education.start_date} - {education.end_date}
+                                  </div>
+                                  <div className="text-primary-80 text-sm">Grade: {education.grade}</div>
+                                </div>
                               ))}
                             </div>
                           </div>
@@ -812,10 +777,10 @@ function RecruiterApplicationsContent({ app }: ApplicationsProps) {
   );
 }
 
-export default function RecruiterApplicationsPage({ app }: ApplicationsProps) {
+export default function RecruiterApplicationsPage() {
   return (
     <ProtectedRoute allowedRoles={['company']}>
-      <RecruiterApplicationsContent app={app} />
+      <RecruiterApplicationsContent />
     </ProtectedRoute>
   );
 }

@@ -98,9 +98,9 @@ export default function CategoryGrid() {
     <div>
       <div className="mx-7">
         <div className="w-full grid grid-cols-1 md:grid-cols-4 gap-4 text-center">
-          {current.map((category) => (
+          {/* {current.map((category) => (
             <CategoryCard key={category.id} category={category} />
-          ))}
+          ))} */}
         </div>
         <div className="py-4">
           <Pagination

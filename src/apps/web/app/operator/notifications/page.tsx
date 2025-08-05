@@ -69,7 +69,7 @@ const notification = [
   },
 ];
 
-export default function OperatorNotificationsPage({ noti }: NotificationProps) {
+export default function OperatorNotificationsPage() {
   const { page, maxPage, current, next, prev } = usePagination(notification, 6);
 
   return (

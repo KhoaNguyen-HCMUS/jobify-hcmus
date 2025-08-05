@@ -71,7 +71,7 @@ const notification = [
   },
 ];
 
-export default function OperatorAnnouncementsPage({ noti }: NotificationProps) {
+export default function OperatorAnnouncementsPage() {
   const { page, maxPage, current, next, prev } = usePagination(notification, 6);
 
   const [open, setOpen] = useState(false);
@@ -127,7 +127,7 @@ export default function OperatorAnnouncementsPage({ noti }: NotificationProps) {
                     onClick={() => setOpen(false)}
                     className="text-secondary-40 cursor-pointer"
                   >
-                    <CircleX size={24} />
+                    <CircleX size={24} /> Close
                   </button>
                 </div>
                 <div className="flex flex-col gap-2 px-4 py-2">
@@ -204,6 +204,7 @@ export default function OperatorAnnouncementsPage({ noti }: NotificationProps) {
                             value={date}
                             onChange={(e) => setDate(e.target.value)}
                             className="w-3/5 bg-neutral-light-20 border border-primary-60 rounded-full px-4"
+                            placeholder="Select Date"
                           />
                         </div>
                         <div className="flex gap-2">
@@ -213,6 +214,7 @@ export default function OperatorAnnouncementsPage({ noti }: NotificationProps) {
                             value={time}
                             onChange={(e) => setTime(e.target.value)}
                             className="w-3/5 bg-neutral-light-20 border border-primary-60 rounded-full px-4"
+                            placeholder="Select Time"
                           />
                         </div>
                       </div>
@@ -267,6 +269,7 @@ export default function OperatorAnnouncementsPage({ noti }: NotificationProps) {
                                   accept=".pdf,.doc,.docx"
                                   onChange={handleFileChange}
                                   className="hidden"
+                                  placeholder="Upload file"
                                 />
                                 <button
                                   onClick={() => {
@@ -337,3 +340,4 @@ export default function OperatorAnnouncementsPage({ noti }: NotificationProps) {
     </div>
   );
 }
+

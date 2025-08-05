@@ -24,6 +24,20 @@ interface CompanyProps {
   };
 }
 
+const transformJobForCard = (job: any) => ({
+  id: job.id.toString(),
+  title: job.title,
+  company_name: job.company,
+  salary_min: job.salary,
+  salary_max: job.salary,
+  currency: "VND",
+  province: job.province,
+  logo: job.logo,
+  name: job.title,
+  status: "active",
+  created_at: new Date(),
+});
+
 const Stat = ({
   value,
   label,
@@ -43,8 +57,9 @@ const Stat = ({
   </div>
 );
 
-function RecruiterDashboardContent({ company }: CompanyProps) {
-  const { page, maxPage, current, next, prev } = usePagination(jobs, 4);
+function RecruiterDashboardContent() {
+  const transformedJobs = jobs.map(transformJobForCard);
+  const { page, maxPage, current, next, prev } = usePagination(transformedJobs, 4);
   const [companyProfile, setCompanyProfile] = useState<CompanyProfile | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -170,10 +185,10 @@ function RecruiterDashboardContent({ company }: CompanyProps) {
   );
 }
 
-export default function RecruiterDashboardPage({ company }: CompanyProps) {
+export default function RecruiterDashboardPage() {
   return (
     <ProtectedRoute allowedRoles={['company']}>
-      <RecruiterDashboardContent company={company} />
+      <RecruiterDashboardContent />
     </ProtectedRoute>
   );
 }

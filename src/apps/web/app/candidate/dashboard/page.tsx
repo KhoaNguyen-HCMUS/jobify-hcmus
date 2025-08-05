@@ -44,7 +44,7 @@ function CandidateDashboardContent() {
   }
 
   return (
-    <div className="w-full h-full bg-neutral-light-60">
+    <div className="w-full h-full min-h-screen bg-neutral-light-60">
       <div className="flex flex-col px-20 py-10 gap-10">
         <div className="flex flex-wrap gap-15">
           <div className="flex-1 flex flex-wrap justify-between bg-highlight-20 rounded-2xl">
@@ -105,10 +105,10 @@ function CandidateDashboardContent() {
                 </span>
               </a>
             </div>
-            <div className="flex flex-col gap-y-6 px-4 py-4">
-              {current.map((job) => (
+            <div className="flex flex-col  gap-y-6 px-4 py-4">
+              {/* {current.map((job) => (
                 <JobCard key={job.id} job={job} />
-              ))}
+              ))} */}
             </div>
             <Pagination
               page={page}
@@ -129,9 +129,9 @@ function CandidateDashboardContent() {
               </a>
             </div>
             <div className="flex flex-col gap-y-6 px-4 py-4">
-              {current.map((job) => (
+              {/* {current.map((job) => (
                 <JobCard key={job.id} job={job} />
-              ))}
+              ))} */}
             </div>
             <Pagination
               page={page}

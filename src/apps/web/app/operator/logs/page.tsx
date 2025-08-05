@@ -47,7 +47,7 @@ const apps = Array.from({ length: 30 }, (_, i) => ({
   time: randomItem(times),
 }));
 
-export default function OperatorLogsPage({ log }: LogsProps) {
+export default function OperatorLogsPage() {
   const [fromDate, setFromDate] = useState("");
   const [toDate, setToDate] = useState("");
 
@@ -68,6 +68,7 @@ export default function OperatorLogsPage({ log }: LogsProps) {
               value={fromDate}
               onChange={(e) => setFromDate(e.target.value)}
               className="bg-neutral-light-20 border border-primary-60 rounded-full px-4"
+              placeholder="Select Date"
             />
             <span className="text-primary-80 pt-2">to</span>
             <input
@@ -75,6 +76,7 @@ export default function OperatorLogsPage({ log }: LogsProps) {
               value={toDate}
               onChange={(e) => setToDate(e.target.value)}
               className="bg-neutral-light-20 border border-primary-60 rounded-full px-4"
+              placeholder="Select Date"
             />
             <button className="bg-accent hover:bg-secondary cursor-pointer text-neutral-light-20 px-4 py-1 rounded-full">
               Filter
