@@ -38,6 +38,7 @@ export default function JobDetail({ job: propJob, jobDetailData, isHR }: JobDeta
   const [job, setJob] = useState<Job | null>(propJob || jobDetailData?.job || null);
   const [company, setCompany] = useState<CompanyProfile | null>(jobDetailData?.company || null);
   const [isSaved, setIsSaved] = useState(false);
+  const [isApplyModalOpen, setIsApplyModalOpen] = useState(false);
   const { handleSaveJob, isSaving } = useSaveJob();
   const userRole = getUserRole();
   const router = useRouter();
@@ -157,7 +158,12 @@ export default function JobDetail({ job: propJob, jobDetailData, isHR }: JobDeta
               </div>
               <div className="flex flex-wrap gap-4">
                 {!isHR ? (
-                  <ApplyJobModal />
+                  <button
+                    onClick={() => setIsApplyModalOpen(true)}
+                    className="cursor-pointer px-6 py-2 bg-accent rounded-full text-background font-semibold text-lg transition-all duration-300 hover:shadow-lg hover:shadow-primary/30 transform hover:-translate-y-0.5"
+                  >
+                    Apply now
+                  </button>
                 ) : (
                   <button
                     disabled
@@ -280,18 +286,20 @@ export default function JobDetail({ job: propJob, jobDetailData, isHR }: JobDeta
                   <h2 className="font-semibold text-accent">Working Time</h2>
                   <p className="text-primary">{job.working_hours || 'Not specified'}</p>
                 </div>
-                <div>
-                  <h2 className="font-semibold text-accent">Apply now!</h2>
-                  <p className="text-primary">Click the Apply button above to submit your application.</p>
-                </div>
-              </div>
-              <div>
-                {!isHR ? (
-                  <div className="m-4">
-                    <ApplyJobModal />
-                  </div>
-                ) : null}
-              </div>
+                                 <div>
+                   <h2 className="font-semibold text-accent">Apply now!</h2>
+                   <p className="text-primary">Click the Apply button above to submit your application.</p>
+                   {!isHR && (
+                     <button
+                       onClick={() => setIsApplyModalOpen(true)}
+                       className="cursor-pointer mb-4 mt-4 px-6 py-2 bg-accent rounded-full text-background font-semibold text-lg  duration-300 hover:shadow-lg hover:shadow-primary/30 "
+                     >
+                       Apply now
+                     </button>
+                   )}
+                 </div>
+                 
+               </div>
             </div>
           </div>
         </div>
@@ -447,6 +455,16 @@ export default function JobDetail({ job: propJob, jobDetailData, isHR }: JobDeta
             </button>
           </div>
         </div>
+      )}
+      
+      {/* Apply Job Modal */}
+      {!isHR && job && (
+        <ApplyJobModal 
+          jobId={job.id} 
+          jobTitle={job.title} 
+          isOpen={isApplyModalOpen} 
+          onClose={() => setIsApplyModalOpen(false)} 
+        />
       )}
     </div>
   );

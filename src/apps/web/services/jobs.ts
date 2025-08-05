@@ -238,4 +238,50 @@ export const postNewJob = async (data: any, token: string): Promise<JobResponse>
       message: 'Network connection error',
     };
   }
+};
+
+export interface ApplyJobData {
+  resume: File;
+  cover_letter: string;
+}
+
+export interface ApplyJobResponse {
+  success: boolean;
+  message: string;
+  data?: {
+    application_id: string;
+  };
+}
+
+export const applyJob = async (jobId: string, data: ApplyJobData): Promise<ApplyJobResponse> => {
+  try {
+    const token = getToken();
+    if (!token) {
+      return {
+        success: false,
+        message: 'Authentication required',
+      };
+    }
+
+    const formData = new FormData();
+    formData.append('resume', data.resume);
+    formData.append('cover_letter', data.cover_letter);
+
+    const response = await fetch(`${API_URL}/jobs/${jobId}/apply`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+      },
+      body: formData,
+    });
+
+    console.log(response);
+    const result = await response.json();
+    return result;
+  } catch (error) {
+    return {
+      success: false,
+      message: 'Network connection error',
+    };
+  }
 }; 

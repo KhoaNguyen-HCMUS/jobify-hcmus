@@ -10,13 +10,20 @@ import {
   TriangleAlert,
   FilePenLine,
 } from "lucide-react";
+import { applyJob, ApplyJobData } from "../services/jobs";
+import { toast } from "react-toastify";
 
-export default function ApplyJobModal() {
-  const [fullName, setFullName] = useState("");
-  const [email, setEmail] = useState("");
-  const [phone, setPhone] = useState("");
+interface ApplyJobModalProps {
+  jobId: string;
+  jobTitle: string;
+  isOpen: boolean;
+  onClose: () => void;
+}
+
+export default function ApplyJobModal({ jobId, jobTitle, isOpen, onClose }: ApplyJobModalProps) {
   const [description, setDescription] = useState("");
-  const [isOpen, setIsOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
   useEffect(() => {
     if (isOpen) {
@@ -38,21 +45,53 @@ export default function ApplyJobModal() {
     const file = e.target.files?.[0];
     if (file) {
       setFileName(file.name);
+      setSelectedFile(file);
       setFileSaved(false);
     }
   };
+
+  const handleSubmit = async () => {
+    if (!selectedFile) {
+      toast.error("Please upload your resume");
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      const data: ApplyJobData = {
+        resume: selectedFile,
+        cover_letter: description.trim()
+      };
+
+      const response = await applyJob(jobId, data);
+      
+      if (response.success) {
+        toast.success("Application submitted successfully!");
+        onClose();
+        // Reset form
+        setDescription("");
+        setFileName("");
+        setSelectedFile(null);
+        setFileSaved(false);
+        if (fileInputRef.current) {
+          fileInputRef.current.value = "";
+        }
+      } else {
+        toast.error(response.message || "Failed to submit application");
+      }
+    } catch (error) {
+      toast.error("Network error occurred");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
     <div>
-      <button
-        onClick={() => setIsOpen(true)}
-        className="relative cursor-pointer px-6 py-2 bg-accent rounded-full text-background font-semibold text-lg transition-all duration-300 hover:shadow-lg hover:shadow-primary/30 transform hover:-translate-y-0.5"
-      >
-        Apply now
-      </button>
       {isOpen && (
         <div
-          onClick={() => setIsOpen(false)}
-          className="fixed inset-0 bg-primary-80 z-50 flex items-center justify-center"
+          onClick={onClose}
+          className="fixed inset-0 bg-primary-80/70 z-50 flex items-center justify-center"
         >
           <div
             onClick={(e) => e.stopPropagation()}
@@ -61,13 +100,12 @@ export default function ApplyJobModal() {
             <div className="flex flex-col gap-2">
               <div className="flex justify-between bg-highlight-40 rounded-t-2xl gap-4 pl-10 pr-4 py-4">
                 <span className="text-primary text-2xl font-bold">
-                  Apply for Apartment Real Estate Sales Officer – Income 18-60
-                  million/month + HH up to 60%/transaction
+                  Apply for {jobTitle}
                 </span>
                 <div className="px-4">
                   <CircleX
                     size={34}
-                    onClick={() => setIsOpen(false)}
+                    onClick={onClose}
                     className="absolute right-1 text-secondary-40 cursor-pointer"
                   />
                 </div>
@@ -92,6 +130,7 @@ export default function ApplyJobModal() {
                         <button
                           onClick={() => {
                             setFileName("");
+                            setSelectedFile(null);
                             fileInputRef.current &&
                               (fileInputRef.current.value = "");
                           }}
@@ -138,84 +177,8 @@ export default function ApplyJobModal() {
                     </div>
                   </div>
                   <div className="border-t border-0 border-primary-40 space-y-4 mt-4 py-2">
-                    <div className="flex justify-between">
-                      <span className="text-primary text-sm">
-                        Please enter full details:
-                      </span>
-                      <span className="text-[#F52121] text-sm">
-                        (*) Required Information.
-                      </span>
-                    </div>
-                    <div>
-                      <div className="flex flex-col">
-                        <label
-                          htmlFor="fullName"
-                          className="block text-sm text-primary"
-                        >
-                          Full Name*
-                        </label>
-                        <div className="relative">
-                          <div className="absolute left-4 top-1/2 transform -translate-y-1/2 text-primary-80">
-                            <User size={18} />
-                          </div>
-                          <input
-                            id="fullName"
-                            type="text"
-                            value={fullName}
-                            onChange={(e) => setFullName(e.target.value)}
-                            placeholder="Enter your full name"
-                            className="w-full pl-10 pr-4 py-2 bg-highlight-20 rounded-xl shadow-2xl text-primary-80 outline-none focus:ring-2 focus:ring-blue-400 focus:bg-white transition-all duration-300"
-                            required
-                          />
-                        </div>
-                      </div>
-                    </div>
-                    <div className="flex flex-wrap justify-between gap-10">
-                      <div className="flex-1 flex flex-col">
-                        <label
-                          htmlFor="email"
-                          className="block text-sm text-primary"
-                        >
-                          Email*
-                        </label>
-                        <div className="relative">
-                          <div className="absolute left-4 top-1/2 transform -translate-y-1/2 text-primary">
-                            <Mail size={18} />
-                          </div>
-                          <input
-                            id="email"
-                            type="text"
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
-                            placeholder="Enter your email"
-                            className="w-full pl-10 pr-4 py-2 bg-highlight-20 rounded-xl shadow-2xl text-primary-80 outline-none focus:ring-2 focus:ring-blue-400 focus:bg-white transition-all duration-300"
-                            required
-                          />
-                        </div>
-                      </div>
-                      <div className="flex-1 flex flex-col">
-                        <label
-                          htmlFor="phone"
-                          className="block text-sm text-primary"
-                        >
-                          Phone Number*
-                        </label>
-                        <div className="relative">
-                          <div className="absolute left-4 top-1/2 transform -translate-y-1/2 text-primary">
-                            <Phone size={18} />
-                          </div>
-                          <input
-                            id="phone"
-                            type="text"
-                            value={phone}
-                            onChange={(e) => setPhone(e.target.value)}
-                            placeholder="Enter your phone number"
-                            className="w-full pl-10 pr-4 py-2 bg-highlight-20 rounded-xl shadow-2xl text-primary-80 outline-none focus:ring-2 focus:ring-blue-400 focus:bg-white transition-all duration-300"
-                            required
-                          />
-                        </div>
-                      </div>
-                    </div>
+                    
+
                   </div>
                 </div>
               </div>
@@ -234,7 +197,7 @@ export default function ApplyJobModal() {
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
                     className="w-full h-32 px-4 py-3 pr-12 text-primary-60 placeholder-primary-60 focus:outline-none resize-none"
-                    placeholder="Write a brief introduction about yourself (strengths, weaknesses) and clearly state your desire and reason for applying for this position."
+                    placeholder="Write a brief introduction about yourself (strengths, weaknesses) and clearly state your desire and reason for applying for this position. (Optional)"
                   ></textarea>
                   <FilePenLine
                     size={24}
@@ -256,19 +219,24 @@ export default function ApplyJobModal() {
                       behavior body. If you encounter if you believe in
                       recruitment or receive suspicious communications from
                       employers, please immediately report to Jobify via
-                      Email hotro@jobify.vn for timely support.
+                      Email hotro@jobify.vn for timely support.
                     </div>
                   </div>
                 </div>
                 <div className="flex flex-wrap gap-10 mb-4">
                   <button
-                    onClick={() => setIsOpen(false)}
-                    className="flex-1 rounded-full bg-primary-40 text-neutral-light-20 px-6 py-2 cursor-pointer"
+                    onClick={onClose}
+                    disabled={isLoading}
+                    className="flex-1 rounded-full bg-primary-40 text-neutral-light-20 px-6 py-2 cursor-pointer disabled:opacity-50"
                   >
                     Cancel
                   </button>
-                  <button className="flex-6 rounded-full bg-accent text-neutral-light-20 px-6 py-2 cursor-pointer">
-                    Submission of application choose
+                  <button 
+                    onClick={handleSubmit}
+                    disabled={isLoading || !selectedFile}
+                    className="flex-6 rounded-full bg-accent text-neutral-light-20 px-6 py-2 cursor-pointer disabled:opacity-50"
+                  >
+                    {isLoading ? "Submitting..." : "Submit Application"}
                   </button>
                 </div>
               </div>
