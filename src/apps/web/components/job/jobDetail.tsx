@@ -16,12 +16,13 @@ import {
   Phone,
 } from "lucide-react";
 import ApplyJobModal from "../../components/applyJobModal";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Job } from "../../services/jobs";
 import { useSaveJob } from "../../hooks/useSaveJob";    
 import { getUserRole } from "../../utils/auth";
 import { CompanyProfile } from "../../services/companyProfile";
 import GoBack from "../goBack";
+import { toast } from "react-toastify";
 
 interface JobDetailData {
   company: CompanyProfile;
@@ -32,23 +33,44 @@ interface JobDetailProps {
   job?: Job;
   jobDetailData?: JobDetailData;
   isHR?: boolean;
+  isSaved?: boolean;
 }
 
-export default function JobDetail({ job: propJob, jobDetailData, isHR }: JobDetailProps) {
+export default function JobDetail({ job: propJob, jobDetailData, isHR, isSaved = false }: JobDetailProps) {
   const [job, setJob] = useState<Job | null>(propJob || jobDetailData?.job || null);
   const [company, setCompany] = useState<CompanyProfile | null>(jobDetailData?.company || null);
-  const [isSaved, setIsSaved] = useState(false);
+  const [isSavedState, setIsSavedState] = useState<boolean>(isSaved);
   const [isApplyModalOpen, setIsApplyModalOpen] = useState(false);
-  const { handleSaveJob, isSaving } = useSaveJob();
+  const { handleSaveJob, handleUnsaveJob, isSaving } = useSaveJob();
   const userRole = getUserRole();
   const router = useRouter();
+  const searchParams = useSearchParams();
 
   const handleSaveClick = async () => {
     if (!job) return;
     
-    const newSavedState = await handleSaveJob(job.id, isSaved);
-    if (newSavedState !== isSaved) {
-      setIsSaved(newSavedState);
+    let newSavedState: boolean;
+    
+    if (isSavedState) {
+      newSavedState = await handleUnsaveJob(job.id);
+    } else {
+      newSavedState = await handleSaveJob(job.id);
+    }
+    
+    if (newSavedState !== isSavedState) {
+      setIsSavedState(newSavedState);
+      
+      const newUrl = new URL(window.location.href);
+      if (newSavedState) {
+        newUrl.searchParams.set('saved', 'true');
+      } else {
+        newUrl.searchParams.delete('saved');
+      }
+      window.history.replaceState({}, '', newUrl.toString());
+      
+      if (!newSavedState && isSaved) {
+        const referrer = document.referrer;
+      }
     }
   };
 
@@ -67,6 +89,10 @@ export default function JobDetail({ job: propJob, jobDetailData, isHR }: JobDeta
       setCompany(jobDetailData.company);
     }
   }, [propJob, jobDetailData]);
+
+  useEffect(() => {
+    setIsSavedState(isSaved);
+  }, [isSaved]);
 
   if (!job) {
     return (
@@ -177,16 +203,16 @@ export default function JobDetail({ job: propJob, jobDetailData, isHR }: JobDeta
                     onClick={handleSaveClick}
                     disabled={isSaving}
                     className={`px-6 py-2 rounded-full font-semibold text-lg transition-all duration-300 hover:shadow-lg hover:shadow-primary/30 transform hover:-translate-y-0.5 flex items-center gap-2 ${
-                      isSaved 
+                      isSavedState 
                         ? 'bg-red-500 text-white hover:bg-red-600' 
                         : 'bg-accent text-background hover:bg-accent/90'
                     } ${isSaving ? 'opacity-50 cursor-not-allowed' : ''}`}
                   >
                     <Heart 
                       size={20} 
-                      className={isSaved ? 'fill-white' : ''}
+                      className={isSavedState ? 'fill-white' : ''}
                     />
-                    {isSaved ? 'Saved' : 'Save'}
+                    {isSavedState ? 'Saved' : 'Save'}
                   </button>
                 )}
               </div>

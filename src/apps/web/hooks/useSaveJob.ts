@@ -1,12 +1,12 @@
 import { useState } from 'react';
-import { toggleSaveJob } from '../services/jobs';
+import { saveJob, unsaveJob } from '../services/jobs';
 import { toast } from 'react-hot-toast';
 import { isAuthenticated } from '../utils/auth';
 
 export const useSaveJob = () => {
   const [isSaving, setIsSaving] = useState(false);
 
-  const handleSaveJob = async (jobId: string, isCurrentlySaved: boolean) => {
+  const handleSaveJob = async (jobId: string) => {
     if (!isAuthenticated()) {
       toast.error('You can only save jobs when logged in');
       return false;
@@ -14,39 +14,43 @@ export const useSaveJob = () => {
 
     try {
       setIsSaving(true);
-      const response = await toggleSaveJob(jobId, isCurrentlySaved);
+      const response = await saveJob(jobId);
       
       if (response.success) {
-        const wasSaved = response.message.includes('saved successfully');
-        const wasUnsaved = response.message.includes('unsaved successfully');
-        
-        if (wasSaved) {
-          toast.success('Job saved successfully!');
-          return true;
-        } else if (wasUnsaved) {
-          toast.success('Job removed from saved list!');
-          return false;
-        } else {
-          // Fallback
-          if (response.data?.saved) {
-            toast.success('Job saved successfully!');
-            return true;
-          } else {
-            toast.success('Job removed from saved list!');
-            return false;
-          }
-        }
+        toast.success('Job saved successfully!');
+        return true;
       } else {
-        if (response.message === 'Authentication required') {
-          toast.error('You can only save jobs when logged in');
-        } else {
-          toast.error(response.message || 'Failed to save job');
-        }
-        return isCurrentlySaved; // Return current state on error
+        toast.error(response.message || 'Failed to save job');
+        return false;
       }
     } catch (error) {
       toast.error('Network error occurred');
-      return isCurrentlySaved; // Return current state on error
+      return false;
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleUnsaveJob = async (jobId: string) => {
+    if (!isAuthenticated()) {
+      toast.error('You can only save jobs when logged in');
+      return true; 
+    }
+
+    try {
+      setIsSaving(true);
+      const response = await unsaveJob(jobId);
+      
+      if (response.success) {
+        toast.success('Job removed from saved jobs');
+        return false;
+      } else {
+        toast.error(response.message || 'Failed to remove job');
+        return true; 
+      }
+    } catch (error) {
+      toast.error('Network error occurred');
+      return true; 
     } finally {
       setIsSaving(false);
     }
@@ -54,6 +58,7 @@ export const useSaveJob = () => {
 
   return {
     handleSaveJob,
+    handleUnsaveJob,
     isSaving,
   };
 }; 

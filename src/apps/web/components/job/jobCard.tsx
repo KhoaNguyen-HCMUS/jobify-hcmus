@@ -10,7 +10,9 @@ import {
 import { DEFAULT_LOGO_IMAGE } from '../../constants/imgConstants';
 import { getUserRole } from '../../utils/auth';
 import { useSaveJob } from '../../hooks/useSaveJob';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { toast } from 'react-toastify';
+import { useRouter } from 'next/navigation';
 
 interface JobCardProps {
   job: {
@@ -31,21 +33,39 @@ interface JobCardProps {
 
 export default function JobCard({ job }: JobCardProps) {
   const [isSaved, setIsSaved] = useState(job.is_saved || false);
-  const { handleSaveJob, isSaving } = useSaveJob();
+  const { handleSaveJob, handleUnsaveJob, isSaving } = useSaveJob();
   const userRole = getUserRole();
+  const router = useRouter();
+
+  useEffect(() => {
+    setIsSaved(job.is_saved || false);
+  }, [job.is_saved]);
 
   const handleHeartClick = async (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
     
-    const newSavedState = await handleSaveJob(job.id, isSaved);
-    if (newSavedState !== isSaved) {
-      setIsSaved(newSavedState);
+    if (isSaved) {
+      const newSavedState = await handleUnsaveJob(job.id);
+      if (newSavedState === false) {
+        setIsSaved(false);
+        
+        if (window.location.pathname.includes('/saved-jobs')) {
+          setTimeout(() => {
+            router.refresh();
+          }, 1000);
+        }
+      }
+    } else {
+      const newSavedState = await handleSaveJob(job.id);
+      if (newSavedState === true) {
+        setIsSaved(true);
+      }
     }
   };
 
   return (
-    <Link href={`/jobs/${job.id}`}>
+    <Link href={`/jobs/${job.id}${isSaved ? '?saved=true' : ''}`}>
       <div className="shadow-md bg-neutral-light-20 rounded-2xl p-6 transition-transform duration-300 hover:-translate-y-2 hover:shadow-lg cursor-pointer">
         <div className="flex items-center space-x-4 mb-4">
           <img

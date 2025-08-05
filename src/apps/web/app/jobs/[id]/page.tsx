@@ -1,14 +1,16 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import JobDetail from "../../../components/job/jobDetail";
 import { getJobById, JobDetailData } from "../../../services/jobs";
 import { toast } from 'react-toastify';
-import { useParams } from "next/navigation";
+import { useParams, useSearchParams } from "next/navigation";
 
-export default function JobDetailPage() {
+function JobDetailPageContent() {
   const [jobDetailData, setJobDetailData] = useState<JobDetailData | null>(null);
   const [loading, setLoading] = useState(true);
   const { id } = useParams();
+  const searchParams = useSearchParams();
+  const isSaved = searchParams.get('saved') === 'true';
 
   useEffect(() => {
     const fetchJob = async () => {
@@ -46,5 +48,19 @@ export default function JobDetailPage() {
     );
   }
 
-  return <JobDetail jobDetailData={jobDetailData} isHR={false} />;
+  return (
+    <JobDetail jobDetailData={jobDetailData} isHR={false} isSaved={isSaved} />
+  );
+}
+
+export default function JobDetailPage() {
+  return (
+    <Suspense fallback={
+      <div className="bg-neutral-light-40 min-h-screen flex items-center justify-center">
+        <div className="text-primary text-xl">Loading...</div>
+      </div>
+    }>
+      <JobDetailPageContent />
+    </Suspense>
+  );
 }

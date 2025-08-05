@@ -4,14 +4,13 @@ import JobCard from "../../../components/job/jobCard";
 import usePagination from "../../../hooks/usePagination";
 import Pagination from "../../../components/pagination";
 import { getSavedJobs, Job } from "../../../services/jobs";
-import { toast } from "react-hot-toast";
 import ProtectedRoute from "../../../components/ProtectedRoute";
-import { Heart, Bookmark } from "lucide-react";
+import { Bookmark } from "lucide-react";
 
 const transformJobForCard = (job: Job) => ({
   id: job.id,
   title: job.title,
-  company_name: job.company_name,
+  company_name: job.company_name || null,
   salary_min: job.salary_min,
   salary_max: job.salary_max,
   currency: job.currency,
@@ -113,7 +112,6 @@ function SavedJobsContent() {
           </>
         ) : (
           <div className="text-center py-16">
-            <div className="text-6xl mb-4">💔</div>
             <h3 className="text-xl font-semibold text-gray-700 mb-2">
               No saved jobs yet
             </h3>
