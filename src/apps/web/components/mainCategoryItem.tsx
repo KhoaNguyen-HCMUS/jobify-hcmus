@@ -48,6 +48,11 @@ export default function MainCategoryItem({ main }: MainCategoryItemProps) {
     }
   };
 
+  const handleToggleClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setOpen(!open);
+  };
+
   return (
     <div className="flex flex-col justify-between hover:bg-neutral-light-80">
       <button
@@ -57,19 +62,16 @@ export default function MainCategoryItem({ main }: MainCategoryItemProps) {
         }`}
       >
         <span className="px-4 py-2">{main.category}</span>
-        <button
-          onClick={(e) => {
-            e.stopPropagation();
-            setOpen(!open);
-          }}
-          className="p-2"
+        <div
+          onClick={handleToggleClick}
+          className="p-2 cursor-pointer"
         >
           {open ? (
             <ChevronUp size={24} />
           ) : (
             <ChevronDown size={24} />
           )}
-        </button>
+        </div>
       </button>
 
       {open && (

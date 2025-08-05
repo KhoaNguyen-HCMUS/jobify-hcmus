@@ -8,11 +8,12 @@ interface JobItemProps {
     logo: string;
     name: string;
     title: string;
-    company: string;
+    company_name: string;
     province: string;
     experience: string;
     salary: string;
     postedAt: string;
+    is_salary_negotiable: boolean;
     status?: string;
   };
 }
@@ -33,7 +34,7 @@ export default function Job({ job }: JobItemProps) {
             </span>
             <div className="flex flex-col justify-between gap-1.5 mt-1.5">
               <span className="text-primary-60 font-semibold line-clamp-1 text-sm">
-                {job.company}
+                {job.company_name}
               </span>
               <div className="flex justify-between items-start flex-wrap gap-1.5">
                 <div className="flex flex-wrap gap-1.5">
@@ -46,8 +47,14 @@ export default function Job({ job }: JobItemProps) {
                   </span>
 
                   <span className="bg-accent-20 text-primary-80 font-semibold rounded-full px-3 py-0.5 text-xs">
-                    {job.salary} VNĐ
+                    {job.salary}
                   </span>
+
+                  <span className="bg-accent-20 text-primary-80 font-semibold rounded-full px-3 py-0.5 text-xs">
+                    {job.is_salary_negotiable ? "Negotiable" : "Fixed Salary"}
+                  </span>
+
+
 
                 </div>
 

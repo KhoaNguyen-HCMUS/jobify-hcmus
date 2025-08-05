@@ -13,9 +13,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { EXPERIENCE_LEVELS, JOB_TYPES } from "../../constants/jobConstants";
 
 const adaptJobForComponent = (job: Job) => {
-  const salaryText = job.is_salary_negotiable 
-    ? 'Negotiable' 
-    : `${parseInt(job.salary_min).toLocaleString()} - ${parseInt(job.salary_max).toLocaleString()}`;
+  const salaryText =`${parseInt(job.salary_min).toLocaleString()} - ${parseInt(job.salary_max).toLocaleString()} ${job.currency || 'VNĐ'}`;
   
   const postedDate = new Date(job.created_at);
   const now = new Date();
@@ -29,11 +27,12 @@ const adaptJobForComponent = (job: Job) => {
     logo: "/logo.png",
     name: job.title,
     title: job.title,
-    company: "Company Name",
+    company_name: job.company_name,
     province: job.province,
     experience: job.experience_level,
     salary: salaryText,
     postedAt: postedAtText,
+    is_salary_negotiable: job.is_salary_negotiable,
     status: job.approved_by ? "approved" : "pending"
   };
 };
@@ -49,12 +48,31 @@ export default function JobsPage() {
   
   // Get URL params
   const industryId = searchParams.get('industry');
+  const keyword = searchParams.get('keyword');
+  const location = searchParams.get('location');
   const experience = searchParams.get('experience') || "allExperience";
   const salary = searchParams.get('salary') || "allSalary";
   const typeOfWork = searchParams.get('typeOfWork') || "allTypeOfWork";
   
   // Filter jobs based on URL params
   const filteredJobs = jobs.filter(job => {
+    // Filter by keyword
+    if (keyword && keyword.trim()) {
+      const searchTerm = keyword.toLowerCase();
+      const jobTitle = job.title.toLowerCase();
+      const jobDescription = job.description?.toLowerCase() || '';
+      if (!jobTitle.includes(searchTerm) && !jobDescription.includes(searchTerm)) {
+        return false;
+      }
+    }
+    
+    // Filter by location
+    if (location && location !== 'All locations') {
+      if (job.province !== location) {
+        return false;
+      }
+    }
+    
     // Filter by industry
     if (industryId && industryId !== 'all') {
       if (job.industry_id !== industryId) {
@@ -73,25 +91,29 @@ export default function JobsPage() {
       const minSalary = parseInt(job.salary_min);
       const maxSalary = parseInt(job.salary_max);
       
-      if (salary === "lessThan10" && maxSalary >= 10) {
+      // Convert to millions for easier comparison
+      const minSalaryM = minSalary / 1000000;
+      const maxSalaryM = maxSalary / 1000000;
+
+       if (salary === "lessThan10" && minSalaryM >= 10) {
+         return false;
+       }
+      if (salary === "10-15" && (minSalaryM > 15 || maxSalaryM < 10)) {
         return false;
       }
-      if (salary === "10-15" && (minSalary < 10 || maxSalary > 15)) {
+      if (salary === "15-20" && (minSalaryM > 20 || maxSalaryM < 15)) {
         return false;
       }
-      if (salary === "15-20" && (minSalary < 15 || maxSalary > 20)) {
+      if (salary === "20-25" && (minSalaryM > 25 || maxSalaryM < 20)) {
         return false;
       }
-      if (salary === "20-25" && (minSalary < 20 || maxSalary > 25)) {
+      if (salary === "25-30" && (minSalaryM > 30 || maxSalaryM < 25)) {
         return false;
       }
-      if (salary === "25-30" && (minSalary < 25 || maxSalary > 30)) {
+      if (salary === "30-50" && (minSalaryM > 50 || maxSalaryM < 30)) {
         return false;
       }
-      if (salary === "30-50" && (minSalary < 30 || maxSalary > 50)) {
-        return false;
-      }
-      if (salary === "over50" && minSalary < 50) {
+      if (salary === "over50" && maxSalaryM < 50) {
         return false;
       }
     }
