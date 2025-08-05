@@ -1,7 +1,7 @@
 const prisma = require('../prisma/client');
 const { successResponse, errorResponse } = require('../utils/response');
 
-exports.getMyProfile = async (req, res) => {
+exports.getCandidateProfile = async (req, res) => {
   try {
     const userId = req.user.id;
 
@@ -27,7 +27,7 @@ exports.getMyProfile = async (req, res) => {
   }
 };
 
-exports.updateMyProfile = async (req, res) => {
+exports.updateCandidateProfile = async (req, res) => {
   try {
     const userId = req.user.id;
     const {
@@ -35,7 +35,7 @@ exports.updateMyProfile = async (req, res) => {
       gender,
       date_of_birth,
       phone,
-      profile_photo_url,
+      profile_photo_id,
       bio,
       province,
       ward,
@@ -65,7 +65,7 @@ exports.updateMyProfile = async (req, res) => {
       gender,
       date_of_birth: parsedDOB,
       phone,
-      profile_photo_url,
+      profile_photo_id,
       bio,
       province,
       ward,
@@ -116,7 +116,7 @@ exports.updateMyProfile = async (req, res) => {
   }
 };
 
-exports.getCompanyProfiles = async (req, res) => {
+exports.getCompanyProfile = async (req, res) => {
   try {
     const userId = req.user.id;
 
@@ -150,8 +150,8 @@ exports.updateCompanyProfile = async (req, res) => {
       address,
       industry,
       size,
-      logo_url,
-      cover_url,
+      logo_id,
+      cover_id,
       founded_year} = req.body;
     
     const companyProfile = await prisma.companies.findUnique({
@@ -178,8 +178,8 @@ exports.updateCompanyProfile = async (req, res) => {
         address,
         industry,
         size,
-        logo_url,
-        cover_url,
+        logo_id,
+        cover_id,
         founded_year,
         status: 'pending',
         updated_at: new Date(),
