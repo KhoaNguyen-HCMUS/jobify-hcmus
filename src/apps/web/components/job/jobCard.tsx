@@ -90,7 +90,7 @@ export default function JobCard({ job }: JobCardProps) {
               {job.title}
             </h3>
             <p className="text-text-80">{job.company_name}</p>
-            {job.is_applied && job.is_saved && (
+            {!(job.is_applied || job.is_saved) && (
               <p className="text-text-80">{formatRelativeTime(job.created_at)}</p>
             )}
           </div>

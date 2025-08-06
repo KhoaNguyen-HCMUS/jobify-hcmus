@@ -15,7 +15,7 @@ const adaptJobForComponent = (job: Job) => {
     logo: "/logo.png",
     name: job.title,
     title: job.title,
-    company_name: job.company_name,
+    company_name: job.company_name || null,
     salary_min: job.salary_min,
     salary_max: job.salary_max,
     currency: job.currency || 'VNĐ',

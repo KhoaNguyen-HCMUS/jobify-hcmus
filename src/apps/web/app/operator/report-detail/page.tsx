@@ -2,6 +2,7 @@ import JobDetail from "../../../components/job/jobDetail";
 import GoBack from "../../../components/goBack";
 import ReportUser from "../../../components/reportUser";
 import Reporter from "../../../components/reporter";
+import { Suspense } from "react";
 
 interface ReportProps {
   report: {
@@ -33,7 +34,7 @@ const reportDetail = {
   candidateLocation: "New York, NY",
 };
 
-export default function ReportDetailPage() {
+function ReportDetailContent() {
   return (
     <div className="flex flex-col gap-4 mx-10 my-6">
       <GoBack />
@@ -80,5 +81,13 @@ export default function ReportDetailPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function ReportDetailPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <ReportDetailContent />
+    </Suspense>
   );
 }

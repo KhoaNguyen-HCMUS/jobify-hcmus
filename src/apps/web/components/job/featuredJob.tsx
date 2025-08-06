@@ -8,7 +8,7 @@ import { useEffect, useState } from "react";
 const transformJobForCard = (job: Job) => ({
   id: job.id,
   title: job.title,
-  company_name: job.company_name,
+  company_name: job.company_name || null,
   salary_min: job.salary_min,
   salary_max: job.salary_max,
   currency: job.currency,
