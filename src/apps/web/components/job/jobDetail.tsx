@@ -16,6 +16,7 @@ import {
   Phone,
 } from "lucide-react";
 import ApplyJobModal from "../../components/applyJobModal";
+import CandidateApplication from "./candidateApplication";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Job } from "../../services/jobs";
 import { useSaveJob } from "../../hooks/useSaveJob";    
@@ -41,6 +42,8 @@ export default function JobDetail({ job: propJob, jobDetailData, isHR, isSaved =
   const [company, setCompany] = useState<CompanyProfile | null>(jobDetailData?.company || null);
   const [isSavedState, setIsSavedState] = useState<boolean>(isSaved);
   const [isApplyModalOpen, setIsApplyModalOpen] = useState(false);
+  const [hasApplied, setHasApplied] = useState<boolean>(false);
+  const [applicationId, setApplicationId] = useState<string | null>(null);
   const { handleSaveJob, handleUnsaveJob, isSaving } = useSaveJob();
   const userRole = getUserRole();
   const router = useRouter();
@@ -80,15 +83,23 @@ export default function JobDetail({ job: propJob, jobDetailData, isHR, isSaved =
     }
   };
 
+  // Check if user has applied to this job
   useEffect(() => {
-    if (propJob) {
-      setJob(propJob);
-    }
-    if (jobDetailData) {
-      setJob(jobDetailData.job);
-      setCompany(jobDetailData.company);
-    }
-  }, [propJob, jobDetailData]);
+    const checkIfApplied = () => {
+      // Check if coming from jobs-applied page
+      const fromAppliedJobs = searchParams.get('from') === 'applied';
+      const appId = searchParams.get('application_id');
+      
+      if (fromAppliedJobs) {
+        setHasApplied(true);
+        if (appId) {
+          setApplicationId(appId);
+        }
+      }
+    };
+
+    checkIfApplied();
+  }, [searchParams]);
 
   useEffect(() => {
     setIsSavedState(isSaved);
@@ -109,8 +120,8 @@ export default function JobDetail({ job: propJob, jobDetailData, isHR, isSaved =
   const deadlineDate = job.deadline ? new Date(job.deadline).toLocaleDateString() : 'Not specified';
 
   return (
-    <div className="flex flex-col gap-8">
-      <div className="flex items-center justify-between px-6">
+    <div className="bg-neutral-light-40 min-h-screen">
+      <div className="flex flex-col mx-6 my-4">
         <GoBack />
         {isHR && (
           <button
@@ -185,10 +196,15 @@ export default function JobDetail({ job: propJob, jobDetailData, isHR, isSaved =
               <div className="flex flex-wrap gap-4">
                 {!isHR ? (
                   <button
-                    onClick={() => setIsApplyModalOpen(true)}
-                    className="cursor-pointer px-6 py-2 bg-accent rounded-full text-background font-semibold text-lg transition-all duration-300 hover:shadow-lg hover:shadow-primary/30 transform hover:-translate-y-0.5"
+                    onClick={hasApplied ? undefined : () => setIsApplyModalOpen(true)}
+                    disabled={hasApplied}
+                    className={`px-6 py-2 rounded-full font-semibold text-lg transition-all duration-300 transform ${
+                      hasApplied 
+                        ? 'bg-green-600 text-white cursor-not-allowed' 
+                        : 'bg-accent text-background hover:shadow-lg hover:shadow-primary/30 hover:-translate-y-0.5 cursor-pointer'
+                    }`}
                   >
-                    Apply now
+                    {hasApplied ? 'Applied ✓' : 'Apply now'}
                   </button>
                 ) : (
                   <button
@@ -312,18 +328,30 @@ export default function JobDetail({ job: propJob, jobDetailData, isHR, isSaved =
                   <h2 className="font-semibold text-accent">Working Time</h2>
                   <p className="text-primary">{job.working_hours || 'Not specified'}</p>
                 </div>
-                                 <div>
-                   <h2 className="font-semibold text-accent">Apply now!</h2>
-                   <p className="text-primary">Click the Apply button above to submit your application.</p>
-                   {!isHR && (
-                     <button
-                       onClick={() => setIsApplyModalOpen(true)}
-                       className="cursor-pointer mb-4 mt-4 px-6 py-2 bg-accent rounded-full text-background font-semibold text-lg  duration-300 hover:shadow-lg hover:shadow-primary/30 "
-                     >
-                       Apply now
-                     </button>
-                   )}
-                 </div>
+                <div>
+                  <h2 className="font-semibold text-accent">
+                    {hasApplied ? 'Application Status' : 'Apply now!'}
+                  </h2>
+                  <p className="text-primary">
+                    {hasApplied 
+                      ? 'You have already applied for this position.' 
+                      : 'Click the Apply button above to submit your application.'
+                    }
+                  </p>
+                  {!isHR && (
+                    <button
+                      onClick={hasApplied ? undefined : () => setIsApplyModalOpen(true)}
+                      disabled={hasApplied}
+                      className={`mb-4 mt-4 px-6 py-2 rounded-full font-semibold text-lg duration-300 ${
+                        hasApplied 
+                          ? 'bg-green-600 text-white cursor-not-allowed' 
+                          : 'bg-accent text-background hover:shadow-lg hover:shadow-primary/30 cursor-pointer'
+                      }`}
+                    >
+                      {hasApplied ? 'Applied ✓' : 'Apply now'}
+                    </button>
+                  )}
+                </div>
                  
                </div>
             </div>
@@ -459,20 +487,16 @@ export default function JobDetail({ job: propJob, jobDetailData, isHR, isSaved =
       </div>
 
       {isHR && (
-        <div className="flex flex-col gap-4 mx-6 my-4 font-semibold">
+        <div className="flex flex-col gap-6 mx-6 my-4">
           <div className="flex gap-2 items-center">
-            <span className="text-primary-80">Status:</span>
+            <span className="text-primary-80 font-semibold">Status:</span>
             <button className="bg-accent hover:bg-secondary text-neutral-light-20 px-6 py-2 rounded-full cursor-pointer">
               {job.status}
             </button>
           </div>
+          
+          
           <div className="flex gap-4">
-            <button
-              onClick={() => router.push("/recruiter/applications")}
-              className="bg-secondary-60 hover:bg-secondary text-background px-6 py-2 rounded-full cursor-pointer"
-            >
-              View applications
-            </button>
             <button className="bg-[#E91919] hover:bg-red-800 text-background px-6 py-2 rounded-full cursor-pointer">
               Close
             </button>
@@ -484,13 +508,18 @@ export default function JobDetail({ job: propJob, jobDetailData, isHR, isSaved =
       )}
       
       {/* Apply Job Modal */}
-      {!isHR && job && (
+      {!isHR && job && !hasApplied && (
         <ApplyJobModal 
           jobId={job.id} 
           jobTitle={job.title} 
           isOpen={isApplyModalOpen} 
           onClose={() => setIsApplyModalOpen(false)} 
         />
+      )}
+
+      {/* Candidate Application Details */}
+      {!isHR && hasApplied && job && (
+        <CandidateApplication jobId={job.id} applicationId={applicationId} />
       )}
     </div>
   );

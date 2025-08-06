@@ -4,6 +4,7 @@ import JobDetail from "../../../components/job/jobDetail";
 import { getJobById, JobDetailData } from "../../../services/jobs";
 import { toast } from 'react-toastify';
 import { useParams, useSearchParams } from "next/navigation";
+import { getUserRole } from "../../../utils/auth";
 
 function JobDetailPageContent() {
   const [jobDetailData, setJobDetailData] = useState<JobDetailData | null>(null);
@@ -11,6 +12,8 @@ function JobDetailPageContent() {
   const { id } = useParams();
   const searchParams = useSearchParams();
   const isSaved = searchParams.get('saved') === 'true';
+  const userRole = getUserRole();
+  const isHR = userRole === 'company';
 
   useEffect(() => {
     const fetchJob = async () => {
@@ -49,7 +52,7 @@ function JobDetailPageContent() {
   }
 
   return (
-    <JobDetail jobDetailData={jobDetailData} isHR={false} isSaved={isSaved} />
+    <JobDetail jobDetailData={jobDetailData} isHR={isHR} isSaved={isSaved} />
   );
 }
 

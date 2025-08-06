@@ -1,5 +1,5 @@
 "use client";
-import { FilePenLine, Mail, Phone, MapPin, Bookmark } from "lucide-react";
+import { FilePenLine, Mail, Phone, MapPin, Bookmark, Briefcase } from "lucide-react";
 import Notification from "../../../components/notification";
 import JobCard from "../../../components/job/jobCard";
 import usePagination from "../../../hooks/usePagination";
@@ -9,9 +9,9 @@ import ProtectedRoute from "../../../components/ProtectedRoute";
 import { getProfile, Profile } from "../../../services/candidateProfile";
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
-import { getSavedJobs, Job } from "../../../services/jobs";
+import { getSavedJobs, getAppliedJobs, Job, AppliedJob } from "../../../services/jobs";
 
-const transformJobForCard = (job: Job) => ({
+const transformJobForCard = (job: Job, isSaved: boolean = false, isApplied: boolean = false) => ({
   id: job.id,
   title: job.title,
   company_name: job.company_name || null,
@@ -23,16 +23,53 @@ const transformJobForCard = (job: Job) => ({
   name: job.title, 
   status: job.status,
   created_at: new Date(job.created_at),
-  is_saved: true, 
+  is_saved: isSaved,
+  is_applied: isApplied,
+});
+
+const transformAppliedJobForCard = (appliedJob: AppliedJob) => ({
+  id: appliedJob.id,
+  title: appliedJob.title,
+  company_name: appliedJob.company_name || null,
+  salary_min: appliedJob.salary_min,
+  salary_max: appliedJob.salary_max,
+  currency: appliedJob.currency, 
+  province: appliedJob.province,
+  logo: "/logo.png", 
+  name: appliedJob.title, 
+  status: appliedJob.status,
+  created_at: new Date(),
+  is_saved: false,
+  is_applied: true,
+  application_id: appliedJob.application_id, // Add application_id
 });
 
 function CandidateDashboardContent() {
-  const { page, maxPage, current, next, prev } = usePagination(jobs, 2);
   const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
   const [savedJobs, setSavedJobs] = useState<Job[]>([]);
   const [savedJobsLoading, setSavedJobsLoading] = useState(true);
   const [savedJobsError, setSavedJobsError] = useState<string | null>(null);
+  const [appliedJobs, setAppliedJobs] = useState<AppliedJob[]>([]);
+  const [appliedJobsLoading, setAppliedJobsLoading] = useState(true);
+  const [appliedJobsError, setAppliedJobsError] = useState<string | null>(null);
+
+  // Pagination hooks
+  const { 
+    page: savedJobsPage, 
+    maxPage: savedJobsMaxPage, 
+    current: savedJobsCurrent, 
+    next: savedJobsNext, 
+    prev: savedJobsPrev 
+  } = usePagination(savedJobs, 3);
+
+  const { 
+    page: appliedJobsPage, 
+    maxPage: appliedJobsMaxPage, 
+    current: appliedJobsCurrent, 
+    next: appliedJobsNext, 
+    prev: appliedJobsPrev 
+  } = usePagination(appliedJobs, 3);
 
   const fetchProfile = async () => {
     try {
@@ -74,9 +111,35 @@ function CandidateDashboardContent() {
     }
   };
 
+  const fetchAppliedJobs = async () => {
+    try {
+      setAppliedJobsLoading(true);
+      const response = await getAppliedJobs();
+      
+      if (response.success && response.data) {
+        // Sort by application_id (newest first) since we don't have created_at
+        const sortedJobs = response.data.sort((a, b) => 
+          b.application_id.localeCompare(a.application_id)
+        );
+        setAppliedJobs(sortedJobs);
+      } else {
+        if (response.message === 'Authentication required') {
+          setAppliedJobsError('Please login to view applied jobs');
+        } else {
+          setAppliedJobsError(response.message || 'Failed to fetch applied jobs');
+        }
+      }
+    } catch (error) {
+      setAppliedJobsError('Network error occurred');
+    } finally {
+      setAppliedJobsLoading(false);
+    }
+  };
+
   useEffect(() => {
     fetchProfile();
     fetchSavedJobs();
+    fetchAppliedJobs();
   }, []);
 
   if (loading) {
@@ -139,27 +202,63 @@ function CandidateDashboardContent() {
         </div>
         <div className="flex flex-wrap gap-15">
           <div className="flex-1 flex flex-col bg-highlight-20 rounded-2xl p-4 shadow-lg">
-            <div className="flex justify-between">
-              <span className="text-primary font-semibold text-xl">
-                Jobs Applied
-              </span>
+            <div className="flex justify-between items-center mb-4">
+              <div className="flex items-center gap-2">
+                <Briefcase className="text-primary" size={24} />
+                <span className="text-primary font-semibold text-xl">
+                  Jobs Applied
+                </span>
+              </div>
               <a href="/candidate/jobs-applied">
                 <span className="text-accent font-semibold cursor-pointer">
                   See All
                 </span>
               </a>
             </div>
-            <div className="flex flex-col gap-y-6 px-4 py-4">
-              {/* {current.map((job) => (
-                <JobCard key={job.id} job={job} />
-              ))} */}
-            </div>
-            <Pagination
-              page={page}
-              maxPage={maxPage}
-              onNext={next}
-              onPrev={prev}
-            />
+            
+            {appliedJobsLoading ? (
+              <div className="flex justify-center items-center h-32">
+                <div className="text-primary text-lg">Loading applied jobs...</div>
+              </div>
+            ) : appliedJobsError ? (
+              <div className="flex justify-center items-center h-32">
+                <div className="text-red-500 text-lg">Error: {appliedJobsError}</div>
+              </div>
+            ) : appliedJobs.length > 0 ? (
+              <>
+                <div className="flex flex-col gap-y-6 px-4 py-4">
+                  {appliedJobsCurrent.map((appliedJob) => (
+                    <JobCard key={appliedJob.application_id} job={transformAppliedJobForCard(appliedJob)} />
+                  ))}
+                </div>
+                {appliedJobsMaxPage > 1 && (
+                  <div className="py-4">
+                    <Pagination
+                      page={appliedJobsPage}
+                      maxPage={appliedJobsMaxPage}
+                      onNext={appliedJobsNext}
+                      onPrev={appliedJobsPrev}
+                    />
+                  </div>
+                )}
+              </>
+            ) : (
+              <div className="text-center py-8">
+                <div className="text-4xl mb-2">📝</div>
+                <h3 className="text-lg font-semibold text-gray-700 mb-2">
+                  No applied jobs yet
+                </h3>
+                <p className="text-gray-500 text-sm mb-4">
+                  Start applying to jobs you're interested in
+                </p>
+                <a
+                  href="/jobs"
+                  className="bg-accent text-white px-4 py-2 rounded-lg hover:bg-accent/90 transition-colors inline-block text-sm"
+                >
+                  Browse Jobs
+                </a>
+              </div>
+            )}
           </div>
           <div className="flex-1 flex flex-col bg-highlight-20 rounded-2xl p-4 shadow-lg">
             <div className="flex justify-between items-center mb-4">
@@ -185,16 +284,23 @@ function CandidateDashboardContent() {
                 <div className="text-red-500 text-lg">Error: {savedJobsError}</div>
               </div>
             ) : savedJobs.length > 0 ? (
-              <div className="flex flex-col gap-y-6 px-4 py-4">
-                {savedJobs.slice(0, 3).map((job) => (
-                  <JobCard key={job.id} job={transformJobForCard(job)} />
-                ))}
-                {savedJobs.length > 3 && (
-                  <div className="text-center text-gray-500 text-sm">
-                    +{savedJobs.length - 3} more saved jobs
+              <>
+                <div className="flex flex-col gap-y-6 px-4 py-4">
+                  {savedJobsCurrent.map((job) => (
+                    <JobCard key={job.id} job={transformJobForCard(job, true, false)} />
+                  ))}
+                </div>
+                {savedJobsMaxPage > 1 && (
+                  <div className="py-4">
+                    <Pagination
+                      page={savedJobsPage}
+                      maxPage={savedJobsMaxPage}
+                      onNext={savedJobsNext}
+                      onPrev={savedJobsPrev}
+                    />
                   </div>
                 )}
-              </div>
+              </>
             ) : (
               <div className="text-center py-8">
                 <div className="text-4xl mb-2">💼</div>

@@ -155,20 +155,14 @@ export default function SideBar() {
     icon?: React.ReactElement;
   }[] = candidateItems;
 
-  console.log("Current user role:", user?.role);
 
   if (user?.role === "candidate") {
     sideBarItems = candidateItems;
-    console.log("Using candidate items");
   } else if (user?.role === "company") {
     sideBarItems = recruiterItems;
-    console.log("Using company/recruiter items");
   } else if (user?.role === "moderator" || user?.role === "admin") {
     sideBarItems = moderatorItems;
-    console.log("Using moderator items");
-  } else {
-    console.log("No matching role, using default candidate items");
-  }
+  } 
 
   if (!user) return null;
   return (

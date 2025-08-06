@@ -1,4 +1,4 @@
-import { Heart } from "lucide-react";
+import { Heart, CheckCircle } from "lucide-react";
 import JobStatusBadge from "./jobStatusBadge";
 import Link from "next/link";
 import { 
@@ -28,6 +28,9 @@ interface JobCardProps {
     status?: string;
     created_at: Date;
     is_saved?: boolean;
+    is_applied?: boolean;
+    fromApplied?: boolean;
+    application_id?: string;
   };
 }
 
@@ -64,8 +67,17 @@ export default function JobCard({ job }: JobCardProps) {
     }
   };
 
+  const buildJobUrl = () => {
+    const params = new URLSearchParams();
+    if (isSaved) params.append('saved', 'true');
+    if (job.fromApplied) params.append('from', 'applied');
+    if (job.application_id) params.append('application_id', job.application_id);
+    const queryString = params.toString();
+    return `/jobs/${job.id}${queryString ? `?${queryString}` : ''}`;
+  };
+
   return (
-    <Link href={`/jobs/${job.id}${isSaved ? '?saved=true' : ''}`}>
+    <Link href={buildJobUrl()}>
       <div className="shadow-md bg-neutral-light-20 rounded-2xl p-6 transition-transform duration-300 hover:-translate-y-2 hover:shadow-lg cursor-pointer">
         <div className="flex items-center space-x-4 mb-4">
           <img
@@ -78,7 +90,9 @@ export default function JobCard({ job }: JobCardProps) {
               {job.title}
             </h3>
             <p className="text-text-80">{job.company_name}</p>
-            <p className="text-text-80">{formatRelativeTime(job.created_at)}</p>
+            {job.is_applied && job.is_saved && (
+              <p className="text-text-80">{formatRelativeTime(job.created_at)}</p>
+            )}
           </div>
         </div>
         <div className="flex flex-wrap gap-2 justify-between items-center text-sm">
@@ -89,6 +103,7 @@ export default function JobCard({ job }: JobCardProps) {
             {job.province}
           </span>
           <JobStatusBadge status={job.status} />
+        
           {userRole === 'candidate' && (
             <button
               onClick={handleHeartClick}
