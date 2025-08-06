@@ -16,14 +16,16 @@ import {
   Phone,
 } from "lucide-react";
 import ApplyJobModal from "../../components/applyJobModal";
+import JobEditModal from "./JobEditModal";
 import CandidateApplication from "./candidateApplication";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Job } from "../../services/jobs";
+import { Job, updateJob, closeJob, deleteJob } from "../../services/jobs";
 import { useSaveJob } from "../../hooks/useSaveJob";    
 import { getUserRole } from "../../utils/auth";
 import { CompanyProfile } from "../../services/companyProfile";
 import GoBack from "../goBack";
 import { toast } from "react-toastify";
+import { getToken } from "../../utils/auth";
 
 interface JobDetailData {
   company: CompanyProfile;
@@ -42,6 +44,7 @@ export default function JobDetail({ job: propJob, jobDetailData, isHR, isSaved =
   const [company, setCompany] = useState<CompanyProfile | null>(jobDetailData?.company || null);
   const [isSavedState, setIsSavedState] = useState<boolean>(isSaved);
   const [isApplyModalOpen, setIsApplyModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [hasApplied, setHasApplied] = useState<boolean>(false);
   const [applicationId, setApplicationId] = useState<string | null>(null);
   const { handleSaveJob, handleUnsaveJob, isSaving } = useSaveJob();
@@ -78,8 +81,66 @@ export default function JobDetail({ job: propJob, jobDetailData, isHR, isSaved =
   };
 
   const handleEditClick = () => {
+    setIsEditModalOpen(true);
+  };
+
+  const handleJobUpdated = () => {
+    window.location.reload();
+  };
+
+  const handleCloseClick = async () => {
+    if (!job) return;
+    
+    if (window.confirm("Are you sure you want to close this job?")) {
+      try {
+        const token = getToken();
+        if (!token) {
+          toast.error("Please login again!");
+          return;
+        }
+
+        const response = await closeJob(job.id, token);
+        if (response.success) {
+          toast.success("Job closed successfully!");
+          window.location.reload();
+        } else {
+          toast.error("Failed to close job: " + response.message);
+        }
+      } catch (error) {
+        toast.error("Error closing job, please try again later.");
+        console.error("Error closing job:", error);
+      }
+    }
+  };
+
+  const handleDeleteClick = async () => {
+    if (!job) return;
+    
+    if (window.confirm("Are you sure you want to delete this job? This action cannot be undone.")) {
+      try {
+        const token = getToken();
+        if (!token) {
+          toast.error("Please login again!");
+          return;
+        }
+
+        const response = await deleteJob(job.id, token);
+        if (response.success) {
+          toast.success("Job deleted successfully!");
+          router.push("/company/jobs");
+        } else {
+          toast.error("Failed to delete job: " + response.message);
+        }
+      } catch (error) {
+        toast.error("Error deleting job, please try again later.");
+        console.error("Error deleting job:", error);
+      }
+    }
+  };
+
+  const handleViewApplicationsClick = () => {
     if (job) {
-      router.push(`/jobs/${job.id}/edit`);
+      router.push(`/company/applications?jobId=${job.id}&jobTitle=${encodeURIComponent(job.title)}`);
     }
   };
 
@@ -123,15 +184,7 @@ export default function JobDetail({ job: propJob, jobDetailData, isHR, isSaved =
     <div className="bg-neutral-light-40 min-h-screen">
       <div className="flex flex-col mx-6 my-4">
         <GoBack />
-        {isHR && (
-          <button
-            onClick={handleEditClick}
-            className="flex items-center gap-2 px-4 py-2 bg-accent text-background rounded-lg hover:bg-accent/90 transition-colors"
-          >
-            <Edit size={20} />
-            Edit Job
-          </button>
-        )}
+        
       </div>
 
       <div className="flex flex-wrap gap-8 px-6">
@@ -495,12 +548,29 @@ export default function JobDetail({ job: propJob, jobDetailData, isHR, isSaved =
             </button>
           </div>
           
-          
           <div className="flex gap-4">
-            <button className="bg-[#E91919] hover:bg-red-800 text-background px-6 py-2 rounded-full cursor-pointer">
+            <button 
+              onClick={handleEditClick}
+              className="bg-gray-500 hover:bg-gray-600 text-white px-6 py-2 rounded-full cursor-pointer"
+            >
+              Edit
+            </button>
+            <button 
+              onClick={handleViewApplicationsClick}
+              className="bg-gray-500 hover:bg-gray-600 text-white px-6 py-2 rounded-full cursor-pointer"
+            >
+              View Applications
+            </button>
+            <button 
+              onClick={handleCloseClick}
+              className="bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded-full cursor-pointer"
+            >
               Close
             </button>
-            <button className="bg-[#E91919] hover:bg-red-800 text-background px-6 py-2 rounded-full cursor-pointer">
+            <button 
+              onClick={handleDeleteClick}
+              className="bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded-full cursor-pointer"
+            >
               Delete
             </button>
           </div>
@@ -520,6 +590,16 @@ export default function JobDetail({ job: propJob, jobDetailData, isHR, isSaved =
       {/* Candidate Application Details */}
       {!isHR && hasApplied && job && (
         <CandidateApplication jobId={job.id} applicationId={applicationId} />
+      )}
+
+      {/* Job Edit Modal */}
+      {isEditModalOpen && job && (
+        <JobEditModal
+          isOpen={isEditModalOpen}
+          job={job}
+          onClose={() => setIsEditModalOpen(false)}
+          onJobUpdated={handleJobUpdated}
+        />
       )}
     </div>
   );

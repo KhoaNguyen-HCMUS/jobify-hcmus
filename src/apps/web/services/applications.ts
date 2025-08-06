@@ -2,6 +2,23 @@ import { getToken } from "../utils/auth";
 import { Profile } from "./candidateProfile";
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
+export interface ApplicationStatusHistory {
+  id: string;
+  application_id: string;
+  old_status: string;
+  new_status: string;
+  changed_by: string;
+  notes: string | null;
+  created_at: string;
+}
+
+export interface UserProfile {
+  full_name: string;
+  province: string;
+  ward: string;
+  industry: string;
+}
+
 export interface Application {
   id: string;
   job_id: string;
@@ -13,16 +30,8 @@ export interface Application {
   applied_at: string;
   updated_at: string;
   application_status_history: ApplicationStatusHistory[];
-}
-
-export interface ApplicationStatusHistory {
-  id: string;
-  application_id: string;
-  old_status: string;
-  new_status: string;
-  changed_by: string;
-  notes: string | null;
-  created_at: string;
+  user_profile: UserProfile;
+  resume_url: string;
 }
 
 export interface ApplicationsResponse {
@@ -30,8 +39,6 @@ export interface ApplicationsResponse {
   message: string;
   data?: Application[];
 }
-
-
 
 export interface ApplicationDetail {
   notes: string | null;
@@ -60,7 +67,7 @@ export const getApplicationsByJob = async (jobId: string): Promise<ApplicationsR
       };
     }
 
-    const response = await fetch(`${API_URL}/jobs/${jobId}/applications`, {
+    const response = await fetch(`${API_URL}/company/jobs/${jobId}/applications`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',

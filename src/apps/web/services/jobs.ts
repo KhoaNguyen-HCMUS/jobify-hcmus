@@ -261,6 +261,67 @@ export const postNewJob = async (data: any, token: string): Promise<JobResponse>
   }
 };
 
+export const updateJob = async (jobId: string, data: any, token: string): Promise<JobResponse> => {
+  try {
+    const response = await fetch(`${API_URL}/jobs/${jobId}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+      },
+      body: JSON.stringify(data),
+    });
+    const result = await response.json();
+    return result;
+  } catch (error) {
+    return {
+      success: false,
+      message: 'Network connection error',
+    };
+  }
+};
+
+export const closeJob = async (jobId: string, token: string): Promise<JobResponse> => {
+  try {
+    const response = await fetch(`${API_URL}/jobs/${jobId}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        status: 'expired'
+      }),
+    });
+    const result = await response.json();
+    return result;
+  } catch (error) {
+    return {
+      success: false,
+      message: 'Network connection error',
+    };
+  }
+};
+
+export const deleteJob = async (jobId: string, token: string): Promise<JobResponse> => {
+  try {
+    const response = await fetch(`${API_URL}/jobs/${jobId}`, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+      },
+    });
+    const result = await response.json();
+    return result;
+  } catch (error) {
+    return {
+      success: false,
+      message: 'Network connection error',
+    };
+  }
+};
+
 export interface ApplyJobData {
   resume: File;
   cover_letter: string;
