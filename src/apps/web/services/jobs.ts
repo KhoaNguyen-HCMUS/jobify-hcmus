@@ -38,6 +38,27 @@ export interface Job {
   company_name?: string;
 }
 
+export interface AppliedJob {
+  id: string;
+  application_id: string;
+  status: string;
+  job_id: string;
+  title: string;
+  province: string;
+  ward: string;
+  salary_min: string;
+  salary_max: string;
+  is_salary_negotiable: boolean;
+  company_name: string;
+  currency: string;
+}
+
+export interface AppliedJobsResponse {
+  success: boolean;
+  message: string;
+  data?: AppliedJob[];
+}
+
 export interface JobDetailData {
   company: CompanyProfile;
   job: Job;
@@ -276,6 +297,34 @@ export const applyJob = async (jobId: string, data: ApplyJobData): Promise<Apply
     });
 
     console.log(response);
+    const result = await response.json();
+    return result;
+  } catch (error) {
+    return {
+      success: false,
+      message: 'Network connection error',
+    };
+  }
+};
+
+export const getAppliedJobs = async (): Promise<AppliedJobsResponse> => {
+  try {
+    const token = getToken();
+    if (!token) {
+      return {
+        success: false,
+        message: 'Authentication required',
+      };
+    }
+
+    const response = await fetch(`${API_URL}/jobs/applied`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+      },
+    });
+
     const result = await response.json();
     return result;
   } catch (error) {
