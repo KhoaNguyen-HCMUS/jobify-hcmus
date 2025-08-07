@@ -62,10 +62,6 @@ exports.createJob = async (req, res) => {
       return errorResponse(res, 'Company not found', ['Company profile does not exist'], 404);
     }
 
-    if (company.status !== 'active') {
-      return errorResponse(res, 'You cannot post jobs while your company profile is not active', [], 403);
-    }
-
     const {
       title,
       province,
@@ -89,9 +85,14 @@ exports.createJob = async (req, res) => {
       skills,
       currency,
       cost_coin,
+      status,
     } = req.body;
 
     const parsedDeadline = deadline ? new Date(deadline) : null;
+
+    if (company.status !== 'active' && status !== 'draft') {
+      return errorResponse(res, 'You cannot post jobs while your company profile is not active', [], 403);
+    }
 
     const newJob = await prisma.job_posts.create({
       data: {
@@ -119,7 +120,7 @@ exports.createJob = async (req, res) => {
         skills,
         currency,
         cost_coin,
-        status: 'pending',         
+        status: status || 'pending',         
       },
     });
 
@@ -171,7 +172,6 @@ exports.updateJob = async (req, res) => {
       skills,
       currency,
       cost_coin,
-      status,
       moderator_notes,
     } = req.body;
 
@@ -202,7 +202,8 @@ exports.updateJob = async (req, res) => {
         skills,
         currency,
         cost_coin,
-        status,
+        prev_status: existingJob.status,
+        status: 'pending',
         moderator_notes,
         updated_at: new Date(),
       },
@@ -212,6 +213,36 @@ exports.updateJob = async (req, res) => {
   } catch (err) {
     console.error(err);
     return errorResponse(res, 'Failed to update job', [err.message], 500);
+  }
+};
+
+exports.closeJob = async (req, res) => {
+  const { id } = req.params;
+  const user = req.user;
+  try {
+    const job = await prisma.job_posts.findUnique({ where: { id } });
+
+    if (!job) {
+      return errorResponse(res, 'Job not found', [], 404);
+    }
+    if (user.role === 'company') {
+      const company = await prisma.companies.findUnique({ where: { user_id: user.id } });
+
+      if (!company || job.company_id !== company.id) {
+        return errorResponse(res, 'You are not authorized to close this job', [], 403);
+      }
+    }
+    await prisma.job_posts.update({
+      where: { id },  
+      data: {
+        status: 'expired',
+        updated_at: new Date(),
+      },
+    }); 
+    return successResponse(res, 'Job closed successfully');
+  } catch (err) {
+    console.error(err);
+    return errorResponse(res, 'Failed to close job', [err.message], 500);
   }
 };
 
@@ -309,8 +340,8 @@ exports.getSavedJobs = async (req, res) => {
 
   try {
     const savedJobIds = await prisma.saved_jobs.findMany({ where: { user_id: userId }, select: { job_id: true } });
-    if (!savedJobIds || savedJobIds.length === 0) {
-      return errorResponse(res, 'No saved jobs found', [], 404);
+    if (savedJobIds.length === 0) {
+      return successResponse(res, 'No saved jobs found', []);
     }
 
     const jobIds = savedJobIds.map(item => item.job_id);
@@ -338,8 +369,8 @@ exports.getRecommendedJobs = async (req, res) => {
       orderBy: { match_score: 'desc' },
       select: { job_id: true },
     });
-    if (!matchedJobIds || matchedJobIds.length === 0) {
-      return errorResponse(res, 'No recommended jobs found', [], 404);
+    if (matchedJobIds.length === 0) {
+      return successResponse(res, 'No recommended jobs found', []);
     }
 
     const jobIds = matchedJobIds.map(item => item.job_id);
@@ -360,25 +391,55 @@ exports.getRecommendedJobs = async (req, res) => {
 
 exports.getAppliedJobs = async (req, res) => {
   const userId = req.user.id;
+
   try {
-    const appliedJobIds = await prisma.job_applications.findMany({
+    const applications = await prisma.job_applications.findMany({
       where: { candidate_id: userId },
-      select: { job_id: true },
+      select: {
+        id: true,         
+        status: true,       
+        job_posts: {
+          select: {
+            id: true,
+            title: true,
+            companies: {
+              select: { company_name: true },
+            },
+            province: true,
+            ward: true,
+            salary_min: true,
+            salary_max: true,
+            is_salary_negotiable: true,
+            currency: true,
+          },
+        },
+      },
     });
-    if (!appliedJobIds || appliedJobIds.length === 0) {
-      return errorResponse(res, 'No applied jobs found', [], 404);
+
+    if (applications.length === 0) {
+      return successResponse(res, 'No applied jobs found', []);
     }
 
-    const jobIds = appliedJobIds.map(item => item.job_id);
+    const result = applications.map(app => {
+      const job = app.job_posts;
 
-    const jobs = await prisma.job_posts.findMany({ where: { id: { in: jobIds } } });
-    
-    const jobsWithCompany = await Promise.all(jobs.map(async (job) => {
-      const company = await prisma.companies.findUnique({ where: { id: job.company_id }, select: { company_name: true } });
-      return { ...job, company_name: company ? company.company_name : 'Unknown' };
-    }));
+      return {
+        application_id: app.id,
+        status: app.status,
+        id: job.id,
+        title: job.title,
+        province: job.province,
+        ward: job.ward,
+        work_place: job.work_place,
+        salary_min: job.salary_min,
+        salary_max: job.salary_max,
+        is_salary_negotiable: job.is_salary_negotiable,
+        currency: job.currency,
+        company_name: job.companies.company_name,
+      };
+    });
 
-    return successResponse(res, 'Applied jobs fetched successfully', jobsWithCompany);
+    return successResponse(res, 'Applied jobs fetched successfully', result);
   } catch (err) {
     console.error(err);
     return errorResponse(res, 'Failed to fetch applied jobs', [err.message], 500);
