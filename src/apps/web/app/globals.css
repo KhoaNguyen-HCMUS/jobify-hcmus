@@ -97,6 +97,7 @@
   --color-link-hover: #3d6cb2;
 
   --gradient-primary: 45deg, #e1effb 0%, #edf5fc 100%;
+  --gradient-primary-2: 45deg, #0f6eff 0%, #b7cae5 100%;
   --color-background: #f2f2f2;
 }
 
@@ -110,7 +111,7 @@
 }
 
 /* LINKS */
-a {
+.custom-link {
   font-weight: var(--font-weight-semibold);
   color: var(--color-link);
 
@@ -120,8 +121,8 @@ a {
   }
 }
 
-@utility display-* {
+/* @utility display-* {
   font-size: --value(-font-size-display-*);
   font-weight: --value(-font-weight-bold);
   text-color: --value(-text-primary-40);
-}
+} */

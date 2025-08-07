@@ -27,5 +27,6 @@
     "@types/express": "^5.0.2",
     "nodemon": "^3.1.10",
     "prisma": "^6.9.0"
-  }
+  },
+  "proxy": "https://jobify-hcmus.onrender.com"
 }
