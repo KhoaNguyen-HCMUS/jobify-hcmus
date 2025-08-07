@@ -1,15 +1,18 @@
 const prisma = require('../prisma/client');
 const { successResponse, errorResponse } = require('../utils/response');
+const { uploadFile } = require('../utils/supabaseStorage');
+const { generateSignedUrl } = require('../utils/supabaseUrl');
 
 exports.getCandidateProfile = async (req, res) => {
-  try {
-    const userId = req.user.id;
+  const { user } = req;
 
+  try {
     const profile = await prisma.user_profiles.findUnique({
-      where: { user_id: userId },
+      where: { user_id: user.id },
       include: {
         experiences: true,
         educations: true,
+        file_uploads: true,
       },
     });
 
@@ -17,19 +20,31 @@ exports.getCandidateProfile = async (req, res) => {
       return errorResponse(res, 'Profile not found', [], 404);
     }
 
-    const email = req.user.email;
-    profile.email = email;
+    const { file_uploads, ...restProfile } = profile;
 
-    return successResponse(res, 'Profile fetched successfully', { profile });
+    let profile_photo_url = null;
+    if (file_uploads) {
+      profile_photo_url = await generateSignedUrl(file_uploads.file_path);
+    }
+
+    return successResponse(res, 'Profile fetched successfully', {
+      profile: {
+        ...restProfile,
+        email: user.email,
+        profile_photo_url,
+      },
+    });
+
   } catch (error) {
-    console.error(error);
+    console.error('Get Candidate Profile Error:', error);
     return errorResponse(res, 'Failed to fetch profile', [error.message], 500);
   }
 };
 
 exports.updateCandidateProfile = async (req, res) => {
+  const userId = req.user.id;
+
   try {
-    const userId = req.user.id;
     const {
       full_name,
       gender,
@@ -117,9 +132,9 @@ exports.updateCandidateProfile = async (req, res) => {
 };
 
 exports.getCompanyProfile = async (req, res) => {
-  try {
-    const userId = req.user.id;
+  const userId = req.user.id;
 
+  try {
     const companyProfiles = await prisma.companies.findUnique({
       where: { user_id: userId }
     });
@@ -138,9 +153,10 @@ exports.getCompanyProfile = async (req, res) => {
 };
 
 exports.updateCompanyProfile = async (req, res) => {
+  const userId = req.user.id;
+
   try {
-    const userId = req.user.id;
-    const { 
+    const {
       company_name,
       website,
       tax_code,
@@ -152,21 +168,19 @@ exports.updateCompanyProfile = async (req, res) => {
       size,
       logo_id,
       cover_id,
-      founded_year} = req.body;
-    
-    const companyProfile = await prisma.companies.findUnique({
+      founded_year,
+    } = req.body;
+
+    const company = await prisma.companies.findUnique({
       where: { user_id: userId },
-      select: {
-        id: true,
-        user_id: true,
-      }
+      select: { id: true },
     });
 
-    if (!companyProfile) {
+    if (!company) {
       return errorResponse(res, 'Company profile not found', [], 404);
     }
 
-    await prisma.companies.update({
+    const updateCompanyPromise = prisma.companies.update({
       where: { user_id: userId },
       data: {
         company_name,
@@ -183,8 +197,32 @@ exports.updateCompanyProfile = async (req, res) => {
         founded_year,
         status: 'pending',
         updated_at: new Date(),
-      }
+      },
     });
+
+    const activeJobs = await prisma.job_posts.findMany({
+      where: {
+        created_by: userId,
+        status: 'active',
+      },
+      select: { id: true },
+    });
+
+    let updateJobsPromise = Promise.resolve();
+    if (activeJobs.length > 0) {
+      const jobIds = activeJobs.map(job => job.id);
+
+      updateJobsPromise = prisma.job_posts.updateMany({
+        where: { id: { in: jobIds } },
+        data: {
+          prev_status: 'active',
+          status: 'draft',
+          updated_at: new Date(),
+        },
+      });
+    }
+
+    await Promise.all([updateCompanyPromise, updateJobsPromise]);
 
     return successResponse(res, 'Company profile updated successfully');
   } catch (error) {
@@ -202,6 +240,10 @@ exports.getCandidateProfileById = async (req, res) => {
       include: {
         experiences: true,
         educations: true,
+        file_uploads: true,
+        users: {
+          select: { email: true },
+        },
       },
     });
 
@@ -209,7 +251,19 @@ exports.getCandidateProfileById = async (req, res) => {
       return errorResponse(res, 'Candidate profile not found', [], 404);
     }
 
-    return successResponse(res, 'Candidate profile fetched successfully', profile);
+    const { file_uploads, users, ...restProfile } = profile;
+    let profile_photo_url = null;
+    if (file_uploads) {
+      profile_photo_url = await generateSignedUrl(file_uploads.file_path);
+    }
+
+    return successResponse(res, 'Candidate profile fetched successfully', {
+      profile: {
+        ...restProfile,   
+        email: profile.users.email,
+        profile_photo_url,
+      },
+    });
   } catch (error) {
     console.error(error);
     return errorResponse(res, 'Failed to fetch candidate profile', [error.message], 500);
