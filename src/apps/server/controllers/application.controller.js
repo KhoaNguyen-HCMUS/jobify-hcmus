@@ -1,8 +1,8 @@
 const prisma = require('../prisma/client');
 const supabase = require('../utils/supabaseClient');
 const { successResponse, errorResponse } = require('../utils/response');
-const { uploadFile } = require('../utils/supabaseStorage.service');
-const { generateSignedUrl } = require('../utils/supabaseUrl.helper');
+const { uploadFile } = require('../utils/supabaseStorage');
+const { generateSignedUrl } = require('../utils/supabaseUrl');
 
 exports.applyJob = async (req, res) => {
   const { id: job_id } = req.params;
@@ -72,7 +72,12 @@ exports.cancelApplication = async (req, res) => {
   const { user } = req; 
 
   try {
-    const application = await prisma.job_applications.findFirst({ where: { job_id } });
+    const application = await prisma.job_applications.findFirst({ 
+      where: { 
+        job_id,
+        candidate_id: user.id,
+      } 
+    });
 
     if (!application) {
       return errorResponse(res, 'Application not found', [], 404);
@@ -135,6 +140,8 @@ exports.getJobApplications = async (req, res) => {
                 province: true,
                 ward: true,
                 industry: true,
+                educations: true,
+                experiences: true,
               }
             },
           },
