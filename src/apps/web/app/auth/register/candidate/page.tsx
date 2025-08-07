@@ -36,7 +36,7 @@ export default function CandidateRegistrationPage() {
     
     if (res.success) {
       toast.success("Registration successful");
-      router.push("/candidate/dashboard");
+      router.push("/auth/sign-in");
     } else {
       toast.error(res.message);
     }

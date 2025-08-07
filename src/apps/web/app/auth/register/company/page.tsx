@@ -54,7 +54,7 @@ export default function CompanyRegistrationPage() {
     
     if (res.success) {
       toast.success("Registration successful");
-      router.push("/company/dashboard");
+      router.push("/auth/sign-in");
     } else {
       toast.error(res.message);
     }

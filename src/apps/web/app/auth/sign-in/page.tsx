@@ -57,7 +57,7 @@ export default function LogInPage() {
                 htmlFor="email"
                 className="block text-sm font-bold text-primary ml-4"
               >
-                Full Name
+                Email
               </label>
               <div className="relative">
                 <div className="absolute left-4 top-1/2 transform -translate-y-1/2 text-primary">
@@ -68,7 +68,7 @@ export default function LogInPage() {
                   type="text"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="Enter your full name"
+                  placeholder="Enter your email"
                   className="w-full pl-12 pr-4 py-4 bg-highlight-40 rounded-full text-primary-80 outline-none focus:ring-2 focus:ring-blue-400 focus:bg-white transition-all duration-300"
                   required
                 />
