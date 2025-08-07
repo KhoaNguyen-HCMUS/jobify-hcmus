@@ -58,9 +58,9 @@ export default function ClientLayout({
       {!hideNav && <Nav />}
       {!hideSideBar && <SideBar />}
       <main
-        className={`${!hideNav ? "pt-20" : ""} ${
-          !hideSideBar ? "pl-72" : ""
-        }`.trim()}
+       className={`${!hideNav ? "pt-20" : ""} ${
+      !hideSideBar ? "pl-72" : ""
+    } min-h-screen`.trim()}
       >
         {children}
       </main>
