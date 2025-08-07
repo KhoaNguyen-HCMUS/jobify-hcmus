@@ -104,21 +104,24 @@ exports.login = async (req, res) => {
       { expiresIn: '30d' }
     );
 
-  let name = '';
+    let name = '';
+    let id = '';
 
-  if (['admin', 'moderator', 'candidate'].includes(user.role)) {
-    const profile = await prisma.user_profiles.findUnique({ where: { user_id: user.id } });
-    if (!profile)
-      return errorResponse(res, 'User profile not found', [], 404);
-    name = profile.full_name;
-  } else if (user.role === 'company') {
-    const company = await prisma.companies.findUnique({ where: { user_id: user.id } });
-    if (!company)
-      return errorResponse(res, 'Company profile not found', [], 404);
-    name = company.company_name;
-  }
+    if (['admin', 'moderator', 'candidate'].includes(user.role)) {
+      const profile = await prisma.user_profiles.findUnique({ where: { user_id: user.id } });
+      if (!profile)
+        return errorResponse(res, 'User profile not found', [], 404);
+      name = profile.full_name;
+      id = profile.id;
+    } else if (user.role === 'company') {
+      const company = await prisma.companies.findUnique({ where: { user_id: user.id } });
+      if (!company)
+        return errorResponse(res, 'Company profile not found', [], 404);
+      name = company.company_name;
+      id = company.id;
+    }
 
-    return successResponse(res, 'Login successful', { token, name, role: user.role });
+    return successResponse(res, 'Login successful', { id, token, name, role: user.role });
   } catch (err) {
     return errorResponse(res, 'Login failed', [err.message], 500);
   }
