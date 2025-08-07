@@ -2,6 +2,7 @@ export interface AuthData {
   token: string;
   name: string;
   role: string;
+  id: string;
 }
 
 export const saveAuthData = (data: AuthData) => {
@@ -43,6 +44,11 @@ export const getUserName = (): string | null => {
 export const getUserRole = (): string | null => {
   const authData = getAuthData();
   return authData?.role || null;
+};
+
+export const getUserId = (): string | null => {
+  const authData = getAuthData();
+  return authData?.id || null;
 };
 
 export const isAuthenticated = (): boolean => {
