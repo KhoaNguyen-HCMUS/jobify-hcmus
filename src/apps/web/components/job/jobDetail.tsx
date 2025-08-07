@@ -14,13 +14,15 @@ import {
   Heart,
   Edit,
   Phone,
+  X,
 } from "lucide-react";
-import ApplyJobModal from "../../components/applyJobModal";
+import ApplyJobModal from "./applyJobModal";
 import JobEditModal from "./JobEditModal";
 import CandidateApplication from "./candidateApplication";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Job, updateJob, closeJob, deleteJob } from "../../services/jobs";
-import { useSaveJob } from "../../hooks/useSaveJob";    
+import { useSaveJob } from "../../hooks/useSaveJob";
+import { useCancelApplication } from "../../hooks/useCancelApplication";    
 import { getUserRole } from "../../utils/auth";
 import { CompanyProfile } from "../../services/companyProfile";
 import GoBack from "../goBack";
@@ -48,9 +50,11 @@ export default function JobDetail({ job: propJob, jobDetailData, isHR, isSaved =
   const [hasApplied, setHasApplied] = useState<boolean>(false);
   const [applicationId, setApplicationId] = useState<string | null>(null);
   const { handleSaveJob, handleUnsaveJob, isSaving } = useSaveJob();
+  const { handleCancelApplication, isLoading: isCancelling } = useCancelApplication();
   const userRole = getUserRole();
   const router = useRouter();
   const searchParams = useSearchParams();
+  const isFull = jobDetailData?.job.applications_count === jobDetailData?.job.number_of_openings;
 
   const handleSaveClick = async () => {
     if (!job) return;
@@ -144,7 +148,37 @@ export default function JobDetail({ job: propJob, jobDetailData, isHR, isSaved =
     }
   };
 
-  // Check if user has applied to this job
+  const handleCancelApplicationClick = async () => {
+    if (!job) {
+      toast.error('Job not found');
+      return;
+    }
+
+    if (window.confirm('Are you sure you want to cancel your application?')) {
+      const success = await handleCancelApplication(job.id);
+      if (success) {
+        setHasApplied(false);
+        setApplicationId(null);
+        
+        const newUrl = new URL(window.location.href);
+        newUrl.searchParams.delete('application_id');
+        newUrl.searchParams.delete('from');
+        window.history.replaceState({}, '', newUrl.toString());
+      }
+    }
+  };
+
+  const handleApplySuccess = (applicationId: string) => {
+    setHasApplied(true);
+    setApplicationId(applicationId);
+    
+    // Update URL params
+    const newUrl = new URL(window.location.href);
+    newUrl.searchParams.set('from', 'applied');
+    newUrl.searchParams.set('application_id', applicationId);
+    window.history.replaceState({}, '', newUrl.toString());
+  };
+
   useEffect(() => {
     const checkIfApplied = () => {
       // Check if coming from jobs-applied page
@@ -247,26 +281,44 @@ export default function JobDetail({ job: propJob, jobDetailData, isHR, isSaved =
                 </span>
               </div>
               <div className="flex flex-wrap gap-4">
-                {!isHR ? (
+                {!isHR && (
+                 <button
+                  onClick={hasApplied || isFull ? undefined : () => setIsApplyModalOpen(true)}
+                  disabled={hasApplied || isFull}
+                  className={`px-6 py-2 rounded-full font-semibold text-lg transition-all duration-300 transform ${
+                    hasApplied
+                      ? 'bg-green-600 text-white cursor-not-allowed'
+                      : isFull
+                      ? 'bg-gray-400 text-white cursor-not-allowed'
+                      : 'bg-accent text-background hover:shadow-lg hover:shadow-primary/30 hover:-translate-y-0.5 cursor-pointer'
+                  }`}
+                >
+                  {hasApplied
+                    ? 'Applied ✓'
+                    : isFull
+                    ? 'Full'
+                    : 'Apply now'}
+                </button>
+                )}
+                {!isHR && hasApplied && userRole === 'candidate' && (
                   <button
-                    onClick={hasApplied ? undefined : () => setIsApplyModalOpen(true)}
-                    disabled={hasApplied}
-                    className={`px-6 py-2 rounded-full font-semibold text-lg transition-all duration-300 transform ${
-                      hasApplied 
-                        ? 'bg-green-600 text-white cursor-not-allowed' 
-                        : 'bg-accent text-background hover:shadow-lg hover:shadow-primary/30 hover:-translate-y-0.5 cursor-pointer'
+                    onClick={handleCancelApplicationClick}
+                    disabled={isCancelling}
+                    className={`px-6 py-2 rounded-full font-semibold text-lg transition-all duration-300 hover:shadow-lg hover:shadow-red-500/30 transform hover:-translate-y-0.5 flex items-center gap-2 bg-red-500 text-white hover:bg-red-600 ${
+                      isCancelling ? 'opacity-50 cursor-not-allowed' : ''
                     }`}
                   >
-                    {hasApplied ? 'Applied ✓' : 'Apply now'}
+                    <X size={20} />
+                    Cancel Application
                   </button>
-                ) : (
+                )}
                   <button
                     disabled
                     className="px-6 py-2 bg-accent rounded-full text-background font-semibold text-lg cursor-not-allowed"
                   >
                     Applied: {job.applications_count}/{job.number_of_openings}
                   </button>
-                )}
+                
                 {userRole === 'candidate' && (
                   <button
                     onClick={handleSaveClick}
@@ -370,10 +422,6 @@ export default function JobDetail({ job: propJob, jobDetailData, isHR, isSaved =
                   <p className="text-primary">{job.benefits || 'No benefits specified'}</p>
                 </div>
                 <div>
-                  <h2 className="font-semibold text-accent">Responsibilities</h2>
-                  <p className="text-primary">{job.responsibilities || 'No responsibilities specified'}</p>
-                </div>
-                <div>
                   <h2 className="font-semibold text-accent">Work Place</h2>
                   <p className="text-primary">{job.work_place}</p>
                 </div>
@@ -392,17 +440,23 @@ export default function JobDetail({ job: propJob, jobDetailData, isHR, isSaved =
                     }
                   </p>
                   {!isHR && (
-                    <button
-                      onClick={hasApplied ? undefined : () => setIsApplyModalOpen(true)}
-                      disabled={hasApplied}
-                      className={`mb-4 mt-4 px-6 py-2 rounded-full font-semibold text-lg duration-300 ${
-                        hasApplied 
-                          ? 'bg-green-600 text-white cursor-not-allowed' 
-                          : 'bg-accent text-background hover:shadow-lg hover:shadow-primary/30 cursor-pointer'
-                      }`}
-                    >
-                      {hasApplied ? 'Applied ✓' : 'Apply now'}
-                    </button>
+                     <button
+    onClick={hasApplied || isFull ? undefined : () => setIsApplyModalOpen(true)}
+    disabled={hasApplied || isFull}
+    className={`px-6 py-2 mb-4 mt-4 rounded-full font-semibold text-lg transition-all duration-300 transform ${
+      hasApplied
+        ? 'bg-green-600 text-white cursor-not-allowed'
+        : isFull
+        ? 'bg-gray-400 text-white cursor-not-allowed'
+        : 'bg-accent text-background hover:-translate-y-0.5 cursor-pointer'
+    }`}
+  >
+    {hasApplied
+      ? 'Applied ✓'
+      : isFull
+      ? 'Full'
+      : 'Apply now'}
+  </button>
                   )}
                 </div>
                  
@@ -584,6 +638,7 @@ export default function JobDetail({ job: propJob, jobDetailData, isHR, isSaved =
           jobTitle={job.title} 
           isOpen={isApplyModalOpen} 
           onClose={() => setIsApplyModalOpen(false)} 
+          onApplySuccess={handleApplySuccess}
         />
       )}
 

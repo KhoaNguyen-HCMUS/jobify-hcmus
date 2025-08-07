@@ -12,9 +12,10 @@ import {
 import { getApplicationByCandidate, getApplicationById, Application, ApplicationDetail } from "../../services/applications";
 import { toast } from "react-toastify";
 import { formatISODate, formatISODateTime } from "../../utils/numberUtils";
+import JobStatusBadge from "./jobStatusBadge";
 
 interface CandidateApplicationProps {
-  jobId: string;
+  jobId: string ;
   applicationId?: string | null;
 }
 
@@ -89,7 +90,7 @@ export default function CandidateApplication({ jobId, applicationId }: Candidate
     <div className="p-6 mt-6">
       <div className="space-y-6">
         <div>
-          <p className="text-primary font-medium">Application Status: {applicationDetail.status}</p>
+          <span className="text-primary font-medium">Application Status:</span>  <JobStatusBadge status={applicationDetail.status} />
         </div>
 
         <div>

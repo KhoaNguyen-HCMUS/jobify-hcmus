@@ -86,7 +86,7 @@ export default function JobCard({ job }: JobCardProps) {
             className="w-1/5 h-1/5 object-contain"
           />
           <div>
-            <h3 className="font-bold text-lg text-text line-clamp-1">
+            <h3 className="font-bold text-lg text-primary line-clamp-1">
               {job.title}
             </h3>
             <p className="text-text-80">{job.company_name}</p>

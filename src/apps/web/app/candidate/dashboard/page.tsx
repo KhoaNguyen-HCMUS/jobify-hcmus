@@ -244,12 +244,11 @@ function CandidateDashboardContent() {
               </>
             ) : (
               <div className="text-center py-8">
-                <div className="text-4xl mb-2">📝</div>
                 <h3 className="text-lg font-semibold text-gray-700 mb-2">
                   No applied jobs yet
                 </h3>
                 <p className="text-gray-500 text-sm mb-4">
-                  Start applying to jobs you're interested in
+                Start applying to jobs you're interested in
                 </p>
                 <a
                   href="/jobs"
@@ -303,12 +302,11 @@ function CandidateDashboardContent() {
               </>
             ) : (
               <div className="text-center py-8">
-                <div className="text-4xl mb-2">💼</div>
                 <h3 className="text-lg font-semibold text-gray-700 mb-2">
                   No saved jobs yet
                 </h3>
                 <p className="text-gray-500 text-sm mb-4">
-                  Start saving jobs you're interested in
+                Start saving jobs you're interested in by clicking the heart icon
                 </p>
                 <a
                   href="/jobs"

@@ -187,7 +187,7 @@ function CandidateProfileContent() {
                       <div>
                         <p className="font-semibold text-secondary text-sm">Achievements:</p>
                         <ul className="list-disc list-inside text-sm text-primary-80 ml-2">
-                          {edu.grade && <li>GPA: {edu.grade}</li>}
+                          {edu.grade && <li>Grade: {edu.grade}</li>}
                           {edu.field_of_study && <li>Field of Study: {edu.field_of_study}</li>}
                           {edu.description && (
                             <li>{edu.description}</li>

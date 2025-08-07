@@ -110,9 +110,6 @@ export default function JobPostModal({ isOpen, onClose }: JobPostModalProps) {
         setWorkingTime("Monday - Friday, 8:00 AM - 5:00 PM");
       }
       
-      if (companyProfile.description ) {
-        setJobDescription(`Join our team at ${companyProfile.company_name}`);
-      }
     }
   }, [companyProfile, workPlace, workingTime, jobDescription]);
 
@@ -120,29 +117,16 @@ export default function JobPostModal({ isOpen, onClose }: JobPostModalProps) {
     setSelectedSubIndustry("");
   }, [selectedIndustry]);
 
-  const handleSelect = (
-    item: string,
-    selected: string[],
-    setSelected: React.Dispatch<React.SetStateAction<string[]>>,
-    setInput: React.Dispatch<React.SetStateAction<string>>
-  ) => {
-    if (!selected.includes(item)) {
-      setSelected([...selected, item]);
-    }
-    setInput("");
-  };
 
-  const handleRemove = (
-    item: string,
-    selected: string[],
-    setSelected: React.Dispatch<React.SetStateAction<string[]>>
-  ) => {
-    setSelected(selected.filter((i) => i !== item));
-  };
 
   const handleSubmit = async (status: "draft" | "pending") => {
     if (!title || !deadline || !salaryMin || !salaryMax || !positions || !numberOfRecruits || !formOfWork || !selectedProvince || !selectedDistrict || !experience || !education || !selectedIndustry) {
-      alert("Please fill in all required fields!");
+      toast.error("Please fill in all required fields!");
+      return;
+    }
+
+    if( parseInt(salaryMin.replace(/\D/g, "")) > parseInt(salaryMax.replace(/\D/g, ""))) {
+      toast.error("Salary Min cannot be greater than Salary Max!");
       return;
     }
 
@@ -150,7 +134,7 @@ export default function JobPostModal({ isOpen, onClose }: JobPostModalProps) {
     try {
       const token = getToken();
       if (!token) {
-        alert("Please login again!");
+        toast.error("Please login again!");
         return;
       }
 
