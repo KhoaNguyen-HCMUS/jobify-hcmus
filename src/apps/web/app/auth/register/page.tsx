@@ -20,7 +20,7 @@ export default function RegisterPage() {
               </p>
               <div className="flex justify-center">
                 <a
-                  href="/register/candidate"
+                  href="/auth/register/candidate"
                   className="bg-secondary hover:bg-primary rounded-full text-white py-4 px-8 font-bold transition-colors duration-300 mt-4 cursor-pointer"
                 >
                   Continue
@@ -37,7 +37,7 @@ export default function RegisterPage() {
               </p>
               <div className="flex justify-center">
                 <a
-                  href="/register/company"
+                  href="/auth/register/company"
                   className="bg-secondary hover:bg-primary rounded-full text-white py-4 px-8 font-bold transition-colors duration-300 mt-4 cursor-pointer"
                 >
                   Continue

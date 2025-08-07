@@ -16,7 +16,7 @@ interface ReportsProps {
     timeModeration: string;
   };
 }
-export default function OperatorReportsPage({ reports }: ReportsProps) {
+export default function OperatorReportsPage() {
   const [fromDate, setFromDate] = useState("");
   const [toDate, setToDate] = useState("");
 
@@ -36,6 +36,7 @@ export default function OperatorReportsPage({ reports }: ReportsProps) {
                 value={fromDate}
                 onChange={(e) => setFromDate(e.target.value)}
                 className="bg-neutral-light-20 border border-primary-60 rounded-full px-4"
+                placeholder="Select Date"
               />
               <span className="text-primary-80 pt-2">to</span>
               <input
@@ -43,6 +44,7 @@ export default function OperatorReportsPage({ reports }: ReportsProps) {
                 value={toDate}
                 onChange={(e) => setToDate(e.target.value)}
                 className="bg-neutral-light-20 border border-primary-60 rounded-full px-4"
+                placeholder="Select Date"
               />
               <button className="bg-accent hover:bg-secondary cursor-pointer text-neutral-light-20 px-4 py-1 rounded-full">
                 Filter
@@ -56,6 +58,7 @@ export default function OperatorReportsPage({ reports }: ReportsProps) {
                 value={fromDate}
                 onChange={(e) => setFromDate(e.target.value)}
                 className="bg-neutral-light-20 border border-primary-60 rounded-full px-4"
+                placeholder="Select Date"
               />
               <span className="text-primary-80 pt-2">to</span>
               <input
@@ -63,6 +66,7 @@ export default function OperatorReportsPage({ reports }: ReportsProps) {
                 value={toDate}
                 onChange={(e) => setToDate(e.target.value)}
                 className="bg-neutral-light-20 border border-primary-60 rounded-full px-4"
+                placeholder="Select Date"
               />
               <button className="bg-accent hover:bg-secondary cursor-pointer text-neutral-light-20 px-4 py-1 rounded-full">
                 Filter

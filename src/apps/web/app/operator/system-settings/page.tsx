@@ -191,7 +191,7 @@ const mains = [
   },
 ];
 
-export default function OperatorSystemSettingsPage({ system }: SystemSettings) {
+export default function OperatorSystemSettingsPage() {
   const [open, setOpen] = useState(false);
   const [nextOpen, setNextOpen] = useState<number | null>(null);
 
@@ -201,7 +201,7 @@ export default function OperatorSystemSettingsPage({ system }: SystemSettings) {
   return (
     <div className="w-full min-h-screen bg-neutral-light-60">
       <div className="flex flex-col px-6 lg:px-20 py-10 gap-4">
-        <button
+        <div
           onClick={() => setOpen(!open)}
           className="flex justify-between bg-neutral-light-20 hover:bg-neutral-light font-semibold text-primary px-4 py-1 cursor-pointer rounded-md shadow-md"
         >
@@ -211,7 +211,7 @@ export default function OperatorSystemSettingsPage({ system }: SystemSettings) {
           ) : (
             <ChevronDown className="text-primary" size={24} />
           )}
-        </button>
+        </div>
         {open && (
           <div>
             {mains.map((main) => {
@@ -221,7 +221,7 @@ export default function OperatorSystemSettingsPage({ system }: SystemSettings) {
               return (
                 <div key={main.id} className="flex">
                   <div className="flex-1 flex flex-col justify-between bg-primary my-2 rounded-md mx-4">
-                    <button
+                    <div
                       onClick={() => setNextOpen(isOpen ? null : main.id)}
                       className="flex justify-between items-center cursor-pointer"
                     >
@@ -249,28 +249,28 @@ export default function OperatorSystemSettingsPage({ system }: SystemSettings) {
                           className="text-neutral-light-20 cursor-pointer"
                         />
                       </div>
-                    </button>
+                    </div>
 
                     {isOpen && (
                       <div>
                         {subCategories.length > 0 ? (
                           subCategories.map((item, index) => (
-                            <button
+                            <div
                               key={`${item}-${index}`}
                               className="w-full text-left font-semibold text-primary bg-neutral-light-60 hover:bg-neutral-light cursor-pointer px-8 py-1"
                             >
                               <span>{item}</span>
-                            </button>
+                            </div>
                           ))
                         ) : (
                           <p className="px-4 py-2 text-sm text-neutral-60">
                             No subcategories available.
                           </p>
                         )}
-                        <button className="w-full flex text-left font-semibold text-primary bg-neutral-light-60 hover:bg-neutral-light cursor-pointer px-8 py-1">
+                        <div className="w-full flex text-left font-semibold text-primary bg-neutral-light-60 hover:bg-neutral-light cursor-pointer px-8 py-1">
                           <PlusIcon size={24} />
                           <span>Add</span>
-                        </button>
+                        </div>
                       </div>
                     )}
                   </div>
@@ -278,14 +278,14 @@ export default function OperatorSystemSettingsPage({ system }: SystemSettings) {
                 </div>
               );
             })}
-            <button className="flex items-center px-4 mx-4 rounded-md py-2 mt-2 text-neutral-light-20 bg-primary cursor-pointer">
+            <div className="flex items-center px-4 mx-4 rounded-md py-2 mt-2 text-neutral-light-20 bg-primary cursor-pointer">
               <PlusIcon size={24} />
               <span>Add new</span>
-            </button>
+            </div>
           </div>
         )}
         <div className="flex flex-col gap-4 bg-neutral-light-40 shadow-md rounded-md">
-          <button
+          <div
             onClick={() => setSettingOpen(!settingOpen)}
             className="w-full flex justify-between bg-neutral-light-20 rounded-t-md hover:bg-neutral-light cursor-pointer px-4 py-1"
           >
@@ -297,12 +297,12 @@ export default function OperatorSystemSettingsPage({ system }: SystemSettings) {
             ) : (
               <ChevronDown className="text-primary-80" size={24} />
             )}
-          </button>
+          </div>
           {settingOpen && (
             <div className="flex flex-col space-y-4 font-semibold bg-neutral-light-40 text-primary px-4 pb-4 rounded-b-md">
               <div className="flex justify-between text-center items-center border bg-neutral-light-20 border-primary-40 px-4 py-4">
                 <span>Maintenance Mode</span>
-                <button
+                <div
                   onClick={() => setEnabled(!enabled)}
                   className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors
                             ${enabled ? "bg-accent" : "bg-primary-40"}`}
@@ -311,7 +311,7 @@ export default function OperatorSystemSettingsPage({ system }: SystemSettings) {
                     className={`inline-block h-5 w-5 transform rounded-full bg-neutral-light-20 transition-transform
                               ${enabled ? "translate-x-5" : "translate-x-1"}`}
                   />
-                </button>
+                </div>
               </div>
               <div className="flex justify-between text-center items-center border bg-neutral-light-20 border-primary-40 px-4 py-3">
                 <span>Default Coin Rate</span>
@@ -356,12 +356,12 @@ export default function OperatorSystemSettingsPage({ system }: SystemSettings) {
                 </span>
               </div>
               <div className="flex gap-4">
-                <button className="rounded-full text-primary bg-secondary-40 hover:bg-accent hover:text-neutral-light-20 px-6 py-2 cursor-pointer">
+                <div className="rounded-full text-primary bg-secondary-40 hover:bg-accent hover:text-neutral-light-20 px-6 py-2 cursor-pointer">
                   Cancel
-                </button>
-                <button className="rounded-full text-neutral-light-20 bg-accent hover:bg-secondary-40 hover:text-primary px-6 py-2 cursor-pointer">
+                </div>
+                <div className="rounded-full text-neutral-light-20 bg-accent hover:bg-secondary-40 hover:text-primary px-6 py-2 cursor-pointer">
                   Save
-                </button>
+                </div>
               </div>
             </div>
           )}

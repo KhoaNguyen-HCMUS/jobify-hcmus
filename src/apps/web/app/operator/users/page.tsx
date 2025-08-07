@@ -82,11 +82,7 @@ const apps = Array.from({ length: 30 }, (_, i) => ({
   activityLog: randomItem(activityLogs),
 }));
 
-export default function OperatorUsersPage({
-  recruiter,
-  candidate,
-  moderator,
-}: UsersProps) {
+export default function OperatorUsersPage() {
   return (
     <div className="w-full min-h-screen bg-neutral-light-60">
       <div className="flex flex-col justify-between px-20 py-10 space-y-6">

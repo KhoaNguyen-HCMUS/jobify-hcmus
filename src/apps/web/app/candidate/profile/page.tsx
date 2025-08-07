@@ -1,47 +1,56 @@
-import { MapPin, Briefcase } from "lucide-react";
+"use client";
+import { MapPin, Briefcase, User, Phone, Calendar, VenusAndMars, Globe, Github, Linkedin, Edit, Mail, GraduationCap, Building, Clock, Award } from "lucide-react";
 import PersonalInformation from "../../../components/personalInformation";
 import Skills from "../../../components/skills";
 import Education from "../../../components/education";
 import WorkExperience from "../../../components/workExperience";
+import { getProfile, Profile } from "../../../services/candidateProfile";
+import { useEffect, useState } from "react";
+import { toast } from "react-toastify";
+import ProtectedRoute from "../../../components/ProtectedRoute";
+import { formatDateForDisplay } from "../../../utils/dateUtils";
 
-export default function CandidateProfilePage() {
-  const userData = {
-    fullName: "Hinh Diem Xuan",
-    gender: "Female",
-    email: "hdxuan23@clc.fitus.edu.vn",
-    phone: "0909 123 456",
-    introduce:
-      "Hello, my name is Hinh Diem Xuan, a recent graduate in Software Engineering – IT from University of Science. I have a strong foundation in programming, databases, and web development, with hands-on project experience. I'm passionate about technology, eager to learn, and looking forward to contributing to impactful projects in a professional environment",
-    location: "227 Nguyen Van Cu, district 5, Ho Chi Minh city, Viet Nam",
-    industry: "IT",
-    profession: "IT",
-    github: "hdxuan23@clc.fitus.edu.vn",
-    linkedIn: "Hinh Diem Xuan",
-    website: "www.facebook.com/hdxuan",
+function CandidateProfileContent() {
+  const [profile, setProfile] = useState<Profile | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  const fetchProfile = async () => {
+    try {
+      setLoading(true);
+      const response = await getProfile();
+      if (response.success && response.data?.profile) {
+        setProfile(response.data.profile);
+      } else {
+        toast.error(response.message || 'Failed to load profile');
+      }
+    } catch (error) {
+      toast.error('Error loading profile data');
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const skills = [{ skill: "Python" }, { skill: "C++" }, { skill: "C#" }];
+  useEffect(() => {
+    fetchProfile();
+  }, []);
 
-  const work = [
-    {
-      title: "Software Engineer",
-      company: "Tech Solution Inc.",
-      timeRange: "March 2022 - Present",
-    },
-  ];
+  if (loading) {
+    return (
+      <div className="w-full h-full  min-h-screen bg-neutral-light-60 flex items-center justify-center">
+        <div className="text-primary text-xl">Loading profile...</div>
+      </div>
+    );
+  }
 
-  const edu = [
-    {
-      title: "Software Engineer",
-      institution: "Tech Solution Inc.",
-      timeRange: "March 2022 - Present",
-    },
-    {
-      title: "Software Engineer",
-      institution: "Tech Solution Inc.",
-      timeRange: "March 2022 - Present",
-    },
-  ];
+  if (!profile) {
+    return (
+      <div className="w-full h-full min-h-screen bg-neutral-light-60 flex items-center justify-center">
+        <div className="text-primary text-xl">Profile not found</div>
+      </div>
+    );
+  }
+
+  const skills = profile.skills ? profile.skills.split(',').map(skill => ({ skill: skill.trim() })).filter(skill => skill.skill) : [];
 
   return (
     <div className="w-full h-full bg-neutral-light-60">
@@ -54,33 +63,41 @@ export default function CandidateProfilePage() {
             <div className="flex-1 flex flex-col gap-2">
               <PersonalInformation
                 title="Full Name"
-                inFor={userData.fullName}
+                inFor={profile.full_name}
               />
-              <PersonalInformation title="Email" inFor={userData.email} />
+              <PersonalInformation title="Phone" inFor={profile.phone} />
             </div>
             <div className="flex-1 flex flex-col gap-2">
-              <PersonalInformation title="Gender" inFor={userData.gender} />
+              <PersonalInformation title="Gender" inFor={profile.gender} />
               <PersonalInformation
-                title="Phone Number"
-                inFor={userData.phone}
+                title="Date of Birth"
+                inFor={profile.date_of_birth ? new Date(profile.date_of_birth).toLocaleDateString() : 'Not specified'}
               />
             </div>
           </div>
           <div className="flex flex-col gap-2">
             <b className="text-primary">Introduce yourself:</b>
-            <span className="text-primary-80">{userData.introduce}</span>
+            <span className="text-primary-80">{profile.bio || 'No bio available'}</span>
           </div>
           <div className="flex flex-col gap-2">
             <b className="text-primary">Location detail:</b>
             <div className="flex flex-wrap gap-2 text-primary-80">
               <MapPin className="w-4 h-4" />
-              <span className="flex justify-between">{userData.location}</span>
+              <span className="flex justify-between">{profile.address_detail}, {profile.ward}, {profile.province}</span>
             </div>
           </div>
           <div className="flex flex-wrap">
             <div className="flex-1 flex flex-col gap-2">
-              <PersonalInformation title="Industry" inFor={userData.industry} />
-              <PersonalInformation title="GitHub" inFor={userData.github} />
+              <PersonalInformation title="Industry" inFor={profile.industry} />
+              <a 
+                href={profile.github_url} 
+                target="_blank" 
+                rel="noopener noreferrer"
+                title="Visit GitHub profile"
+                aria-label="Visit GitHub profile"
+              >
+                <PersonalInformation title="GitHub" inFor={profile.github_url} />
+              </a>
               <div className="flex flex-col gap-2">
                 <span className="text-primary text-lg">
                   <b>Skills:</b>
@@ -88,62 +105,124 @@ export default function CandidateProfilePage() {
                 <div className="flex flex-wrap gap-2 items-center text-primary-80 font-semibold">
                   <Briefcase className="w-4 h-4 mr-1" />
                   <div className="flex flex-wrap gap-2 ">
-                    {skills.map((skill, idx) => (
-                      <Skills key={idx} skill={skill.skill} />
-                    ))}
+                    {skills.length > 0 ? (
+                      skills.map((skill, idx) => (
+                        <Skills key={idx} skill={skill.skill} />
+                      ))
+                    ) : (
+                      <span className="text-primary-60">No skills specified</span>
+                    )}
                   </div>
                 </div>
               </div>
             </div>
             <div className="flex-1 flex flex-col gap-2">
-              <PersonalInformation
-                title="Profession"
-                inFor={userData.profession}
-              />
-              <PersonalInformation title="LinkedIn" inFor={userData.linkedIn} />
-              <a href={userData.website}>
+              <PersonalInformation title="Email" inFor={profile.email} />
+
+              <a 
+                href={profile.linkedin_url} 
+                target="_blank" 
+                rel="noopener noreferrer"
+                title="Visit LinkedIn profile"
+                aria-label="Visit LinkedIn profile"
+              >
+                <PersonalInformation title="LinkedIn" inFor={profile.linkedin_url} />
+              </a>
+              <a 
+                href={profile.website}
+                target="_blank" 
+                rel="noopener noreferrer"
+                title="Visit personal website"
+                aria-label="Visit personal website"
+              >
                 <PersonalInformation
-                  title="Person website"
-                  inFor={userData.website}
+                  title="Personal website"
+                  inFor={profile.website}
                 />
               </a>
             </div>
           </div>
-          <div className="flex flex-wrap">
-            <div className="flex-1 flex flex-col gap-2">
-              <b className="text-primary">Work Experience:</b>
-              <div className="flex flex-col gap-2">
-                {work?.map((works, idx) => (
-                  <WorkExperience
-                    key={idx}
-                    title={works.title}
-                    company={works.company}
-                    timeRange={works.timeRange}
-                  />
-                ))}
+          
+          <div className="flex flex-wrap gap-8">
+            <div className="flex-1">
+              <h2 className="text-xl font-bold text-primary mb-4">Work Experience</h2>
+              <div className="space-y-4">
+                {profile.experiences && profile.experiences.length > 0 ? (
+                  profile.experiences.map((exp, idx) => (
+                    <div key={idx} className="mb-4">
+                      <h3 className="font-bold text-primary">{exp.job_title}</h3>
+                      <p className="italic font-bold text-secondary">{exp.company_name}</p>
+                      <p className="text-sm text-accent mb-2">
+                        {exp.start_date ? new Date(exp.start_date).toLocaleDateString('en-US', { month: 'long', year: 'numeric' }) : 'N/A'} - {exp.is_current ? 'Present' : (exp.end_date ? new Date(exp.end_date).toLocaleDateString('en-US', { month: 'long', year: 'numeric' }) : 'N/A')}
+                      </p>
+                      {exp.description && (
+                        <div>
+                          <p className="font-semibold text-primary text-sm">Achievements:</p>
+                          <ul className="list-disc list-inside text-sm text-primary-80 ml-2">
+                            {exp.description.split('\n').map((line, i) => (
+                              <li key={i}>{line.trim()}</li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
+                    </div>
+                  ))
+                ) : (
+                  <p className="text-primary-60">No work experience added yet</p>
+                )}
               </div>
             </div>
-            <div className="flex-1 flex flex-col gap-2">
-              <b className="text-primary">Education:</b>
-              <div className="flex flex-col gap-2">
-                {edu?.map((education, idx) => (
-                  <Education
-                    key={idx}
-                    title={education.title}
-                    institution={education.institution}
-                    timeRange={education.timeRange}
-                  />
-                ))}
+
+            <div className="flex-1">
+              <h2 className="text-xl font-bold text-primary mb-4">Education</h2>
+              <div className="space-y-4">
+                {profile.educations && profile.educations.length > 0 ? (
+                  profile.educations.map((edu, idx) => (
+                    <div key={idx} className="mb-4">
+                      <h3 className="font-bold text-primary">{edu.degree}</h3>
+                      <p className="italic font-bold text-secondary">{edu.institution}</p>
+                      <p className="text-sm text-accent mb-2">
+                        {edu.start_date ? new Date(edu.start_date).toLocaleDateString('en-US', { month: 'short', year: 'numeric' }) : 'N/A'} - {edu.end_date ? new Date(edu.end_date).toLocaleDateString('en-US', { month: 'short', year: 'numeric' }) : 'Present'}
+                      </p>
+                      <div>
+                        <p className="font-semibold text-secondary text-sm">Achievements:</p>
+                        <ul className="list-disc list-inside text-sm text-primary-80 ml-2">
+                          {edu.grade && <li>Grade: {edu.grade}</li>}
+                          {edu.field_of_study && <li>Field of Study: {edu.field_of_study}</li>}
+                          {edu.description && (
+                            <li>{edu.description}</li>
+                          )}
+                        </ul>
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <p className="text-primary-60">No education added yet</p>
+                )}
               </div>
             </div>
           </div>
         </div>
         <div className="flex">
-          <div className="bg-accent hover:bg-secondary cursor-pointer text-neutral-light-20 font-semibold rounded-2xl px-6 py-2">
-            <a href="/candidate/profile/edit">Edit</a>
-          </div>
+          <a 
+            href="/candidate/profile/edit"
+            title="Edit profile"
+            aria-label="Edit profile"
+          >
+            <div className="bg-accent hover:bg-secondary cursor-pointer text-neutral-light-20 font-semibold rounded-2xl px-6 py-2">
+              Edit
+            </div>
+          </a>
         </div>
       </div>
     </div>
+  );
+}
+
+export default function CandidateProfilePage() {
+  return (
+    <ProtectedRoute allowedRoles={['candidate']}>
+      <CandidateProfileContent />
+    </ProtectedRoute>
   );
 }

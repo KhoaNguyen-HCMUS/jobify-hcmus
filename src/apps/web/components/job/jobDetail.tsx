@@ -10,144 +10,222 @@ import {
   MapPin,
   ShieldHalf,
   Users,
-  CircleX,
-  ChevronDown,
-  ChevronUp,
+  ArrowLeft,
+  Heart,
+  Edit,
+  Phone,
   X,
 } from "lucide-react";
-import ApplyJobModal from "../../components/applyJobModal";
-import { useRouter } from "next/navigation";
-import { useParams } from "next/navigation";
-import { jobs } from "../../components/fakeJob";
+import ApplyJobModal from "./applyJobModal";
+import JobEditModal from "./JobEditModal";
+import CandidateApplication from "./candidateApplication";
+import { useRouter, useSearchParams } from "next/navigation";
+import { Job, updateJob, closeJob, deleteJob } from "../../services/jobs";
+import { useSaveJob } from "../../hooks/useSaveJob";
+import { useCancelApplication } from "../../hooks/useCancelApplication";    
+import { getUserRole } from "../../utils/auth";
+import { CompanyProfile } from "../../services/companyProfile";
+import GoBack from "../goBack";
+import { toast } from "react-toastify";
+import { getToken } from "../../utils/auth";
 
-interface JobDetailProps {
-  details?: {
-    title: string;
-    salary: string;
-    location: string;
-    experience: string;
-    deadline: string;
-    current: string;
-    max: string;
-    image: string;
-    companyName: string;
-    scale: string;
-    field: string;
-    jobDescription: string;
-    applicantRequirements: string;
-    benefit: string;
-    right: string;
-    workPlace: string;
-    workingTime: string;
-    applicationInformation: string;
-    rank: string;
-    education: string;
-    numberOfRecruiter: string;
-    formOfWork: string;
-    relatedOccupations: string;
-    requiredSkills: string;
-    area: string;
-  };
-  isHR?: boolean;
+interface JobDetailData {
+  company: CompanyProfile;
+  job: Job;
 }
 
-const related = ["Sales", "Construction", "Python", "Design", "Marketing"];
-const areaList = ["Sales", "Construction", "Python", "Design", "Marketing"];
-const skills = ["Sales", "Construction", "Python", "Design", "Marketing"];
+interface JobDetailProps {
+  job?: Job;
+  jobDetailData?: JobDetailData;
+  isHR?: boolean;
+  isSaved?: boolean;
+}
 
-export default function JobDetail({ details, isHR }: JobDetailProps) {
-  const params = useParams();
-  const id = Array.isArray(params.id) ? params.id[0] : params.id;
-
-  const [job, setJob] = useState<any>(null);
-
-  useEffect(() => {
-    const jobFound = jobs.find((j) => j.id === Number(id));
-    setJob(jobFound ?? null);
-  }, [id]);
-
+export default function JobDetail({ job: propJob, jobDetailData, isHR, isSaved = false }: JobDetailProps) {
+  const [job, setJob] = useState<Job | null>(propJob || jobDetailData?.job || null);
+  const [company, setCompany] = useState<CompanyProfile | null>(jobDetailData?.company || null);
+  const [isSavedState, setIsSavedState] = useState<boolean>(isSaved);
+  const [isApplyModalOpen, setIsApplyModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [hasApplied, setHasApplied] = useState<boolean>(false);
+  const [applicationId, setApplicationId] = useState<string | null>(null);
+  const { handleSaveJob, handleUnsaveJob, isSaving } = useSaveJob();
+  const { handleCancelApplication, isLoading: isCancelling } = useCancelApplication();
+  const userRole = getUserRole();
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const isFull = jobDetailData?.job.applications_count === jobDetailData?.job.number_of_openings;
 
-  const [title, setTitle] = useState(job?.title || "");
-  const [deadline, setDeadline] = useState(job?.deadline || "");
-  const [location, setLocation] = useState(job?.location || "");
-  const [salary, setSalary] = useState(job?.salary || "");
-  const [experience, setExperience] = useState(job?.experience || "");
-  const [rank, setRank] = useState(job?.rank || "");
-  const [education, setEducation] = useState(job?.education || "");
-  const [numberOfRecruits, setNumberOfRecruits] = useState(
-    job?.numberOfRecruiter || ""
-  );
-  const [formOfWork, setFormOfWork] = useState(job?.formOfWork || "");
-  const [relatedOccupations, setRelatedOccupations] = useState(
-    job?.relatedOccupations || ""
-  );
-  const [skill, setSkill] = useState(job?.requiredSkills || "");
-  const [area, setArea] = useState(job?.area || "");
-  const [workingTime, setWorkingTime] = useState(job?.workingTime || "");
-  const [workPlace, setWorkPlace] = useState(job?.workPlace || "");
-  const [jobDescription, setJobDescription] = useState(
-    job?.jobDescription || ""
-  );
-  const [applicantRequirements, setApplicantRequirements] = useState(
-    job?.applicantRequirements || ""
-  );
-  const [benefit, setBenefit] = useState(job?.benefit || "");
-
-  const isHrSafe = isHR ?? false;
-
-  const [isOpen, setIsOpen] = useState(false);
-  const [isOpenNext, setIsOpenNext] = useState(false);
-  const [selectedRelatedOccupations, setSelectedRelatedOccupations] = useState<
-    string[]
-  >([]);
-  const [selectedAreas, setSelectedAreas] = useState<string[]>([]);
-  const [selectedSkills, setSelectedSkills] = useState<string[]>([]);
-
-  const [openRelatedOccupation, setOpenRelatedOccupation] = useState(false);
-  const [openArea, setOpenArea] = useState(false);
-  const [openSkill, setOpenSkill] = useState(false);
-
-  const handleSelect = (
-    item: string,
-    selected: string[],
-    setSelected: React.Dispatch<React.SetStateAction<string[]>>,
-    setInput: React.Dispatch<React.SetStateAction<string>>
-  ) => {
-    if (!selected.includes(item)) {
-      setSelected([...selected, item]);
+  const handleSaveClick = async () => {
+    if (!job) return;
+    
+    let newSavedState: boolean;
+    
+    if (isSavedState) {
+      newSavedState = await handleUnsaveJob(job.id);
+    } else {
+      newSavedState = await handleSaveJob(job.id);
     }
-    setInput("");
+    
+    if (newSavedState !== isSavedState) {
+      setIsSavedState(newSavedState);
+      
+      const newUrl = new URL(window.location.href);
+      if (newSavedState) {
+        newUrl.searchParams.set('saved', 'true');
+      } else {
+        newUrl.searchParams.delete('saved');
+      }
+      window.history.replaceState({}, '', newUrl.toString());
+      
+      if (!newSavedState && isSaved) {
+        const referrer = document.referrer;
+      }
+    }
   };
 
-  // RemoveItem
-  const handleRemove = (
-    item: string,
-    selected: string[],
-    setSelected: React.Dispatch<React.SetStateAction<string[]>>
-  ) => {
-    setSelected(selected.filter((i) => i !== item));
+  const handleEditClick = () => {
+    setIsEditModalOpen(true);
+  };
+
+  const handleJobUpdated = () => {
+    window.location.reload();
+  };
+
+  const handleCloseClick = async () => {
+    if (!job) return;
+    
+    if (window.confirm("Are you sure you want to close this job?")) {
+      try {
+        const token = getToken();
+        if (!token) {
+          toast.error("Please login again!");
+          return;
+        }
+
+        const response = await closeJob(job.id, token);
+        if (response.success) {
+          toast.success("Job closed successfully!");
+          window.location.reload();
+        } else {
+          toast.error("Failed to close job: " + response.message);
+        }
+      } catch (error) {
+        toast.error("Error closing job, please try again later.");
+        console.error("Error closing job:", error);
+      }
+    }
+  };
+
+  const handleDeleteClick = async () => {
+    if (!job) return;
+    
+    if (window.confirm("Are you sure you want to delete this job? This action cannot be undone.")) {
+      try {
+        const token = getToken();
+        if (!token) {
+          toast.error("Please login again!");
+          return;
+        }
+
+        const response = await deleteJob(job.id, token);
+        if (response.success) {
+          toast.success("Job deleted successfully!");
+          router.push("/company/jobs");
+        } else {
+          toast.error("Failed to delete job: " + response.message);
+        }
+      } catch (error) {
+        toast.error("Error deleting job, please try again later.");
+        console.error("Error deleting job:", error);
+      }
+    }
+  };
+
+  const handleViewApplicationsClick = () => {
+    if (job) {
+      router.push(`/company/applications?jobId=${job.id}&jobTitle=${encodeURIComponent(job.title)}`);
+    }
+  };
+
+  const handleCancelApplicationClick = async () => {
+    if (!job) {
+      toast.error('Job not found');
+      return;
+    }
+
+    if (window.confirm('Are you sure you want to cancel your application?')) {
+      const success = await handleCancelApplication(job.id);
+      if (success) {
+        setHasApplied(false);
+        setApplicationId(null);
+        
+        const newUrl = new URL(window.location.href);
+        newUrl.searchParams.delete('application_id');
+        newUrl.searchParams.delete('from');
+        window.history.replaceState({}, '', newUrl.toString());
+      }
+    }
+  };
+
+  const handleApplySuccess = (applicationId: string) => {
+    setHasApplied(true);
+    setApplicationId(applicationId);
+    
+    // Update URL params
+    const newUrl = new URL(window.location.href);
+    newUrl.searchParams.set('from', 'applied');
+    newUrl.searchParams.set('application_id', applicationId);
+    window.history.replaceState({}, '', newUrl.toString());
   };
 
   useEffect(() => {
-    if (isOpen) {
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "auto";
-    }
-
-    return () => {
-      document.body.style.overflow = "auto";
+    const checkIfApplied = () => {
+      // Check if coming from jobs-applied page
+      const fromAppliedJobs = searchParams.get('from') === 'applied';
+      const appId = searchParams.get('application_id');
+      
+      if (fromAppliedJobs) {
+        setHasApplied(true);
+        if (appId) {
+          setApplicationId(appId);
+        }
+      }
     };
-  }, [isOpen]);
+
+    checkIfApplied();
+  }, [searchParams]);
+
+  useEffect(() => {
+    setIsSavedState(isSaved);
+  }, [isSaved]);
+
+  if (!job) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-primary text-xl">Job not found</div>
+      </div>
+    );
+  }
+
+  const salaryText = job.is_salary_negotiable 
+    ? 'Negotiable' 
+    : `${parseInt(job.salary_min).toLocaleString()} - ${parseInt(job.salary_max).toLocaleString()}`;
+
+  const deadlineDate = job.deadline ? new Date(job.deadline).toLocaleDateString() : 'Not specified';
 
   return (
-    <div className="flex flex-col gap-8">
+    <div className="bg-neutral-light-40 min-h-screen">
+      <div className="flex flex-col mx-6 my-4">
+        <GoBack />
+        
+      </div>
+
       <div className="flex flex-wrap gap-8 px-6">
         <div className="flex-2 space-y-4">
           <div className="flex flex-col justify-between bg-neutral-light-20 shadow-xl rounded-3xl space-y-4 p-6">
             <div className="text-primary font-semibold text-2xl">
-              {job?.title}
+              {job.title}
             </div>
             <div className="flex flex-wrap gap-4 justify-between">
               <div className="flex items-center gap-2">
@@ -160,7 +238,7 @@ export default function JobDetail({ details, isHR }: JobDetailProps) {
                     Salary
                   </div>
                   <div className="text-primary-80 font-semibold">
-                    {job?.salary}
+                    {salaryText}
                   </div>
                 </div>
               </div>
@@ -174,7 +252,7 @@ export default function JobDetail({ details, isHR }: JobDetailProps) {
                     Location
                   </div>
                   <div className="text-primary-80 font-semibold">
-                    {job?.location}
+                    {job.province}, {job.ward}
                   </div>
                 </div>
               </div>
@@ -188,7 +266,7 @@ export default function JobDetail({ details, isHR }: JobDetailProps) {
                     Experience
                   </div>
                   <div className="text-primary-80 font-semibold">
-                    {job?.experience}
+                    {job.experience_level}
                   </div>
                 </div>
               </div>
@@ -199,65 +277,120 @@ export default function JobDetail({ details, isHR }: JobDetailProps) {
                   <Clock size={24} />
                 </div>
                 <span className="w-full pl-10 pr-4 py-2 text-lg font-semibold rounded-xl text-primary-80 ">
-                  Deadline: {job?.deadline}
+                  Deadline: {deadlineDate}
                 </span>
               </div>
               <div className="flex flex-wrap gap-4">
-                {!isHrSafe ? (
-                  <ApplyJobModal />
-                ) : (
+                {!isHR && (
+                 <button
+                  onClick={hasApplied || isFull ? undefined : () => setIsApplyModalOpen(true)}
+                  disabled={hasApplied || isFull}
+                  className={`px-6 py-2 rounded-full font-semibold text-lg transition-all duration-300 transform ${
+                    hasApplied
+                      ? 'bg-green-600 text-white cursor-not-allowed'
+                      : isFull
+                      ? 'bg-gray-400 text-white cursor-not-allowed'
+                      : 'bg-accent text-background hover:shadow-lg hover:shadow-primary/30 hover:-translate-y-0.5 cursor-pointer'
+                  }`}
+                >
+                  {hasApplied
+                    ? 'Applied ✓'
+                    : isFull
+                    ? 'Full'
+                    : 'Apply now'}
+                </button>
+                )}
+                {!isHR && hasApplied && userRole === 'candidate' && (
+                  <button
+                    onClick={handleCancelApplicationClick}
+                    disabled={isCancelling}
+                    className={`px-6 py-2 rounded-full font-semibold text-lg transition-all duration-300 hover:shadow-lg hover:shadow-red-500/30 transform hover:-translate-y-0.5 flex items-center gap-2 bg-red-500 text-white hover:bg-red-600 ${
+                      isCancelling ? 'opacity-50 cursor-not-allowed' : ''
+                    }`}
+                  >
+                    <X size={20} />
+                    Cancel Application
+                  </button>
+                )}
                   <button
                     disabled
                     className="px-6 py-2 bg-accent rounded-full text-background font-semibold text-lg cursor-not-allowed"
                   >
-                    Applied: {job?.current}/{job?.max}
+                    Applied: {job.applications_count}/{job.number_of_openings}
+                  </button>
+                
+                {userRole === 'candidate' && (
+                  <button
+                    onClick={handleSaveClick}
+                    disabled={isSaving}
+                    className={`px-6 py-2 rounded-full font-semibold text-lg transition-all duration-300 hover:shadow-lg hover:shadow-primary/30 transform hover:-translate-y-0.5 flex items-center gap-2 ${
+                      isSavedState 
+                        ? 'bg-red-500 text-white hover:bg-red-600' 
+                        : 'bg-accent text-background hover:bg-accent/90'
+                    } ${isSaving ? 'opacity-50 cursor-not-allowed' : ''}`}
+                  >
+                    <Heart 
+                      size={20} 
+                      className={isSavedState ? 'fill-white' : ''}
+                    />
+                    {isSavedState ? 'Saved' : 'Save'}
                   </button>
                 )}
-                <a
-                  href="/save"
-                  className="px-6 py-2 bg-accent rounded-full text-background font-semibold text-lg transition-all duration-300 hover:shadow-lg hover:shadow-primary/30 transform hover:-translate-y-0.5"
-                >
-                  Save
-                </a>
               </div>
             </div>
           </div>
         </div>
+
         <div className="flex-1 space-y-4">
           <div className="flex flex-col justify-between bg-neutral-light-20 shadow-xl rounded-3xl space-y-4 p-6">
             <div className="flex px-2">
               <img
-                src={job?.image}
-                alt={job?.companyName}
-                className="border-1 rounded-xs"
+                src={company?.logo_url || "/logo.png"}
+                alt="Company"
+                className="border-1 rounded-xs w-16 h-16 object-contain"
               />
-              <div className="text-primary">{job?.companyName}</div>
+              <div className="text-primary ml-4">{company?.company_name || "Company Name"}</div>
             </div>
             <div className="px-4 space-y-3">
-              <div className="flex gap-10">
-                <div className="flex gap-4">
-                  <Users size={24} className="text-primary" />
-                  <span className="text-primary font-semibold">Scale: </span>
+              {company?.size && (
+                <div className="flex gap-10">
+                  <div className="flex gap-4">
+                    <Users size={24} className="text-primary" />
+                    <span className="text-primary font-semibold">Scale: </span>
+                  </div>
+                  <span className="text-primary-80">{company.size}</span>
                 </div>
-                <span className="text-primary-80">{job?.scale}</span>
-              </div>
-              <div className="flex gap-10">
-                <div className="flex gap-2">
-                  <BriefcaseBusiness size={24} className="text-primary" />
-                  <span className="text-primary font-semibold">Field: </span>
+              )}
+              {company?.industry && (
+                <div className="flex gap-10">
+                  <div className="flex gap-2">
+                    <BriefcaseBusiness size={24} className="text-primary" />
+                    <span className="text-primary font-semibold">Field: </span>
+                  </div>
+                  <span className="text-primary-80">{company.industry}</span>
                 </div>
-                <span className="text-primary-80">{job?.field}</span>
-              </div>
-              <div className="flex gap-3">
-                <div className="flex gap-2">
-                  <MapPin size={24} className="text-primary" />
-                  <span className="text-primary font-semibold">Location: </span>
+              )}
+              {company?.address && (
+                <div className="flex gap-3">
+                  <div className="flex gap-2">
+                    <MapPin size={24} className="text-primary" />
+                    <span className="text-primary font-semibold">Address: </span>
+                  </div>
+                  <span className="text-primary-80">{company.address}</span>
                 </div>
-                <span className="text-primary-80">{job?.location}</span>
-              </div>
+              )}
+              {company?.phone_number && (
+                <div className="flex gap-3">
+                  <div className="flex gap-2">
+                    <Phone size={24} className="text-primary" />
+                    <span className="text-primary font-semibold">Phone: </span>
+                  </div>
+                  <span className="text-primary-80">{company.phone_number}</span>
+                </div>
+              )}
             </div>
             <div className="flex space-x-1 text-accent font-semibold justify-center">
-              <a href="/company" className="flex gap-2">
+              <a href={`/company-detail/${company?.id}`} className="flex gap-2">
                 <p>View company page </p>
                 <FileStack />
               </a>
@@ -265,6 +398,7 @@ export default function JobDetail({ details, isHR }: JobDetailProps) {
           </div>
         </div>
       </div>
+
       <div className="flex flex-wrap gap-6 px-6">
         <div className="flex-2 space-y-4">
           <div className="bg-neutral-light-20 shadow-xl rounded-3xl space-y-4">
@@ -275,47 +409,62 @@ export default function JobDetail({ details, isHR }: JobDetailProps) {
               <div className="flex flex-col justify-between px-6 space-y-4 mt-4">
                 <div className="">
                   <h2 className="font-semibold text-accent">Job Description</h2>
-                  <p className="text-primary">{job?.jobDescription}</p>
+                  <p className="text-primary">{job.description || 'No description available'}</p>
                 </div>
                 <div>
                   <h2 className="font-semibold text-accent">
                     Applicant Requirements
                   </h2>
-                  <p className="text-primary">{job?.applicantRequirements}</p>
+                  <p className="text-primary">{job.requirements || 'No requirements specified'}</p>
                 </div>
                 <div>
-                  <h2 className="font-semibold text-accent">Benefit</h2>
-                  <p className="text-primary">{job?.benefit}</p>
-                </div>
-                <div>
-                  <h2 className="font-semibold text-accent">Right</h2>
-                  <p className="text-primary">{job?.right}</p>
+                  <h2 className="font-semibold text-accent">Benefits</h2>
+                  <p className="text-primary">{job.benefits || 'No benefits specified'}</p>
                 </div>
                 <div>
                   <h2 className="font-semibold text-accent">Work Place</h2>
-                  <p className="text-primary">{job?.workPlace}</p>
+                  <p className="text-primary">{job.work_place}</p>
                 </div>
                 <div>
                   <h2 className="font-semibold text-accent">Working Time</h2>
-                  <p className="text-primary">{job?.workingTime}</p>
+                  <p className="text-primary">{job.working_hours || 'Not specified'}</p>
                 </div>
                 <div>
-                  <h2 className="font-semibold text-accent">Apply now!</h2>
-                  <p className="text-primary">{job?.applicationInformation}</p>
+                  <h2 className="font-semibold text-accent">
+                    {hasApplied ? 'Application Status' : 'Apply now!'}
+                  </h2>
+                  <p className="text-primary">
+                    {hasApplied 
+                      ? 'You have already applied for this position.' 
+                      : 'Click the Apply button above to submit your application.'
+                    }
+                  </p>
+                  {!isHR && (
+                     <button
+    onClick={hasApplied || isFull ? undefined : () => setIsApplyModalOpen(true)}
+    disabled={hasApplied || isFull}
+    className={`px-6 py-2 mb-4 mt-4 rounded-full font-semibold text-lg transition-all duration-300 transform ${
+      hasApplied
+        ? 'bg-green-600 text-white cursor-not-allowed'
+        : isFull
+        ? 'bg-gray-400 text-white cursor-not-allowed'
+        : 'bg-accent text-background hover:-translate-y-0.5 cursor-pointer'
+    }`}
+  >
+    {hasApplied
+      ? 'Applied ✓'
+      : isFull
+      ? 'Full'
+      : 'Apply now'}
+  </button>
+                  )}
                 </div>
-              </div>
-              <div>
-                {!isHrSafe ? (
-                  <div className="m-4">
-                    <ApplyJobModal />
-                  </div>
-                ) : (
-                  <button></button>
-                )}
-              </div>
+                 
+               </div>
             </div>
           </div>
         </div>
+
         <div className="flex-1 space-y-4">
           <div className="flex flex-col justify-between rounded-xl p-4 space-y-4">
             <div className="bg-neutral-light-20 shadow-xl rounded-3xl space-y-4">
@@ -331,9 +480,9 @@ export default function JobDetail({ details, isHR }: JobDetailProps) {
                     />
                     <div className="flex flex-col justify-between">
                       <span className="text-secondary font-semibold">
-                        Ranks
+                        Position
                       </span>
-                      <span className="text-secondary-80">{job?.rank}</span>
+                      <span className="text-secondary-80">{job.position}</span>
                     </div>
                   </div>
                   <div className="flex px-4 gap-4">
@@ -346,7 +495,7 @@ export default function JobDetail({ details, isHR }: JobDetailProps) {
                         Education
                       </span>
                       <span className="text-secondary-80">
-                        {job?.education}
+                        {job.education_level}
                       </span>
                     </div>
                   </div>
@@ -357,10 +506,10 @@ export default function JobDetail({ details, isHR }: JobDetailProps) {
                     />
                     <div className="flex flex-col justify-between">
                       <span className="text-secondary font-semibold">
-                        Number of recruits
+                        Number of openings
                       </span>
                       <span className="text-secondary-80">
-                        {job?.numberOfRecruiter}
+                        {job.number_of_openings}
                       </span>
                     </div>
                   </div>
@@ -371,10 +520,10 @@ export default function JobDetail({ details, isHR }: JobDetailProps) {
                     />
                     <div className="flex flex-col">
                       <span className="text-secondary font-semibold">
-                        Form of work
+                        Job type
                       </span>
                       <span className="text-secondary-80">
-                        {job?.formOfWork}
+                        {job.job_type}
                       </span>
                     </div>
                   </div>
@@ -382,6 +531,7 @@ export default function JobDetail({ details, isHR }: JobDetailProps) {
               </div>
             </div>
           </div>
+
           <div className="flex flex-col justify-between rounded-xl p-4 space-y-4">
             <div className="bg-neutral-light-20 shadow-xl rounded-3xl space-y-4">
               <div className="flex flex-col justify-between">
@@ -391,669 +541,120 @@ export default function JobDetail({ details, isHR }: JobDetailProps) {
                 <div className="flex flex-col space-y-4 mx-6 my-6">
                   <div className="flex flex-col space-y-2">
                     <span className="font-semibold text-xl text-accent">
-                      Related occupations
+                      Experience Level
                     </span>
                     <div className="grid grid-cols-2 gap-4 p-2">
                       <span className="bg-highlight-40 rounded-full px-4 py-2 text-center text-primary font-semibold">
-                        {job?.relatedOccupations}
+                        {job.experience_level}
                       </span>
                     </div>
                   </div>
                   <div className="flex flex-col space-y-2">
                     <span className="font-semibold text-xl text-accent">
-                      Required Skills
+                      Job Type
                     </span>
                     <div className="grid grid-cols-2 gap-4 p-2">
                       <span className="bg-highlight-40 rounded-full px-4 py-2 text-center text-primary font-semibold">
-                        {job?.requiredSkills}
+                        {job.job_type}
                       </span>
                     </div>
                   </div>
                   <div className="flex flex-col space-y-2">
                     <span className="font-semibold text-xl text-accent">
-                      Area
+                      Location
                     </span>
                     <div className="grid grid-cols-2 gap-4 p-2">
                       <span className="bg-highlight-40 rounded-full px-4 py-2 text-center text-primary font-semibold">
-                        {job?.area}
+                        {job.province}
                       </span>
                     </div>
                   </div>
+                  {job.skills && (
+                    <div className="flex flex-col space-y-2">
+                      <span className="font-semibold text-xl text-accent">
+                        Skills
+                      </span>
+                      <div className="flex flex-wrap gap-2 p-2">
+                        {job.skills.split(',').map((skill, index) => (
+                          <span 
+                            key={index}
+                            className="bg-highlight-40 rounded-full px-4 py-2 text-center text-primary font-semibold"
+                          >
+                            {skill.trim()}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
           </div>
         </div>
       </div>
-      {!isHrSafe ? (
-        <div></div>
-      ) : (
-        <div className="flex flex-col gap-4 mx-6 my-4 font-semibold">
+
+      {isHR && (
+        <div className="flex flex-col gap-6 mx-6 my-4">
           <div className="flex gap-2 items-center">
-            <span className="text-primary-80 ">Status:</span>
+            <span className="text-primary-80 font-semibold">Status:</span>
             <button className="bg-accent hover:bg-secondary text-neutral-light-20 px-6 py-2 rounded-full cursor-pointer">
-              Active
+              {job.status}
             </button>
           </div>
+          
           <div className="flex gap-4">
-            <button
-              onClick={() => {
-                setIsOpen(true);
-                setIsOpenNext(false);
-              }}
-              className="bg-secondary-60 hover:bg-secondary text-background px-6 py-2 rounded-full cursor-pointer"
+            <button 
+              onClick={handleEditClick}
+              className="bg-gray-500 hover:bg-gray-600 text-white px-6 py-2 rounded-full cursor-pointer"
             >
               Edit
             </button>
-            {isOpen && (
-              <div
-                onClick={() => {
-                  if (!isOpenNext) setIsOpen(false);
-                }}
-                className="fixed inset-0 bg-primary-80 z-50 flex items-center justify-center"
-              >
-                <div
-                  onClick={(e) => e.stopPropagation()}
-                  className="w-3/5 max-h-[90vh] overflow-y-auto bg-neutral-light-40 rounded-2xl relative"
-                >
-                  <div className="flex flex-col gap-2">
-                    <div className="flex justify-between bg-primary rounded-t-2xl gap-4 pl-4 pr-4 py-2">
-                      <span className="text-neutral-light-20 text-2xl font-bold">
-                        Job post
-                      </span>
-                      <div className="px-4">
-                        <CircleX
-                          size={32}
-                          onClick={() => setIsOpen(false)}
-                          className="absolute right-3 text-secondary-40 cursor-pointer"
-                        />
-                      </div>
-                    </div>
-                    <div className="px-4 pb-4">
-                      <div className="flex flex-col rounded-b-2xl gap-2">
-                        <div className="flex flex-col">
-                          <label
-                            htmlFor="title"
-                            className="block text-sm font-bold text-primary"
-                          >
-                            Title*:
-                          </label>
-                          <div className="relative">
-                            <input
-                              id="title"
-                              type="text"
-                              value={title}
-                              onChange={(e) => setTitle(e.target.value)}
-                              placeholder="Enter name"
-                              className="w-full border border-primary-80 pl-4 pr-4 py-2 bg-neutral-light-20 rounded-xl text-primary-80 outline-none focus:ring-1 focus:bg-white transition-all duration-300"
-                              required
-                            />
-                          </div>
-                        </div>
-                        <div className="w-full flex flex-wrap gap-x-10 gap-y-2">
-                          <div className="flex-1 flex flex-col gap-2">
-                            <div className="flex flex-col">
-                              <label
-                                htmlFor="deadline"
-                                className="block text-sm font-bold text-primary"
-                              >
-                                Deadline*:
-                              </label>
-                              <div className="relative">
-                                <input
-                                  id="deadline"
-                                  type="date"
-                                  value={deadline}
-                                  onChange={(e) => setDeadline(e.target.value)}
-                                  placeholder="dd/mm/yyyy"
-                                  className="w-full border border-primary-80 pl-4 pr-4 py-2 bg-neutral-light-20 rounded-xl text-primary-80 outline-none focus:ring-1 focus:bg-white transition-all duration-300"
-                                  required
-                                />
-                              </div>
-                            </div>
-                            <div className="flex flex-col">
-                              <label
-                                htmlFor="salary"
-                                className="block text-sm font-bold text-primary"
-                              >
-                                Salary*:
-                              </label>
-                              <div className="relative">
-                                <input
-                                  id="salary"
-                                  type="text"
-                                  value={salary}
-                                  onChange={(e) => setSalary(e.target.value)}
-                                  placeholder="Enter salary"
-                                  className="w-full border border-primary-80 pl-4 pr-4 py-2 bg-neutral-light-20 rounded-xl text-primary-80 outline-none focus:ring-1 focus:bg-white transition-all duration-300"
-                                  required
-                                />
-                              </div>
-                            </div>
-                            <div className="flex flex-col">
-                              <label
-                                htmlFor="rank"
-                                className="block text-sm font-bold text-primary"
-                              >
-                                Ranks*:
-                              </label>
-                              <div className="relative">
-                                <input
-                                  id="rank"
-                                  type="text"
-                                  value={rank}
-                                  onChange={(e) => setRank(e.target.value)}
-                                  placeholder="Enter ranks"
-                                  className="w-full border border-primary-80 pl-4 pr-4 py-2 bg-neutral-light-20 rounded-xl text-primary-80 outline-none focus:ring-1 focus:bg-white transition-all duration-300"
-                                  required
-                                />
-                              </div>
-                            </div>
-                            <div className="flex flex-col">
-                              <label
-                                htmlFor="numberOfRecruits"
-                                className="block text-sm font-bold text-primary"
-                              >
-                                Number of recruits*:
-                              </label>
-                              <div className="relative">
-                                <input
-                                  id="numberOfRecruits"
-                                  type="text"
-                                  value={numberOfRecruits}
-                                  onChange={(e) =>
-                                    setNumberOfRecruits(e.target.value)
-                                  }
-                                  placeholder="Enter number of recruits"
-                                  className="w-full border border-primary-80 pl-4 pr-4 py-2 bg-neutral-light-20 rounded-xl text-primary-80 outline-none focus:ring-1 focus:bg-white transition-all duration-300"
-                                  required
-                                />
-                              </div>
-                            </div>
-                            <div className="flex flex-col w-full max-w-2xl">
-                              <label className="mb-1 text-sm font-bold text-primary">
-                                Related Occupation:
-                              </label>
-                              <div className="relative w-full border border-primary-80 bg-neutral-light-20 rounded-xl p-2">
-                                {/* Selected */}
-                                <div className="flex flex-wrap gap-2 mb-2">
-                                  {selectedRelatedOccupations.map(
-                                    (item, index) => (
-                                      <span
-                                        key={index}
-                                        className="px-4 py-1 bg-neutral-medium-60 text-secondary font-semibold rounded-full text-sm flex items-center gap-2"
-                                      >
-                                        {item}
-                                        <button
-                                          onClick={() =>
-                                            handleRemove(
-                                              item,
-                                              selectedRelatedOccupations,
-                                              setSelectedRelatedOccupations
-                                            )
-                                          }
-                                        >
-                                          <X size={18} />
-                                        </button>
-                                      </span>
-                                    )
-                                  )}
-                                </div>
-                                {/* Input */}
-                                <div className="relative">
-                                  <input
-                                    type="text"
-                                    value={relatedOccupations}
-                                    onChange={(e) =>
-                                      setRelatedOccupations(e.target.value)
-                                    }
-                                    placeholder="Add related occupation"
-                                    className="w-full pl-2 pb-2 bg-neutral-light-20 rounded-xl text-primary-80 outline-none"
-                                    onFocus={() =>
-                                      setOpenRelatedOccupation(true)
-                                    }
-                                  />
-                                  <button
-                                    type="button"
-                                    onClick={() =>
-                                      setOpenRelatedOccupation(
-                                        !openRelatedOccupation
-                                      )
-                                    }
-                                    className="absolute right-3 top-1/2 -translate-y-1/2 text-primary"
-                                  >
-                                    {openRelatedOccupation ? (
-                                      <ChevronUp size={20} />
-                                    ) : (
-                                      <ChevronDown size={20} />
-                                    )}
-                                  </button>
-                                </div>
-                                {/* Dropdown */}
-                                {openRelatedOccupation && (
-                                  <div className="absolute left-0 top-full mt-2 w-full border border-primary-80 rounded-xl bg-neutral-light-20 shadow-lg p-2 z-10 max-h-40 overflow-y-auto">
-                                    <div className="flex flex-wrap gap-2">
-                                      {related
-                                        .filter((item) =>
-                                          item
-                                            .toLowerCase()
-                                            .includes(
-                                              relatedOccupations.toLowerCase()
-                                            )
-                                        )
-                                        .map((item, index) => (
-                                          <span
-                                            key={index}
-                                            onClick={() =>
-                                              handleSelect(
-                                                item,
-                                                selectedRelatedOccupations,
-                                                setSelectedRelatedOccupations,
-                                                setRelatedOccupations
-                                              )
-                                            }
-                                            className="px-4 py-1 bg-neutral-medium-60 text-secondary font-semibold rounded-full text-sm cursor-pointer hover:bg-neutral-medium"
-                                          >
-                                            {item}
-                                          </span>
-                                        ))}
-                                    </div>
-                                  </div>
-                                )}
-                              </div>
-                            </div>
-                            <div className="flex flex-col w-full max-w-2xl">
-                              <label className="mb-1 text-sm font-bold text-primary">
-                                Area:
-                              </label>
-                              <div className="relative w-full border border-primary-80 bg-neutral-light-20 rounded-xl p-2">
-                                {/* Selected */}
-                                <div className="flex flex-wrap gap-2 mb-2">
-                                  {selectedAreas.map((item, index) => (
-                                    <span
-                                      key={index}
-                                      className="px-4 py-1 bg-neutral-medium-60 text-secondary font-semibold rounded-full text-sm flex items-center gap-2"
-                                    >
-                                      {item}
-                                      <button
-                                        onClick={() =>
-                                          handleRemove(
-                                            item,
-                                            selectedAreas,
-                                            setSelectedAreas
-                                          )
-                                        }
-                                      >
-                                        <X size={18} />
-                                      </button>
-                                    </span>
-                                  ))}
-                                </div>
-                                {/* Input */}
-                                <div className="relative">
-                                  <input
-                                    type="text"
-                                    value={area}
-                                    onChange={(e) => setArea(e.target.value)}
-                                    placeholder="Add area"
-                                    className="w-full pl-2 pb-2 bg-neutral-light-20 rounded-xl text-primary-80 outline-none"
-                                    onFocus={() => setOpenArea(true)}
-                                  />
-                                  <button
-                                    type="button"
-                                    onClick={() => setOpenArea(!openArea)}
-                                    className="absolute right-3 top-1/2 -translate-y-1/2 text-primary"
-                                  >
-                                    {openArea ? (
-                                      <ChevronUp size={20} />
-                                    ) : (
-                                      <ChevronDown size={20} />
-                                    )}
-                                  </button>
-                                </div>
-                                {/* Dropdown */}
-                                {openArea && (
-                                  <div className="absolute left-0 top-full mt-2 w-full border border-primary-80 rounded-xl bg-neutral-light-20 shadow-lg p-2 z-10 max-h-40 overflow-y-auto">
-                                    <div className="flex flex-wrap gap-2">
-                                      {areaList
-                                        .filter((item) =>
-                                          item
-                                            .toLowerCase()
-                                            .includes(area.toLowerCase())
-                                        )
-                                        .map((item, index) => (
-                                          <span
-                                            key={index}
-                                            onClick={() =>
-                                              handleSelect(
-                                                item,
-                                                selectedAreas,
-                                                setSelectedAreas,
-                                                setArea
-                                              )
-                                            }
-                                            className="px-4 py-1 bg-neutral-medium-60 text-secondary font-semibold rounded-full text-sm cursor-pointer hover:bg-neutral-medium"
-                                          >
-                                            {item}
-                                          </span>
-                                        ))}
-                                    </div>
-                                  </div>
-                                )}
-                              </div>
-                            </div>
-                          </div>
-                          <div className="flex-1 flex flex-col gap-2">
-                            <div className="flex flex-col">
-                              <label
-                                htmlFor="location"
-                                className="block text-sm font-bold text-primary"
-                              >
-                                Location:
-                              </label>
-                              <div className="relative">
-                                <input
-                                  id="location"
-                                  type="text"
-                                  value={location}
-                                  onChange={(e) => setLocation(e.target.value)}
-                                  placeholder="Enter location"
-                                  className="w-full border border-primary-80 pl-4 pr-4 py-2 bg-neutral-light-20 rounded-xl text-primary-80 outline-none focus:ring-1 focus:bg-white transition-all duration-300"
-                                />
-                              </div>
-                            </div>
-                            <div className="flex flex-col">
-                              <label
-                                htmlFor="experience"
-                                className="block text-sm font-bold text-primary"
-                              >
-                                Experience:
-                              </label>
-                              <div className="relative">
-                                <input
-                                  id="experience"
-                                  type="text"
-                                  value={experience}
-                                  onChange={(e) =>
-                                    setExperience(e.target.value)
-                                  }
-                                  placeholder="Enter experience"
-                                  className="w-full border border-primary-80 pl-4 pr-4 py-2 bg-neutral-light-20 rounded-xl text-primary-80 outline-none focus:ring-1 focus:bg-white transition-all duration-300"
-                                />
-                              </div>
-                            </div>
-                            <div className="flex flex-col">
-                              <label
-                                htmlFor="education"
-                                className="block text-sm font-bold text-primary"
-                              >
-                                Education:
-                              </label>
-                              <div className="relative">
-                                <input
-                                  id="education"
-                                  type="text"
-                                  value={education}
-                                  onChange={(e) => setEducation(e.target.value)}
-                                  placeholder="Enter education"
-                                  className="w-full border border-primary-80 pl-4 pr-4 py-2 bg-neutral-light-20 rounded-xl text-primary-80 outline-none focus:ring-1 focus:bg-white transition-all duration-300"
-                                />
-                              </div>
-                            </div>
-                            <div className="flex flex-col">
-                              <label
-                                htmlFor="formOfWork"
-                                className="block text-sm font-bold text-primary"
-                              >
-                                Form of work*:
-                              </label>
-                              <div className="relative">
-                                <input
-                                  id="formOfWork"
-                                  type="text"
-                                  value={formOfWork}
-                                  onChange={(e) =>
-                                    setFormOfWork(e.target.value)
-                                  }
-                                  placeholder="Enter form of work"
-                                  className="w-full border border-primary-80 pl-4 pr-4 py-2 bg-neutral-light-20 rounded-xl text-primary-80 outline-none focus:ring-1 focus:bg-white transition-all duration-300"
-                                  required
-                                />
-                              </div>
-                            </div>
-                            <div className="flex flex-col w-full max-w-2xl">
-                              <label className="mb-1 text-sm font-bold text-primary">
-                                Skills:
-                              </label>
-                              <div className="relative w-full border border-primary-80 bg-neutral-light-20 rounded-xl p-2">
-                                {/* Selected */}
-                                <div className="flex flex-wrap gap-2 mb-2">
-                                  {selectedSkills.map((item, index) => (
-                                    <span
-                                      key={index}
-                                      className="px-4 py-1 bg-neutral-medium-60 text-secondary font-semibold rounded-full text-sm flex items-center gap-2"
-                                    >
-                                      {item}
-                                      <button
-                                        onClick={() =>
-                                          handleRemove(
-                                            item,
-                                            selectedSkills,
-                                            setSelectedSkills
-                                          )
-                                        }
-                                      >
-                                        <X size={18} />
-                                      </button>
-                                    </span>
-                                  ))}
-                                </div>
-                                {/* Input */}
-                                <div className="relative">
-                                  <input
-                                    type="text"
-                                    value={skill}
-                                    onChange={(e) => setSkill(e.target.value)}
-                                    placeholder="Add skills"
-                                    className="w-full pl-2 pb-2 bg-neutral-light-20 rounded-xl text-primary-80 outline-none"
-                                    onFocus={() => setOpenSkill(true)}
-                                  />
-                                  <button
-                                    type="button"
-                                    onClick={() => setOpenSkill(!openSkill)}
-                                    className="absolute right-3 top-1/2 -translate-y-1/2 text-primary"
-                                  >
-                                    {openSkill ? (
-                                      <ChevronUp size={20} />
-                                    ) : (
-                                      <ChevronDown size={20} />
-                                    )}
-                                  </button>
-                                </div>
-                                {/* Dropdown */}
-                                {openSkill && (
-                                  <div className="absolute left-0 top-full mt-2 w-full border border-primary-80 rounded-xl bg-neutral-light-20 shadow-lg p-2 z-10 max-h-40 overflow-y-auto">
-                                    <div className="flex flex-wrap gap-2">
-                                      {skills
-                                        .filter((item) =>
-                                          item
-                                            .toLowerCase()
-                                            .includes(skill.toLowerCase())
-                                        )
-                                        .map((item, index) => (
-                                          <span
-                                            key={index}
-                                            onClick={() =>
-                                              handleSelect(
-                                                item,
-                                                selectedSkills,
-                                                setSelectedSkills,
-                                                setSkill
-                                              )
-                                            }
-                                            className="px-4 py-1 bg-neutral-medium-60 text-secondary font-semibold rounded-full text-sm cursor-pointer hover:bg-neutral-medium"
-                                          >
-                                            {item}
-                                          </span>
-                                        ))}
-                                    </div>
-                                  </div>
-                                )}
-                              </div>
-                            </div>
-
-                            <div className="flex flex-col">
-                              <label
-                                htmlFor="workingTime"
-                                className="block text-sm font-bold text-primary"
-                              >
-                                Working time:
-                              </label>
-                              <div className="relative">
-                                <input
-                                  id="workingTime"
-                                  type="text"
-                                  value={workingTime}
-                                  onChange={(e) =>
-                                    setWorkingTime(e.target.value)
-                                  }
-                                  placeholder="Enter working time"
-                                  className="w-full border border-primary-80 pl-4 pr-4 py-2 bg-neutral-light-20 rounded-xl text-primary-80 outline-none focus:ring-1 focus:bg-white transition-all duration-300"
-                                />
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                        <div className="flex flex-col">
-                          <label
-                            htmlFor="workPlace"
-                            className="block text-sm font-bold text-primary"
-                          >
-                            Work Place:
-                          </label>
-                          <div className="relative">
-                            <input
-                              id="workPlace"
-                              type="text"
-                              value={workPlace}
-                              onChange={(e) => setWorkPlace(e.target.value)}
-                              placeholder="Enter work place"
-                              className="w-full border border-primary-80 px-4 py-2 bg-neutral-light-20 rounded-xl text-primary-80 outline-none focus:ring-1 focus:bg-white transition-all duration-300"
-                            />
-                          </div>
-                        </div>
-                        <div className="flex flex-col">
-                          <label
-                            htmlFor="jobDescription"
-                            className="block text-sm font-bold text-primary"
-                          >
-                            Job Description:
-                          </label>
-                          <div className="relative">
-                            <textarea
-                              id="jobDescription"
-                              value={jobDescription}
-                              onChange={(e) =>
-                                setJobDescription(e.target.value)
-                              }
-                              className="w-full border border-primary-80 h-16 px-4 py-2 text-primary-80 focus:outline-none resize-none bg-neutral-light-20 rounded-xl focus:ring-1 focus:bg-white transition-all duration-300"
-                              placeholder="Enter description"
-                            ></textarea>
-                          </div>
-                        </div>
-                        <div className="flex flex-col">
-                          <label
-                            htmlFor="applicantRequirements"
-                            className="block text-sm font-bold text-primary"
-                          >
-                            Applicant Requirements:
-                          </label>
-                          <div className="relative">
-                            <textarea
-                              id="applicantRequirements"
-                              value={applicantRequirements}
-                              onChange={(e) =>
-                                setApplicantRequirements(e.target.value)
-                              }
-                              className="w-full border border-primary-80 h-16 px-4 py-2 text-primary-80 focus:outline-none resize-none bg-neutral-light-20 rounded-xl focus:ring-1 focus:bg-white transition-all duration-300"
-                              placeholder="Enter applicant requirements"
-                            ></textarea>
-                          </div>
-                        </div>
-                        <div className="flex flex-col">
-                          <label
-                            htmlFor="benefit"
-                            className="block text-sm font-bold text-primary"
-                          >
-                            Benefit:
-                          </label>
-                          <div className="relative">
-                            <textarea
-                              id="benefit"
-                              value={benefit}
-                              onChange={(e) => setBenefit(e.target.value)}
-                              className="w-full border border-primary-80 h-16 px-4 py-2 text-primary-80 focus:outline-none resize-none bg-neutral-light-20 rounded-xl focus:ring-1 focus:bg-white transition-all duration-300"
-                              placeholder="Enter benefit"
-                            ></textarea>
-                          </div>
-                        </div>
-                        <div className="flex gap-4">
-                          <button
-                            onClick={() => setIsOpen(false)}
-                            className="bg-secondary-60 text-neutral-light-20 hover:bg-secondary px-6 py-2 rounded-full font-semibold cursor-pointer"
-                          >
-                            Cancel
-                          </button>
-                          <button
-                            onClick={() => setIsOpenNext(true)}
-                            className="bg-secondary text-neutral-light-20 hover:bg-secondary-60 px-6 py-2 rounded-full font-semibold cursor-pointer"
-                          >
-                            Save
-                          </button>
-                          {isOpenNext && (
-                            <div className="fixed inset-0 bg-primary/60 z-30 flex items-center justify-center">
-                              <div
-                                onClick={(e) => e.stopPropagation()}
-                                className="w-full max-w-2/5 flex flex-col items-center text-center font-semibold bg-neutral-light-40 rounded-2xl p-6 gap-4"
-                              >
-                                <span className="text-primary">
-                                  Your job post has been submitted successfully.
-                                  It will be published once approved.
-                                </span>
-                                <button
-                                  onClick={() => {
-                                    setIsOpenNext(false);
-                                    setIsOpen(false);
-                                  }}
-                                  className="bg-accent hover:bg-secondary text-neutral-light-20 rounded-full px-6 py-2 cursor-pointer"
-                                >
-                                  Agree
-                                </button>
-                              </div>
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            <button
-              onClick={() => router.push("/recruiter/applications")}
-              className="bg-secondary-60 hover:bg-secondary text-background px-6 py-2 rounded-full cursor-pointer"
+            <button 
+              onClick={handleViewApplicationsClick}
+              className="bg-gray-500 hover:bg-gray-600 text-white px-6 py-2 rounded-full cursor-pointer"
             >
-              View applications
+              View Applications
             </button>
-            <button className="bg-[#E91919] hover:bg-red-800 text-background px-6 py-2 rounded-full cursor-pointer">
+            <button 
+              onClick={handleCloseClick}
+              className="bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded-full cursor-pointer"
+            >
               Close
             </button>
-            <button className="bg-[#E91919] hover:bg-red-800 text-background px-6 py-2 rounded-full cursor-pointer">
+            <button 
+              onClick={handleDeleteClick}
+              className="bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded-full cursor-pointer"
+            >
               Delete
             </button>
           </div>
         </div>
+      )}
+      
+      {/* Apply Job Modal */}
+      {!isHR && job && !hasApplied && (
+        <ApplyJobModal 
+          jobId={job.id} 
+          jobTitle={job.title} 
+          isOpen={isApplyModalOpen} 
+          onClose={() => setIsApplyModalOpen(false)} 
+          onApplySuccess={handleApplySuccess}
+        />
+      )}
+
+      {/* Candidate Application Details */}
+      {!isHR && hasApplied && job && (
+        <CandidateApplication jobId={job.id} applicationId={applicationId} />
+      )}
+
+      {/* Job Edit Modal */}
+      {isEditModalOpen && job && (
+        <JobEditModal
+          isOpen={isEditModalOpen}
+          job={job}
+          onClose={() => setIsEditModalOpen(false)}
+          onJobUpdated={handleJobUpdated}
+        />
       )}
     </div>
   );

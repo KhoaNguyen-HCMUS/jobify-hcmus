@@ -18,16 +18,17 @@ export default function SideBar() {
   const pathname = usePathname();
 
   const [user, setUser] = useState<{
-    role: "candidate" | "hr" | "moderator";
+    role: "candidate" | "company" | "moderator" | "admin";
   } | null>(null);
 
   useEffect(() => {
-    const storedUser = localStorage.getItem("user");
+    const storedUser = localStorage.getItem("authData");
     if (storedUser) {
       try {
-        setUser(JSON.parse(storedUser));
+        const userData = JSON.parse(storedUser);
+        setUser(userData);
       } catch (err) {
-        console.error("Invalid user date in localStorage");
+        console.error("Invalid user data in localStorage");
       }
     }
   }, []);
@@ -72,37 +73,37 @@ export default function SideBar() {
 
   const recruiterItems = [
     {
-      href: "/recruiter/dashboard",
+      href: "/company/dashboard",
       label: "Dashboard",
       icon: <TextSelect size={24} />,
     },
     {
-      href: "/recruiter/profile",
+      href: "/company/profile",
       label: "Profile",
       icon: <User size={24} />,
     },
     {
-      href: "/recruiter/jobs",
+      href: "/company/jobs",
       label: "My Jobs",
       icon: <ShoppingBag size={24} />,
     },
     {
-      href: "/recruiter/wallet",
+      href: "/company/wallet",
       label: "Wallet",
       icon: <Wallet size={24} />,
     },
     {
-      href: "/recruiter/change-password",
+      href: "/company/change-password",
       label: "Change Password",
       icon: <Lock size={24} />,
     },
     {
-      href: "/recruiter/notifications",
+      href: "/company/notifications",
       label: "Notifications",
       icon: <BellIcon size={24} />,
     },
     {
-      href: "/recruiter/reports",
+      href: "/company/reports",
       label: "Report History",
       icon: <TriangleAlert size={24} />,
     },
@@ -153,18 +154,19 @@ export default function SideBar() {
     icon?: React.ReactElement;
   }[] = candidateItems;
 
+
   if (user?.role === "candidate") {
     sideBarItems = candidateItems;
-  } else if (user?.role === "hr") {
+  } else if (user?.role === "company") {
     sideBarItems = recruiterItems;
-  } else if (user?.role === "moderator") {
+  } else if (user?.role === "moderator" || user?.role === "admin") {
     sideBarItems = moderatorItems;
-  }
+  } 
 
   if (!user) return null;
   return (
     <aside
-      className={`fixed md:flex  top-20 left-0 bottom-0 z-50 w-72 transition-all duration-300 bg-neutral-light-40 backdrop-blur-md shadow-lg`}
+      className={`fixed md:flex  top-20 left-0 bottom-0 z-40 w-72 transition-all duration-300 bg-neutral-light-40 backdrop-blur-md shadow-lg min-h-screen`}
     >
       <div className="container">
         <div className="flex flex-col">

@@ -1,21 +1,24 @@
 {
   "name": "server",
   "version": "1.0.0",
-  "main": "main.js",
+  "main": "server.js",
   "scripts": {
-    "dev": "nodemon main.js",
-    "server": "nodemon main.js",
-    "start": "node main.js",
-    "start:prod": "node main.js"
+    "dev": "nodemon server.js",
+    "server": "nodemon server.js",
+    "start": "node server.js",
+    "seed": "node prisma/seed.js"
   },
   "dependencies": {
-    "express": "^4.18.2",
+    "bcryptjs": "^3.0.2",
     "cors": "^2.8.5",
-    "dotenv": "^16.3.1"
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
+    "jsonwebtoken": "^9.0.2"
   },
   "devDependencies": {
-    "nodemon": "^3.0.1",
+    "@types/cors": "^2.8.13",
     "@types/express": "^4.17.17",
-    "@types/cors": "^2.8.13"
+    "nodemon": "^3.0.1",
+    "prisma-erd-generator": "^2.0.4"
   }
 }

@@ -3,6 +3,7 @@
 import { usePathname } from "next/navigation";
 import Nav from "./nav";
 import SideBar from "./sideBar";
+import Footer from "./footer";
 
 export default function ClientLayout({
   children,
@@ -11,8 +12,11 @@ export default function ClientLayout({
 }>) {
   const pathname = usePathname();
   const hideNav = [
-    "/auth/login",
+    "/auth/sign-in",
     "/auth/register",
+    "/auth/register/candidate",
+    "/auth/register/company",
+    "/auth/register/company/pending",
     "/forgot-password",
     "/forgot-password-second",
     "/forgot-password-third",
@@ -24,17 +28,22 @@ export default function ClientLayout({
 
   const hideSideBar =
     [
-      "/auth/login",
+      "/auth/sign-in",
       "/",
       "/auth/register",
+      "/auth/register/candidate",
+      "/auth/register/company",
+      "/auth/register/company/pending",
       "/forgot-password",
       "/forgot-password-second",
       "/forgot-password-third",
       "/register/candidate",
       "/register/company",
       "/pending-approval",
-      "/about",
+      "/about-us",
       "/jobs",
+      "/company-detail",
+      "/job-detail",
       "/recommended",
       "/support",
       "/recruiter/applications",
@@ -42,19 +51,20 @@ export default function ClientLayout({
     ].includes(pathname) ||
     pathname.startsWith("/jobs/") ||
     pathname.startsWith("/reports/") ||
-    pathname.startsWith("/companies/");
+    pathname.startsWith("/company-detail/");
 
   return (
     <>
       {!hideNav && <Nav />}
       {!hideSideBar && <SideBar />}
       <main
-        className={`${!hideNav ? "pt-20" : ""} ${
-          !hideSideBar ? "pl-72" : ""
-        }`.trim()}
+       className={`${!hideNav ? "pt-20" : ""} ${
+      !hideSideBar ? "pl-72" : ""
+    } min-h-screen`.trim()}
       >
         {children}
       </main>
+      {!hideNav && <Footer />}
     </>
   );
 }

@@ -69,9 +69,7 @@ const notification = [
   },
 ];
 
-export default function RecruiterNotificationsPage({
-  noti,
-}: NotificationProps) {
+export default function RecruiterNotificationsPage() {
   const { page, maxPage, current, next, prev } = usePagination(notification, 5);
 
   return (

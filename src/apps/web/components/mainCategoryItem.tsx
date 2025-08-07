@@ -1,134 +1,84 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ChevronDown, ChevronUp } from "lucide-react";
 import SubCategoryList from "./subCategoryList";
+import { getAllIndustries, Industry, getIndustriesByCategory, IndustryCategory } from "../services/industries";
 
 interface MainCategoryItemProps {
   main: {
     category: string;
+    id: string;
+    isSelected?: boolean;
+    onSelect?: (id: string) => void;
   };
 }
 
-const subs: Record<string, string[]> = {
-  "Software & IT": [
-    "Software Engineer",
-    "Data Science & Analytics",
-    "Systems & Network Administration",
-    "Cybersecurity",
-    "Software Quality Assurance",
-  ],
-  "Marketing & Advertising": [
-    "Digital Marketing",
-    "Content Marketing",
-    "Public Relations (PR)",
-    "Brand Development",
-    "Market Research",
-  ],
-  "Sales & Business Development": [
-    "Account Management",
-    "New Business Development",
-    "E-commerce Sales",
-    "Sales Support",
-    "Regional/Area Sales Management",
-  ],
-  "Accounting & Finance": [
-    "Financial Accounting",
-    "Management Accounting",
-    "Financial Analysis",
-    "Auditing",
-    "Corporate Finance",
-  ],
-  "Human Resources": [
-    "Recruitment",
-    "Learning & Development (L&D)",
-    "Compensation & Benefits (C&B)",
-    "Employee Relations",
-    "Performance Management",
-  ],
-  "Customer Support & Service": [
-    "Customer Care",
-    "Technical Support",
-    "Customer Experience (CX Management)",
-    "Customer Service Representative",
-    "Service Quality Assurance",
-  ],
-  "Education & Training": [
-    "Teaching",
-    "Curriculum Development",
-    "Educational Counseling",
-    "Corporate Training",
-    "Educational Administration",
-  ],
-  "Healthcare & Medical": [
-    "Nursing",
-    "Physicians & Medical Specialists",
-    "Pharmacy",
-    "Medical Technologists/Technicians",
-    "Hospital Management & Public Health",
-  ],
-  "Engineering & Construction": [
-    "Civil Engineering",
-    "Mechanical Engineering",
-    "Electrical Engineering",
-    "Construction Project Management",
-    "Architecture",
-  ],
-  "Design & Creative Arts": [
-    "Graphic Design",
-    "User Experience (UX) Design",
-    "User Interface (UI) Design",
-    "Fashion Design",
-    "Multimedia Content Creation",
-  ],
-  "Operations & Logistics": [
-    "Supply Chain Management",
-    "Warehouse Management",
-    "Transportation Management",
-    "Operations Analysis",
-    "Operations Support",
-  ],
-  "Real Estate": [
-    "Real Estate Agent/Broker",
-    "Real Estate Investment",
-    "Property Management",
-    "Real Estate Appraisal",
-    "Real Estate Development",
-  ],
-  "Manufacturing & Labor": [
-    "Manufacturing Engineering",
-    "Quality Control/Assurance",
-    "Factory Operations Management",
-    "Production Control",
-    "Occupational Health & Safety (OH&S)",
-  ],
-  "Legal & Compliance": [
-    "Lawyer/Attorney",
-    "Corporate Legal Counsel",
-    "Compliance Officer",
-    "Paralegal/Legal Assistant",
-    "Intellectual Property (IP)",
-  ],
-};
-
 export default function MainCategoryItem({ main }: MainCategoryItemProps) {
   const [open, setOpen] = useState(false);
-  const subCategories = subs[main.category] || [];
+  const [subCategories, setSubCategories] = useState<string[]>([]);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    const fetchSubCategories = async () => {
+      if (!open) return;
+      
+      try {
+        setLoading(true);
+        const response = await getAllIndustries();
+        if (response.success && response.data) {
+          const categories = getIndustriesByCategory(response.data);
+          const mainCategory = categories.find(cat => cat.name === main.category);
+          if (mainCategory) {
+            setSubCategories(mainCategory.children.map(child => child.name));
+          }
+        }
+      } catch (error) {
+        console.error('Failed to fetch sub categories:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchSubCategories();
+  }, [open, main.category]);
+
+  const handleCategoryClick = () => {
+    if (main.onSelect) {
+      main.onSelect(main.id);
+    }
+  };
+
+  const handleToggleClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setOpen(!open);
+  };
 
   return (
     <div className="flex flex-col justify-between hover:bg-neutral-light-80">
       <button
-        onClick={() => setOpen(!open)}
-        className="flex justify-between items-center cursor-pointer"
+        onClick={handleCategoryClick}
+        className={`flex justify-between items-center cursor-pointer w-full text-left ${
+          main.isSelected ? 'bg-accent text-white' : ''
+        }`}
       >
-        <span className="text-primary px-4 py-2">{main.category}</span>
-        {open ? (
-          <ChevronUp className="text-primary" size={24} />
-        ) : (
-          <ChevronDown className="text-primary" size={24} />
-        )}
+        <span className="px-4 py-2">{main.category}</span>
+        <div
+          onClick={handleToggleClick}
+          className="p-2 cursor-pointer"
+        >
+          {open ? (
+            <ChevronUp size={24} />
+          ) : (
+            <ChevronDown size={24} />
+          )}
+        </div>
       </button>
 
-      {open && <SubCategoryList subCategories={subCategories} />}
+      {open && (
+        <SubCategoryList 
+          subCategories={loading ? ['Loading...'] : subCategories} 
+        />
+      )}
     </div>
   );
 }
