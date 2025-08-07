@@ -179,3 +179,32 @@ export const updateApplicationStatus = async (
     };
   }
 }; 
+
+export interface CancelApplicationResponse {
+  success: boolean;
+  message: string;
+  data?: null;
+}
+
+export const cancelApplication = async (jobId: string): Promise<CancelApplicationResponse> => {
+  try {
+    const token = getToken();
+    if (!token) {
+      throw new Error('No authentication token found');
+    }
+
+    const response = await fetch(`${API_URL}/jobs/${jobId}/apply`, {
+      method: 'DELETE',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+    });
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error('Error canceling application:', error);
+    throw error;
+  }
+}; 
