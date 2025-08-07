@@ -41,6 +41,9 @@ export interface ApplicationsResponse {
 }
 
 export interface ApplicationDetail {
+  id: string;
+  job_id: string;
+  candidate_id: string;
   notes: string | null;
   applied_at: string;
   updated_at: string;
@@ -55,6 +58,17 @@ export interface ApplicationDetailResponse {
   success: boolean;
   message: string;
   data?: ApplicationDetail;
+}
+
+export interface UpdateApplicationStatusRequest {
+  newStatus: string;
+  notes?: string;
+}
+
+export interface UpdateApplicationStatusResponse {
+  success: boolean;
+  message: string;
+  data: any;
 }
 
 export const getApplicationsByJob = async (jobId: string): Promise<ApplicationsResponse> => {
@@ -137,6 +151,31 @@ export const getApplicationById = async (applicationId: string): Promise<Applica
     return {
       success: false,
       message: 'Network connection error',
+    };
+  }
+};
+
+export const updateApplicationStatus = async (
+  applicationId: string,
+  payload: UpdateApplicationStatusRequest,
+): Promise<UpdateApplicationStatusResponse> => {
+  try {
+    const token = getToken();
+    const response = await fetch(`${API_URL}/applications/${applicationId}/status`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+      },
+      body: JSON.stringify(payload),
+    });
+    const result = await response.json();
+    return result;
+  } catch (error) {
+    return {
+      success: false,
+      message: 'Network connection error',
+      data: null,
     };
   }
 }; 

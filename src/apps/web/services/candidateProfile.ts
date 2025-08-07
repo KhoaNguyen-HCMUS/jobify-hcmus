@@ -37,6 +37,7 @@ export interface Profile {
   gender: string;
   date_of_birth: string;
   phone: string;
+  profile_photo_id: string | null;
   profile_photo_url: string | null;
   bio: string;
   province: string;
@@ -152,6 +153,35 @@ export const updateProfile = async (updateData: UpdateProfileData): Promise<Prof
     return {
       success: false,
       message: 'Failed to update profile',
+    };
+  }
+};
+
+export const getCandidateProfileById = async (candidateId: string): Promise<ProfileResponse> => {
+  try {
+    const token = getToken();
+
+    if (!token) {
+      return {
+        success: false,
+        message: 'No authentication token found',
+      };
+    }
+
+    const response = await fetch(`${API_URL}/profile/candidate/${candidateId}`, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+    });
+
+    const result = await response.json();
+    return result;
+  } catch (error) {
+    return {
+      success: false,
+      message: 'Failed to fetch candidate profile',
     };
   }
 }; 

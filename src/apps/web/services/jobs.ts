@@ -283,8 +283,8 @@ export const updateJob = async (jobId: string, data: any, token: string): Promis
 
 export const closeJob = async (jobId: string, token: string): Promise<JobResponse> => {
   try {
-    const response = await fetch(`${API_URL}/jobs/${jobId}`, {
-      method: 'PUT',
+    const response = await fetch(`${API_URL}/jobs/${jobId}/close`, {
+      method: 'PATCH',
       headers: {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${token}`,

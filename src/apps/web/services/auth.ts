@@ -33,6 +33,7 @@ export interface AuthResponse {
     token: string;
     name: string;
     role: string;
+    id: string;
   };
 }
 
@@ -54,6 +55,7 @@ export const registerCandidate = async (data: RegisterCandidateData): Promise<Au
         token: result.data.token,
         name: result.data.name,
         role: result.data.role,
+        id: result.data.id,
       });
     }
 
@@ -83,6 +85,7 @@ export const registerCompany = async (data: RegisterCompanyData): Promise<AuthRe
         token: result.data.token,
         name: result.data.name,
         role: result.data.role,
+        id: result.data.id,
       });
     }
 
@@ -111,6 +114,7 @@ export const login = async (data: LoginData): Promise<AuthResponse> => {
       saveAuthData({
         token: result.data.token,
         name: result.data.name,
+        id: result.data.id,
         role: result.data.role,
       });
     }
