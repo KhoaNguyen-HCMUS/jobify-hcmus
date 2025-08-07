@@ -5,10 +5,10 @@ import Notification from "../../../components/notification";
 import JobCard from "../../../components/job/jobCard";
 import usePagination from "../../../hooks/usePagination";
 import Pagination from "../../../components/pagination";
-import { jobs } from "../../../components/fakeJob";
 import { DEFAULT_COVER_IMAGE } from "../../../constants/imgConstants";
 import { DEFAULT_AVATAR_IMAGE } from "../../../constants/imgConstants";
 import { getCompanyProfile, CompanyProfile } from "../../../services/companyProfile";
+import { getJobsByCompany, Job } from "../../../services/jobs";
 import ProtectedRoute from "../../../components/ProtectedRoute";
 
 interface CompanyProps {
@@ -24,18 +24,18 @@ interface CompanyProps {
   };
 }
 
-const transformJobForCard = (job: any) => ({
-  id: job.id.toString(),
+const transformJobForCard = (job: Job) => ({
+  id: job.id,
   title: job.title,
-  company_name: job.company,
-  salary_min: job.salary,
-  salary_max: job.salary,
-  currency: "VND",
+  company_name: job.company_name || null,
+  salary_min: job.salary_min,
+  salary_max: job.salary_max,
+  currency: job.currency,
   province: job.province,
-  logo: job.logo,
+  logo: "/logo.png",
   name: job.title,
-  status: "active",
-  created_at: new Date(),
+  status: job.status,
+  created_at: new Date(job.created_at),
 });
 
 const Stat = ({
@@ -58,27 +58,59 @@ const Stat = ({
 );
 
 function RecruiterDashboardContent() {
-  const transformedJobs = jobs.map(transformJobForCard);
-  const { page, maxPage, current, next, prev } = usePagination(transformedJobs, 4);
   const [companyProfile, setCompanyProfile] = useState<CompanyProfile | null>(null);
+  const [jobs, setJobs] = useState<Job[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [jobStats, setJobStats] = useState({
+    totalJobs: 0,
+    activeJobs: 0,
+    expiredJobs: 0,
+    applications: 0,
+    coins: 250
+  });
 
   useEffect(() => {
-    const loadCompanyProfile = async () => {
+    const loadDashboardData = async () => {
       try {
-        const response = await getCompanyProfile();
-        if (response.success && response.data) {
-          setCompanyProfile(response.data.companyProfiles);
+        setIsLoading(true);
+        
+        const profileResponse = await getCompanyProfile();
+        if (profileResponse.success && profileResponse.data) {
+          setCompanyProfile(profileResponse.data.companyProfiles);
+        }
+
+        const jobsResponse = await getJobsByCompany();
+        if (jobsResponse.success && jobsResponse.data) {
+          const sortedJobs = jobsResponse.data.sort((a, b) => 
+            new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+          );
+          setJobs(sortedJobs);
+          
+          const totalJobs = sortedJobs.length;
+          const activeJobs = sortedJobs.filter(job => job.status === 'active').length;
+          const expiredJobs = sortedJobs.filter(job => job.status === 'expired').length;
+          const totalApplications = sortedJobs.reduce((sum, job) => sum + (job.applications_count || 0), 0);
+          
+          setJobStats({
+            totalJobs,
+            activeJobs,
+            expiredJobs,
+            applications: totalApplications,
+            coins: 250 
+          });
         }
       } catch (error) {
-        console.error("Error loading company profile:", error);
+        console.error("Error loading dashboard data:", error);
       } finally {
         setIsLoading(false);
       }
     };
 
-    loadCompanyProfile();
+    loadDashboardData();
   }, []);
+
+  const transformedJobs = jobs.map(transformJobForCard);
+  const { page, maxPage, current, next, prev } = usePagination(transformedJobs, 4);
 
   return (
     <div className="w-full h-full bg-neutral-light-60">
@@ -136,13 +168,13 @@ function RecruiterDashboardContent() {
             <div className="flex flex-col lg:flex-row gap-10">
               <div className="flex-1 flex flex-col justify-center items-center gap-6">
                 <div className="flex justify-center gap-12 flex-wrap">
-                  <Stat value="10" label="Job Posts" color="#1C1C50" />
-                  <Stat value="5" label="Active Jobs" color="#26B709" />
-                  <Stat value="5" label="Expired Jobs" color="#F52121" />
+                  <Stat value={jobStats.totalJobs.toString()} label="Job Posts" color="#1C1C50" />
+                  <Stat value={jobStats.activeJobs.toString()} label="Active Jobs" color="#26B709" />
+                  <Stat value={jobStats.expiredJobs.toString()} label="Expired Jobs" color="#F52121" />
                 </div>
                 <div className="flex justify-center gap-12 flex-wrap">
-                  <Stat value="95" label="Applications" color="#0C53DE" />
-                  <Stat value="250" label="Coins" color="#DD8D0E" />
+                  <Stat value={jobStats.applications.toString()} label="Applications" color="#0C53DE" />
+                  <Stat value={jobStats.coins.toString()} label="Coins" color="#DD8D0E" />
                 </div>
               </div>
               
