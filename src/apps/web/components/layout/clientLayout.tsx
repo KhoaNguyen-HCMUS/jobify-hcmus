@@ -3,6 +3,7 @@
 import { usePathname } from "next/navigation";
 import Nav from "./nav";
 import SideBar from "./sideBar";
+import Footer from "./footer";
 
 export default function ClientLayout({
   children,
@@ -63,6 +64,7 @@ export default function ClientLayout({
       >
         {children}
       </main>
+      {!hideNav && <Footer />}
     </>
   );
 }

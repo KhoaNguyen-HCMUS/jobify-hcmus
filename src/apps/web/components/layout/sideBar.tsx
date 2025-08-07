@@ -26,7 +26,6 @@ export default function SideBar() {
     if (storedUser) {
       try {
         const userData = JSON.parse(storedUser);
-        console.log("User data from localStorage:", userData);
         setUser(userData);
       } catch (err) {
         console.error("Invalid user data in localStorage");

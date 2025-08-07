@@ -66,7 +66,6 @@ export default function NavBar() {
   const companyItems = [
     { href: "/company/dashboard", label: "Dashboard" },
     { href: "/company/jobs", label: "My Jobs" },
-    { href: "/company/applications", label: "Applications" },
     { href: "/support", label: "Support" },
     { href: "/about-us", label: "About Us" },
   ];
