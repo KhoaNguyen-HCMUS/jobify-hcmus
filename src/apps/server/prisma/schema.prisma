@@ -187,6 +187,7 @@ model job_posts {
   created_at                         DateTime           @default(now()) @db.Timestamp(6)
   updated_at                         DateTime           @default(now()) @db.Timestamp(6)
   skills                             String
+  prev_status                        String?            @db.VarChar
   job_applications                   job_applications[]
   job_matches                        job_matches[]
   users_job_posts_approved_byTousers users?             @relation("job_posts_approved_byTousers", fields: [approved_by], references: [id], onUpdate: NoAction)
