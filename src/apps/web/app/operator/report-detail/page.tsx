@@ -32,6 +32,7 @@ const reportDetail = {
   candidateName: "Jane Smith",
   candidateIndustry: "Software Development",
   candidateLocation: "New York, NY",
+  companyReason: "Inappropriate job posting"
 };
 
 function ReportDetailContent() {

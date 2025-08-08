@@ -1,6 +1,5 @@
 "use client";
 import FeaturedJob from "../components/job/featuredJob";
-import TopCompany from "../components/topCompany";
 import CategoryGrid from "../components/categoryGrid";
 import KeywordSearch from "../components/keywordSearch";
 

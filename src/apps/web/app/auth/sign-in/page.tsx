@@ -11,10 +11,12 @@ export default function LogInPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
+      setIsLoading(true);
       const res = await login({
         email: email,
         password: password,
@@ -29,7 +31,7 @@ export default function LogInPage() {
         } else if (role === 'company') {
           router.push("/company/dashboard");
         } else if (role === 'admin' || role === 'moderator') {
-          router.push("/operator/dashboard");
+          router.push("/operator/company-pending");
         } else {
           router.push("/"); 
         }
@@ -39,7 +41,13 @@ export default function LogInPage() {
     } catch (error) {
       console.error("Error during login:", error);
       toast.error("An error occurred during login. Please try again later.");
+    } finally {
+      setIsLoading(false);
     }
+  };
+
+  const handleGoogleLogin = () => {
+    toast.info("Google login is not available yet.");
   };
 
   return (
@@ -121,16 +129,20 @@ export default function LogInPage() {
             {/* Submit Button */}
             <button
               type="submit"
-              className="w-full bg-secondary hover:bg-primary rounded-full text-white py-4 px-8 font-bold transition-colors duration-300 mt-8 cursor-pointer"
+              className="w-full bg-secondary hover:bg-primary rounded-full text-white py-4 px-8 font-bold transition-colors duration-300 mt-8 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+              disabled={isLoading}
             >
-              Sign in
+              {isLoading ? "Signing in..." : "Sign in"}
             </button>
             <p className="text-accent text-center">Or continue with</p>
+            
             <button
-              type="submit"
-              className="w-full bg-red-600 hover:bg-red-700 rounded-full text-white py-4 px-8 font-bold transition-colors duration-300 cursor-pointer"
+              type="button"
+              onClick={handleGoogleLogin}
+              className="w-full bg-red-600 hover:bg-red-700 rounded-full text-white py-4 px-8 font-bold transition-colors duration-300 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+              disabled={isLoading}
             >
-              Sign in with Google
+              {isLoading ? "Signing in..." : "Sign in with Google"}
             </button>
 
             {/* Sign Up */}
