@@ -15,6 +15,7 @@ function JobDetailPageContent() {
   const userRole = getUserRole();
   const userId = getUserId();
   const isHR = userRole === 'company' && jobDetailData?.company.id === userId;
+  const isModerator = userRole === 'moderator' || userRole === 'admin';
   
 
   useEffect(() => {
@@ -55,7 +56,7 @@ function JobDetailPageContent() {
   }
 
   return (
-    <JobDetail jobDetailData={jobDetailData} isHR={isHR} isSaved={isSaved} />
+    <JobDetail jobDetailData={jobDetailData} isHR={isHR} isSaved={isSaved} isModerator={isModerator} />
   );
 }
 

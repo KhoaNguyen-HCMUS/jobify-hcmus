@@ -1,71 +1,113 @@
 "use client";
-import { BookUp, CircleX } from "lucide-react";
+import { BookUp } from "lucide-react";
 import { useState, useEffect } from "react";
 import KeyWord from "../../../components/keyWord";
-import JobDetail from "../../../components/job/jobDetail";
-import RejectReason from "../../../components/rejectReason";
-import ModeratorNote from "../../../components/moderatorNote";
-
-interface JobPendingProps {
-  job: {
-    date: string;
-    jobTitle: string;
-    status: string;
-    detail: string;
-    time: string;
-    note: string;
-  };
-}
-
-const jobTitles = [
-  "Chuyên Viên Kinh Doanh",
-  "Nhân Viên Tư Vấn",
-  "Quản Lý Dự Án",
-  "Kỹ Sư Phần Mềm",
-  "Nhân Sự Tuyển Dụng",
-];
-const statuss = ["Pending"];
-const dates = ["01/07/2025"];
-const times = ["15:11:03"];
-const notes = ["Moderator's Note"];
-
-const randomItem = (arr: any[]) => arr[Math.floor(Math.random() * arr.length)];
+// import JobDetailModal from "../../../components/JobDetailModal";
+import { getPendingJobs, approveJob, rejectJob, PendingJob } from "../../../services/admin";
+import { toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import { useRouter } from "next/navigation";
 
 export default function OperatorJobPendingPage() {
+  const router = useRouter();
   const [fromDate, setFromDate] = useState("");
   const [toDate, setToDate] = useState("");
-
-  const handleFilter = () => {
-    console.log("Filter from: ", fromDate, "to: ", toDate);
-  };
-
+  const [jobs, setJobs] = useState<PendingJob[]>([]);
+  const [loading, setLoading] = useState(true);
   const [selectedJobId, setSelectedJobId] = useState<string | null>(null);
   const [showModal, setShowModal] = useState(false);
+  const [showRejectModal, setShowRejectModal] = useState(false);
+  const [rejectReason, setRejectReason] = useState("");
 
-  const handleRowClick = (id: string) => {
-    setSelectedJobId(id);
-    setShowModal(true);
+  // Fetch pending jobs
+  const fetchPendingJobs = async () => {
+    try {
+      setLoading(true);
+      const response = await getPendingJobs();
+      if (response.success) {
+        setJobs(response.data);
+      } else {
+        toast.error(response.message || "Failed to fetch pending jobs");
+      }
+    } catch (error) {
+      console.error("Error fetching pending jobs:", error);
+      toast.error("An error occurred while fetching pending jobs");
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const [apps, setApps] = useState<any[]>([]);
-
   useEffect(() => {
-    const generatedApps = Array.from({ length: 30 }, (_, i) => ({
-      id: (i + 1).toString(),
-      date: randomItem(dates),
-      jobTitle: randomItem(jobTitles),
-      status: randomItem(statuss),
-      detail: <BookUp />,
-      time: randomItem(times),
-      note: randomItem(notes),
-    }));
-
-    setApps(generatedApps);
+    fetchPendingJobs();
   }, []);
 
-  const selectedJob = apps.find((c) => c.id === selectedJobId);
+  const handleRowClick = (id: string) => {
+    // setSelectedJobId(id);
+    // setShowModal(true);
+    router.push(`/jobs/${id}`);
+  };
 
-  const [isOpen, setIsOpen] = useState(false);
+  const selectedJob = jobs.find((j) => j.id === selectedJobId);
+
+  const handleApprove = async () => {
+    if (!selectedJobId) return;
+    
+    try {
+      const response = await approveJob(selectedJobId);
+      if (response.success) {
+        toast.success("Job approved successfully!");
+        setShowModal(false);
+        setSelectedJobId(null);
+        fetchPendingJobs(); // Refresh the list
+      } else {
+        toast.error(response.message || "Failed to approve job");
+      }
+    } catch (error) {
+      console.error("Error approving job:", error);
+      toast.error("An error occurred while approving job");
+    }
+  };
+
+  const handleReject = async (reason: string) => {
+    if (!selectedJobId || !reason.trim()) {
+      toast.error("Please provide a rejection reason");
+      return;
+    }
+    
+    try {
+      const response = await rejectJob(selectedJobId, reason);
+      if (response.success) {
+        toast.success("Job rejected successfully!");
+        setShowModal(false);
+        setSelectedJobId(null);
+        setRejectReason("");
+        setShowRejectModal(false);
+        fetchPendingJobs(); // Refresh the list
+      } else {
+        toast.error(response.message || "Failed to reject job");
+      }
+    } catch (error) {
+      console.error("Error rejecting job:", error);
+      toast.error("An error occurred while rejecting job");
+    }
+  };
+
+  const handleCloseModal = () => {
+    setShowModal(false);
+    setSelectedJobId(null);
+    setRejectReason("");
+    setShowRejectModal(false);
+  };
+
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('vi-VN');
+  };
+
+  const formatTime = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toLocaleTimeString('vi-VN');
+  };
 
   return (
     <div className="w-full min-h-screen bg-neutral-light-60">
@@ -113,101 +155,68 @@ export default function OperatorJobPendingPage() {
               </tr>
             </thead>
             <tbody>
-              {apps.map((job, index) => (
-                <tr
-                  key={job.id}
-                  onClick={() => handleRowClick(job.id)}
-                  className={`py-2 px-4 text-primary-80 hover:bg-highlight transition-colors cursor-pointer ${
-                    index % 2 === 0 ? "bg-highlight-20" : "bg-highlight-40"
-                  }`}
-                >
-                  <td className="w-4/13 border border-primary-60 p-2">
-                    <span className="line-clamp-1">{job?.jobTitle}</span>
-                  </td>
-                  <td className="w-2/13 border border-primary-60 p-2">
-                    <span className="flex justify-center line-clamp-1">
-                      {job?.status}
-                    </span>
-                  </td>
-                  <td className="w-1/13 border border-primary-60 p-2">
-                    <span className="flex justify-center line-clamp-1">
-                      {job?.detail}
-                    </span>
-                  </td>
-                  <td className="w-3/13 border border-primary-60 p-2">
-                    <span className="flex justify-center items-center line-clamp-1">
-                      {job?.date} - {job?.time}
-                    </span>
-                  </td>
-                  <td className="w-4/13 border border-primary-60 p-2">
-                    <span className="line-clamp-1">{job?.note}</span>
+              {loading ? (
+                <tr>
+                  <td colSpan={5} className="py-8 text-center text-primary-80">
+                    Loading...
                   </td>
                 </tr>
-              ))}
+              ) : jobs.length === 0 ? (
+                <tr>
+                  <td colSpan={5} className="py-8 text-center text-primary-80">
+                    No pending jobs found.
+                  </td>
+                </tr>
+              ) : (
+                jobs.map((job, index) => (
+                  <tr
+                    key={job.id}
+                    onClick={() => handleRowClick(job.id)}
+                    className={`py-2 px-4 text-primary-80 hover:bg-highlight transition-colors cursor-pointer ${
+                      index % 2 === 0 ? "bg-highlight-20" : "bg-highlight-40"
+                    }`}
+                  >
+                    <td className="w-4/13 border border-primary-60 p-2">
+                      <span className="line-clamp-1">{job?.title}</span>
+                    </td>
+                    <td className="w-2/13 border border-primary-60 p-2">
+                      <span className="flex justify-center line-clamp-1">
+                        {job?.status}
+                      </span>
+                    </td>
+                    <td className="w-1/13 border border-primary-60 p-2">
+                      <span className="flex justify-center line-clamp-1">
+                        <BookUp />
+                      </span>
+                    </td>
+                    <td className="w-3/13 border border-primary-60 p-2">
+                      <span className="flex justify-center items-center line-clamp-1">
+                        {formatDate(job?.created_at)} - {formatTime(job?.created_at)}
+                      </span>
+                    </td>
+                    <td className="w-4/13 border border-primary-60 p-2">
+                      <span className="line-clamp-1">
+                        {job?.moderator_notes || "-"}
+                      </span>
+                    </td>
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
-          {showModal && selectedJob && (
-            <div
-              onClick={() => {
-                setShowModal(false);
-                setSelectedJobId(null);
-              }}
-              className="fixed inset-0 bg-primary-80 z-50 flex items-center justify-center"
-            >
-              <div
-                onClick={(e) => e.stopPropagation()}
-                className="w-3/5 max-h-[90vh] overflow-y-auto bg-neutral-light rounded-md relative"
-              >
-                <div className="flex flex-col gap-4 px-10 py-6">
-                  <div className="flex justify-between">
-                    <span className="text-primary text-xl font-bold">
-                      Profile:
-                    </span>
-                    <CircleX size={24} className="text-secondary-40" />
-                  </div>
-                  <JobDetail />
-                  <ModeratorNote />
-                  <div className="flex flex-wrap gap-2">
-                    <button className="font-semibold bg-accent hover:bg-secondary cursor-pointer text-neutral-light-20 px-4 py-2 rounded-full">
-                      Approval
-                    </button>
-                    <button
-                      onClick={() => setIsOpen(true)}
-                      className="font-semibold bg-[#F52121] hover:bg-red-800 cursor-pointer text-neutral-light-20 px-4 py-2 rounded-full"
-                    >
-                      Reject
-                    </button>
-                    {isOpen && (
-                      <div className="fixed inset-0  bg-primary/80 z-50 flex items-center justify-center">
-                        <div className="w-2/5 bg-neutral-light rounded-md">
-                          <div className="flex flex-col gap-2 mx-20 my-10 space-y-4">
-                            <RejectReason />
-                            <div className="flex flex-wrap gap-2">
-                              <button
-                                onClick={() => {
-                                  setIsOpen(false);
-                                  setShowModal(false);
-                                }}
-                                className="bg-accent rounded-full hover:bg-secondary cursor-pointer text-neutral-light-20 px-4 py-2 font-semibold"
-                              >
-                                Send
-                              </button>
-                              <button
-                                onClick={() => setIsOpen(false)}
-                                className="font-semibold rounded-full hover:bg-primary cursor-pointer bg-primary-60 text-neutral-light-20 px-4 py-2"
-                              >
-                                Cancel
-                              </button>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
+
+          {/* Job Detail Modal */}
+          {/* <JobDetailModal
+            job={selectedJob}
+            isOpen={showModal}
+            onClose={handleCloseModal}
+            onApprove={handleApprove}
+            onReject={handleReject}
+            rejectReason={rejectReason}
+            setRejectReason={setRejectReason}
+            showRejectModal={showRejectModal}
+            setShowRejectModal={setShowRejectModal}
+          /> */}
         </div>
       </div>
     </div>

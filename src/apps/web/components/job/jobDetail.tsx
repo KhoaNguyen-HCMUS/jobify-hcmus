@@ -28,6 +28,9 @@ import { CompanyProfile } from "../../services/companyProfile";
 import GoBack from "../goBack";
 import { toast } from "react-toastify";
 import { getToken } from "../../utils/auth";
+import JobStatusBadge from "./jobStatusBadge";
+import ModeratorNote from "../moderatorNote";
+import { approveJob, rejectJob } from "../../services/admin";
 
 interface JobDetailData {
   company: CompanyProfile;
@@ -39,9 +42,10 @@ interface JobDetailProps {
   jobDetailData?: JobDetailData;
   isHR?: boolean;
   isSaved?: boolean;
+  isModerator?: boolean;
 }
 
-export default function JobDetail({ job: propJob, jobDetailData, isHR, isSaved = false }: JobDetailProps) {
+export default function JobDetail({ job: propJob, jobDetailData, isHR, isModerator, isSaved = false }: JobDetailProps) {
   const [job, setJob] = useState<Job | null>(propJob || jobDetailData?.job || null);
   const [company, setCompany] = useState<CompanyProfile | null>(jobDetailData?.company || null);
   const [isSavedState, setIsSavedState] = useState<boolean>(isSaved);
@@ -55,6 +59,8 @@ export default function JobDetail({ job: propJob, jobDetailData, isHR, isSaved =
   const router = useRouter();
   const searchParams = useSearchParams();
   const isFull = jobDetailData?.job.applications_count === jobDetailData?.job.number_of_openings;
+  const [showRejectNote, setShowRejectNote] = useState(false);
+  const [rejectNote, setRejectNote] = useState("");
 
   const handleSaveClick = async () => {
     if (!job) return;
@@ -179,6 +185,42 @@ export default function JobDetail({ job: propJob, jobDetailData, isHR, isSaved =
     window.history.replaceState({}, '', newUrl.toString());
   };
 
+  const handleApprove = async () => {
+    if (!job) return;
+    const result = await approveJob(job.id);
+    if (result.success) {
+      toast.success("Job approved successfully!");
+      window.location.reload();
+    } else {
+      toast.error("Failed to approve job: " + result.message);
+    }
+  };
+
+  const handleReject = async () => {
+    if (!job) return;
+    const result = await rejectJob(job.id, rejectNote);
+    if (result.success) {
+      toast.success("Job rejected successfully!");
+      window.location.reload();
+    } else {
+      toast.error("Failed to reject job: " + result.message);
+    }
+  };
+
+  const handleUpdateNotes = async (notes: string) => {
+    if (!job) return;
+    const token = getToken();
+    if (!token) {
+      toast.error("Please login again!");
+      return;
+    }
+    const result = await updateJob(job.id, { moderator_notes: notes }, token);
+    if (result.success) {
+      toast.success("Job notes updated successfully!");
+      window.location.reload();
+    }
+  };
+
   useEffect(() => {
     const checkIfApplied = () => {
       // Check if coming from jobs-applied page
@@ -281,7 +323,7 @@ export default function JobDetail({ job: propJob, jobDetailData, isHR, isSaved =
                 </span>
               </div>
               <div className="flex flex-wrap gap-4">
-                {!isHR && (
+                {(!isHR && !isModerator) && (
                  <button
                   onClick={hasApplied || isFull ? undefined : () => setIsApplyModalOpen(true)}
                   disabled={hasApplied || isFull}
@@ -430,6 +472,7 @@ export default function JobDetail({ job: propJob, jobDetailData, isHR, isSaved =
                   <p className="text-primary">{job.working_hours || 'Not specified'}</p>
                 </div>
                 <div>
+                  
                   <h2 className="font-semibold text-accent">
                     {hasApplied ? 'Application Status' : 'Apply now!'}
                   </h2>
@@ -439,7 +482,7 @@ export default function JobDetail({ job: propJob, jobDetailData, isHR, isSaved =
                       : 'Click the Apply button above to submit your application.'
                     }
                   </p>
-                  {!isHR && (
+                  {(!isHR && !isModerator) && (
                      <button
     onClick={hasApplied || isFull ? undefined : () => setIsApplyModalOpen(true)}
     disabled={hasApplied || isFull}
@@ -593,13 +636,15 @@ export default function JobDetail({ job: propJob, jobDetailData, isHR, isSaved =
         </div>
       </div>
 
-      {isHR && (
+      {(isHR) && (
         <div className="flex flex-col gap-6 mx-6 my-4">
           <div className="flex gap-2 items-center">
             <span className="text-primary-80 font-semibold">Status:</span>
-            <button className="bg-accent hover:bg-secondary text-neutral-light-20 px-6 py-2 rounded-full cursor-pointer">
-              {job.status}
-            </button>
+            <JobStatusBadge status={job.status} /> 
+          </div>
+            <div className="flex gap-2 items-center">
+            <span className="text-primary-80 font-semibold">Moderator Notes:</span>
+            <span className="text-primary-80">{job.moderator_notes}</span>
           </div>
           
           <div className="flex gap-4">
@@ -630,9 +675,64 @@ export default function JobDetail({ job: propJob, jobDetailData, isHR, isSaved =
           </div>
         </div>
       )}
+
+      {isModerator && (
+    <div className="flex flex-col gap-6 mx-6 my-4">
+      <div className="flex gap-2 items-center">
+        <span className="text-primary-80 font-semibold">Status:</span>
+        <JobStatusBadge status={job.status} /> 
+      </div>
+      <div className="flex gap-2 items-center">
+        <span className="text-primary-80 font-semibold">Moderator Notes:</span>
+        <span className="text-primary-80">{job.moderator_notes}</span>
+      </div>
+      <div className="flex gap-2">
+        <button
+          className="bg-accent hover:bg-secondary text-neutral-light-20 px-6 py-2 rounded-full cursor-pointer"
+          onClick={handleApprove}
+        >
+          Approve
+        </button>
+        <button
+          className="bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded-full cursor-pointer"
+          onClick={() => setShowRejectNote(true)}
+        >
+          Reject
+        </button>
+      </div>
+      {showRejectNote && (
+        <div className="flex flex-col gap-2 w-full max-w-2xl">
+          <label className="text-2xl font-bold text-primary mb-1" htmlFor="reject-note">
+            Moderator's Note:
+          </label>
+          <textarea
+            id="reject-note"
+            className="w-full min-h-[80px] border border-primary-40 rounded-lg px-4 py-2 text-primary-80 focus:outline-none focus:ring-2 focus:ring-accent bg-neutral-light-20"
+            placeholder="Enter moderator's note for rejection"
+            value={rejectNote}
+            onChange={e => setRejectNote(e.target.value)}
+          />
+          <div className="flex gap-2">
+            <button
+              className="mt-2 bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded-full cursor-pointer font-semibold transition"
+              onClick={handleReject}
+            >
+              Confirm Reject
+            </button>
+            <button
+              className="mt-2 bg-gray-400 hover:bg-gray-500 text-white px-6 py-2 rounded-full cursor-pointer font-semibold transition"
+              onClick={() => setShowRejectNote(false)}
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+  )}
       
       {/* Apply Job Modal */}
-      {!isHR && job && !hasApplied && (
+      {!isHR && !isModerator && job && !hasApplied && (
         <ApplyJobModal 
           jobId={job.id} 
           jobTitle={job.title} 
@@ -643,7 +743,7 @@ export default function JobDetail({ job: propJob, jobDetailData, isHR, isSaved =
       )}
 
       {/* Candidate Application Details */}
-      {!isHR && hasApplied && job && (
+      {!isHR && !isModerator && hasApplied && job && (
         <CandidateApplication jobId={job.id} applicationId={applicationId} />
       )}
 
