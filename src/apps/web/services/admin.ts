@@ -182,7 +182,7 @@ export const rejectCompany = async (companyId: string, reason: string): Promise<
   }
 };
 
-export const rejectJob = async (jobId: string, notes: string): Promise<{ success: boolean; message: string }> => {
+export const rejectJob = async (jobId: string, moderator_notes: string): Promise<{ success: boolean; message: string }> => {
   try {
     const token = getToken();
     const response = await fetch(`${API_URL}/admin/jobs/${jobId}/reject`, {
@@ -191,7 +191,7 @@ export const rejectJob = async (jobId: string, notes: string): Promise<{ success
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${token}`,
       },
-      body: JSON.stringify({ notes }),
+      body: JSON.stringify({ moderator_notes }),
     });
 
     const result = await response.json();
