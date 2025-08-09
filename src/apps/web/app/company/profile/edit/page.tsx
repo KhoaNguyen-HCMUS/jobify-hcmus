@@ -1,7 +1,8 @@
 "use client";
 import { useState, useEffect } from "react";
-import { MapPin, Briefcase, Globe, Building, Barcode, Phone, Mail, Users, Calendar } from "lucide-react";
+import { MapPin, Briefcase, Globe, Building, Barcode, Phone, Mail, Users, Calendar, ChevronDown, X } from "lucide-react";
 import { getCompanyProfile, updateCompanyProfile, CompanyProfile, UpdateCompanyData } from "../../../../services/companyProfile";
+import { getAllIndustries, Industry, getIndustriesByCategory, IndustryCategory } from "../../../../services/industries";
 import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
 import ProtectedRoute from "../../../../components/ProtectedRoute";
@@ -21,8 +22,15 @@ function RecruiterProfileEditContent() {
   const [description, setDescription] = useState("");
   const [address, setAddress] = useState("");
   const [industry, setIndustry] = useState("");
+  const [selectedIndustries, setSelectedIndustries] = useState<string[]>([]);
   const [size, setSize] = useState("");
   const [foundedYear, setFoundedYear] = useState("");
+
+  // Industry data
+  const [industries, setIndustries] = useState<Industry[]>([]);
+  const [industryCategories, setIndustryCategories] = useState<IndustryCategory[]>([]);
+  const [showIndustryDropdown, setShowIndustryDropdown] = useState(false);
+  const [industrySearchTerm, setIndustrySearchTerm] = useState("");
 
   useEffect(() => {
     const loadCompanyProfile = async () => {
@@ -42,6 +50,11 @@ function RecruiterProfileEditContent() {
           setDescription(profile.description || "");
           setAddress(profile.address || "");
           setIndustry(profile.industry || "");
+          // Parse industries from string to array if they exist
+          if (profile.industry) {
+            const industriesArray = profile.industry.split(',').map(ind => ind.trim()).filter(ind => ind);
+            setSelectedIndustries(industriesArray);
+          }
           setSize(profile.size || "");
           setFoundedYear(profile.founded_year ? profile.founded_year.toString() : "");
         } else {
@@ -55,7 +68,63 @@ function RecruiterProfileEditContent() {
       }
     };
 
+    const fetchIndustries = async () => {
+      try {
+        const response = await getAllIndustries();
+        if (response.success && response.data) {
+          setIndustries(response.data);
+          const categories = getIndustriesByCategory(response.data);
+          setIndustryCategories(categories);
+        }
+      } catch (error) {
+        console.error('Error fetching industries:', error);
+      }
+    };
+
     loadCompanyProfile();
+    fetchIndustries();
+  }, []);
+
+  const handleIndustryToggle = (industryName: string) => {
+    setSelectedIndustries(prev => {
+      if (prev.includes(industryName)) {
+        return prev.filter(ind => ind !== industryName);
+      } else {
+        return [...prev, industryName];
+      }
+    });
+  };
+
+  const removeIndustry = (industryName: string) => {
+    setSelectedIndustries(prev => prev.filter(ind => ind !== industryName));
+  };
+
+  const filteredIndustries = industries.filter(industry =>
+    industry.name.toLowerCase().includes(industrySearchTerm.toLowerCase())
+  );
+
+  const filteredCategories = industrySearchTerm 
+    ? industryCategories.map(category => ({
+        ...category,
+        children: category.children.filter(industry =>
+          industry.name.toLowerCase().includes(industrySearchTerm.toLowerCase())
+        )
+      })).filter(category => category.children.length > 0)
+    : industryCategories;
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as Element;
+      if (!target.closest('.industry-dropdown')) {
+        setShowIndustryDropdown(false);
+        setIndustrySearchTerm(""); // Clear search when dropdown closes
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
   }, []);
 
   const handleSubmit = async () => {
@@ -71,7 +140,7 @@ function RecruiterProfileEditContent() {
         email: email.trim() || undefined,
         description: description.trim() || undefined,
         address: address.trim() || undefined,
-        industry: industry.trim() || undefined,
+        industry: selectedIndustries.length > 0 ? selectedIndustries.join(', ') : undefined,
         size: size.trim() || undefined,
         founded_year: foundedYear ? parseInt(foundedYear) : undefined,
       };
@@ -332,18 +401,141 @@ function RecruiterProfileEditContent() {
             >
               Industry:
             </label>
-            <div className="relative">
-              <div className="absolute left-4 top-1/2 transform -translate-y-1/2 text-primary">
+            <div className="relative industry-dropdown z-100">
+              <div className="absolute left-4 top-1/2 transform -translate-y-1/2 text-primary z-10">
                 <Briefcase size={18} />
               </div>
-              <input
-                id="industry"
-                type="text"
-                value={industry}
-                onChange={(e) => setIndustry(e.target.value)}
-                placeholder="Enter industry (comma separated for multiple)"
-                className="w-full border border-primary-60 pl-12 pr-4 py-2 bg-neutral-light-20 rounded-xl text-primary-80 outline-none focus:ring-1 focus:bg-white transition-all duration-300"
-              />
+              <div className="relative">
+                <div
+                  className="w-full border border-primary-60 pl-12 pr-10 py-2 bg-neutral-light-20 rounded-xl text-primary-80 outline-none focus:ring-1 focus:primary focus:bg-white transition-all duration-300 cursor-pointer min-h-[42px] flex items-center"
+                  onClick={() => {
+                    setShowIndustryDropdown(!showIndustryDropdown);
+                    if (!showIndustryDropdown) {
+                      // Auto-focus search input when dropdown opens
+                      setTimeout(() => {
+                        const searchInput = document.querySelector('.industry-search-input') as HTMLInputElement;
+                        if (searchInput) {
+                          searchInput.focus();
+                        }
+                      }, 100);
+                    }
+                  }}
+                >
+                  <div className="flex flex-wrap gap-1 flex-1">
+                    {selectedIndustries.length > 0 ? (
+                      selectedIndustries.map((industryName, index) => (
+                        <span
+                          key={index}
+                          className="bg-primary-20 text-primary px-2 py-1 rounded-lg text-sm flex items-center gap-1"
+                        >
+                          {industryName}
+                          <X
+                            size={14}
+                            className="cursor-pointer hover:text-accent"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              removeIndustry(industryName);
+                            }}
+                          />
+                        </span>
+                      ))
+                    ) : (
+                      <span className="text-primary-60">Select industries</span>
+                    )}
+                  </div>
+                  <div className="absolute right-4 top-1/2 transform -translate-y-1/2 text-primary cursor-pointer">
+                    <ChevronDown size={18} />
+                  </div>
+                </div>
+              </div>
+              {showIndustryDropdown && (
+                <div className="absolute z-10 w-full mt-1 bg-white border border-primary-60 rounded-xl shadow-lg max-h-60 overflow-hidden">
+                  {/* Search Input */}
+                  <div className="p-3 border-b border-primary-20">
+                    <input
+                      type="text"
+                      placeholder="Search industries..."
+                      value={industrySearchTerm}
+                      onChange={(e) => setIndustrySearchTerm(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' && filteredIndustries.length > 0) {
+                          e.preventDefault();
+                          const firstIndustry = filteredIndustries.sort((a, b) => a.name.localeCompare(b.name))[0];
+                          handleIndustryToggle(firstIndustry.name);
+                          setIndustrySearchTerm("");
+                        }
+                      }}
+                      className="industry-search-input w-full px-3 py-2 border border-primary-40 rounded-lg text-primary-80 outline-none focus:ring-1 focus:ring-accent focus:border-accent"
+                      onClick={(e) => e.stopPropagation()}
+                    />
+                  </div>
+                  {/* Industry List */}
+                  <div className="max-h-48 overflow-y-auto">
+                    {industrySearchTerm ? (
+                      // Show flat filtered list when searching
+                      filteredIndustries.length > 0 ? (
+                        filteredIndustries
+                          .sort((a, b) => a.name.localeCompare(b.name))
+                          .map((industry) => (
+                          <div
+                            key={industry.id}
+                            className={`px-4 py-2 hover:bg-neutral-light-80 cursor-pointer text-primary-80 flex items-center gap-2 ${
+                              selectedIndustries.includes(industry.name) ? 'bg-primary-20' : ''
+                            }`}
+                            onClick={() => handleIndustryToggle(industry.name)}
+                          >
+                            <input
+                              type="checkbox"
+                              checked={selectedIndustries.includes(industry.name)}
+                              onChange={() => {}}
+                              className="w-4 h-4 text-accent bg-gray-100 border-gray-300 rounded focus:ring-accent"
+                            />
+                            <span className="flex-1">{industry.name}</span>
+                          </div>
+                        ))
+                      ) : (
+                        <div className="px-4 py-2 text-primary-60 text-center">
+                          No industries found
+                        </div>
+                      )
+                    ) : (
+                      // Show categorized list when not searching
+                      filteredCategories.length > 0 ? (
+                        filteredCategories.map((category) => (
+                          <div key={category.id}>
+                            {/* Category Header */}
+                            <div className="px-4 py-2 bg-neutral-light-40 text-primary font-semibold text-sm border-b border-primary-20">
+                              {category.name}
+                            </div>
+                            {/* Category Children */}
+                            {category.children.map((industry) => (
+                              <div
+                                key={industry.id}
+                                className={`px-6 py-2 hover:bg-neutral-light-80 cursor-pointer text-primary-80 flex items-center gap-2 ${
+                                  selectedIndustries.includes(industry.name) ? 'bg-primary-20' : ''
+                                }`}
+                                onClick={() => handleIndustryToggle(industry.name)}
+                              >
+                                <input
+                                  type="checkbox"
+                                  checked={selectedIndustries.includes(industry.name)}
+                                  onChange={() => {}}
+                                  className="w-4 h-4 text-accent bg-gray-100 border-gray-300 rounded focus:ring-accent"
+                                />
+                                <span className="flex-1">{industry.name}</span>
+                              </div>
+                            ))}
+                          </div>
+                        ))
+                      ) : (
+                        <div className="px-4 py-2 text-primary-60 text-center">
+                          No industries available
+                        </div>
+                      )
+                    )}
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </div>
