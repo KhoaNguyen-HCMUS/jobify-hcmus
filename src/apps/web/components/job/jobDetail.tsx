@@ -58,7 +58,7 @@ export default function JobDetail({ job: propJob, jobDetailData, isHR, isModerat
   const userRole = getUserRole();
   const router = useRouter();
   const searchParams = useSearchParams();
-  const isFull = jobDetailData?.job.applications_count === jobDetailData?.job.number_of_openings;
+  const isFull = jobDetailData?.job?.applications_count === jobDetailData?.job?.number_of_openings;
   const [showRejectNote, setShowRejectNote] = useState(false);
   const [rejectNote, setRejectNote] = useState("");
 
@@ -358,7 +358,7 @@ export default function JobDetail({ job: propJob, jobDetailData, isHR, isModerat
                     disabled
                     className="px-6 py-2 bg-accent rounded-full text-background font-semibold text-lg cursor-not-allowed"
                   >
-                    Applied: {job.applications_count}/{job.number_of_openings}
+                    Applied: {job?.applications_count || 0}/{job?.number_of_openings || 0}
                   </button>
                 
                 {userRole === 'candidate' && (
