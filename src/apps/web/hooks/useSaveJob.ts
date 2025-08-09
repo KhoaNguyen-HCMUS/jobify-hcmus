@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { saveJob, unsaveJob } from '../services/jobs';
-import { toast } from 'react-hot-toast';
+import { toast } from 'react-toastify';
 import { isAuthenticated } from '../utils/auth';
 
 export const useSaveJob = () => {
