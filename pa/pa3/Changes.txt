@@ -1,0 +1,1 @@
+﻿We decided to split the "View/Edit Profile" use case into two separate use cases: View/Edit Candidate Profile and View/Edit Company Profile
