@@ -7,7 +7,7 @@ export default function HomePage() {
   return (
     <div className="w-full min-h-screen bg-accent-40">
       <div className="mb-10">
-        <h1 className="font-bold text-7xl text-primary mb-10">
+        <h1 className="font-bold text-7xl text-primary ml-16 py-10">
           Find Opportunities <br /> That Fit You Best!
         </h1>
         <p className="text-2xl text-secondary ml-16">
@@ -16,18 +16,23 @@ export default function HomePage() {
         </p>
       </div>
       <div>
-        <KeywordSearch />
+        <div className="mx-16 mb-16">
+          <KeywordSearch />
+        </div>
         <div className="bg-neutral-light-40">
-          <h2 className="font-bold text-4xl text-primary pl-10 w-full mb-6 pt-6">
+          <div className="flex justify-between font-bold text-4xl text-primary px-10 w-full mb-6 pt-6">
             <i>New Jobs</i>
-            <a href="/jobs" className="text-accent underline hover:text-accent/80 text-xl ml-4">
+            <a
+              href="/jobs"
+              className="text-accent hover:text-primary text-xl ml-4"
+            >
               See all
             </a>
-          </h2>
+          </div>
           <FeaturedJob />
         </div>
         <div className="bg-accent-20">
-          <h2 className="font-bold text-4xl text-neutral-light-20 pl-10 py-6 w-full bg-primary mb-6">
+          <h2 className="font-bold text-4xl text-neutral-light-20 pl-10 py-6 w-full bg-primary">
             <i>Top Outstanding Industries</i>
           </h2>
           <CategoryGrid />

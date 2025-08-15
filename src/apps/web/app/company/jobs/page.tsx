@@ -17,8 +17,8 @@ const transformJobForCard = (job: Job) => ({
   salary_max: job.salary_max,
   currency: job.currency,
   province: job.province,
-  logo: "/logo.png", 
-  name: job.title, 
+  logo: "/logo.png",
+  name: job.title,
   status: job.status,
   created_at: new Date(job.created_at),
 });
@@ -33,11 +33,13 @@ function RecruiterJobsContent() {
     const fetchCompanyJobs = async () => {
       try {
         setIsLoading(true);
-        
+
         const response = await getJobsByCompany();
         if (response.success && response.data) {
-          const sortedJobs = response.data.sort((a, b) => 
-            new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+          const sortedJobs = response.data.sort(
+            (a, b) =>
+              new Date(b.created_at).getTime() -
+              new Date(a.created_at).getTime()
           );
           setJobs(sortedJobs);
         } else {
@@ -95,19 +97,19 @@ function RecruiterJobsContent() {
     <div className="w-full min-h-screen h-full bg-neutral-light-60">
       <div className="flex flex-col px-20 py-10 gap-6">
         <div className="flex justify-between">
-          <button
-            onClick={() => setIsOpen(true)}
+          <a
+            href="/company/post"
             className="border-2 border-secondary text-secondary font-semibold rounded-full flex items-center px-4 hover:bg-secondary hover:text-accent-20 transition cursor-pointer"
           >
             <Plus size={24} />
             <span>Post new job</span>
-          </button>
+          </a>
           <KeyWord />
         </div>
 
         {/* Jobs Count */}
         <div className="text-gray-600">
-          You have {jobs.length} job posting{jobs.length !== 1 ? 's' : ''}
+          You have {jobs.length} job posting{jobs.length !== 1 ? "s" : ""}
         </div>
 
         {/* Jobs Grid */}
@@ -118,7 +120,12 @@ function RecruiterJobsContent() {
                 <JobCard key={job.id} job={transformJobForCard(job)} />
               ))}
             </div>
-            <Pagination page={page} maxPage={maxPage} onNext={next} onPrev={prev} />
+            <Pagination
+              page={page}
+              maxPage={maxPage}
+              onNext={next}
+              onPrev={prev}
+            />
           </>
         ) : (
           <div className="text-center py-16">
@@ -138,15 +145,13 @@ function RecruiterJobsContent() {
           </div>
         )}
       </div>
-      
-      <JobPostModal isOpen={isOpen} onClose={() => setIsOpen(false)} />
     </div>
   );
 }
 
 export default function RecruiterJobsSavedPage() {
   return (
-    <ProtectedRoute allowedRoles={['company']}>
+    <ProtectedRoute allowedRoles={["company"]}>
       <RecruiterJobsContent />
     </ProtectedRoute>
   );

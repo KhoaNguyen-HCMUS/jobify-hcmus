@@ -154,19 +154,18 @@ export default function SideBar() {
     icon?: React.ReactElement;
   }[] = candidateItems;
 
-
   if (user?.role === "candidate") {
     sideBarItems = candidateItems;
   } else if (user?.role === "company") {
     sideBarItems = recruiterItems;
   } else if (user?.role === "moderator" || user?.role === "admin") {
     sideBarItems = moderatorItems;
-  } 
+  }
 
   if (!user) return null;
   return (
     <aside
-      className={`fixed md:flex  top-20 left-0 bottom-0 z-40 w-72 transition-all duration-300 bg-neutral-light-40 backdrop-blur-md shadow-lg min-h-screen`}
+      className={`fixed md:flex top-20 left-0 bottom-0 z-40 w-72 transition-all duration-300 bg-neutral-light-40 backdrop-blur-md shadow-lg min-h-screen`}
     >
       <div className="container">
         <div className="flex flex-col">

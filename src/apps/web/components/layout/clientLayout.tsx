@@ -40,7 +40,7 @@ export default function ClientLayout({
       "/register/candidate",
       "/register/company",
       "/pending-approval",
-      "/about-us",
+      "/about",
       "/jobs",
       "/company-detail",
       "/job-detail",
@@ -48,9 +48,11 @@ export default function ClientLayout({
       "/support",
       "/recruiter/applications",
       "/operator/report-detail",
+      "/company/post",
     ].includes(pathname) ||
     pathname.startsWith("/jobs/") ||
     pathname.startsWith("/reports/") ||
+    pathname.startsWith("/company/post/") ||
     pathname.startsWith("/company-detail/");
 
   return (
@@ -58,9 +60,9 @@ export default function ClientLayout({
       {!hideNav && <Nav />}
       {!hideSideBar && <SideBar />}
       <main
-       className={`${!hideNav ? "pt-20" : ""} ${
-      !hideSideBar ? "pl-72" : ""
-    } min-h-screen`.trim()}
+        className={`${!hideNav ? "pt-20" : ""} ${
+          !hideSideBar ? "pl-72" : ""
+        } min-h-screen`.trim()}
       >
         {children}
       </main>

@@ -41,9 +41,7 @@ export default function CompanyDetailModal({
         <div className="flex flex-col">
           <div className="flex flex-col gap-2 mx-10 my-4">
             <div className="flex justify-between">
-              <span className="text-primary text-2xl font-bold">
-                Profile:
-              </span>
+              <span className="text-primary text-2xl font-bold">Profile:</span>
               <CircleX
                 size={24}
                 className="text-primary-80 cursor-pointer"
@@ -86,20 +84,14 @@ export default function CompanyDetailModal({
                         <span className="font-semibold">
                           Business License Number:
                         </span>
-                        <span>
-                          {company?.license_number}
-                        </span>
+                        <span>{company?.license_number}</span>
                       </div>
                       <div className="flex gap-2">
-                        <span className="font-semibold">
-                          Company Size:
-                        </span>
+                        <span className="font-semibold">Company Size:</span>
                         <span>{company?.size}</span>
                       </div>
                       <div className="flex gap-2">
-                        <span className="font-semibold">
-                          Company Website:
-                        </span>
+                        <span className="font-semibold">Company Website:</span>
                         <a
                           href={company?.website}
                           className="text-accent hover:underline"
@@ -153,7 +145,7 @@ export default function CompanyDetailModal({
             <div className="flex flex-col gap-2">
               <ModeratorNote />
               <div className="flex flex-wrap gap-2">
-                <button 
+                <button
                   onClick={onApprove}
                   className="font-semibold bg-accent hover:bg-secondary cursor-pointer text-neutral-light-20 px-4 py-2 rounded-full"
                 >
@@ -161,7 +153,7 @@ export default function CompanyDetailModal({
                 </button>
                 <button
                   onClick={() => setShowRejectModal(true)}
-                  className="font-semibold bg-[#F52121] hover:bg-red-800 cursor-pointer text-neutral-light-20 px-4 py-2 rounded-full"
+                  className="font-semibold bg-primary-60 hover:bg-primary cursor-pointer text-neutral-light-20 px-4 py-2 rounded-full"
                 >
                   Reject
                 </button>
@@ -176,10 +168,7 @@ export default function CompanyDetailModal({
         <div className="fixed inset-0 bg-primary/80 z-50 flex items-center justify-center">
           <div className="w-2/5 bg-neutral-light rounded-md">
             <div className="flex flex-col gap-2 mx-20 my-10 space-y-4">
-              <RejectReason 
-                value={rejectReason}
-                onChange={setRejectReason}
-              />
+              <RejectReason value={rejectReason} onChange={setRejectReason} />
               <div className="flex flex-wrap gap-2">
                 <button
                   onClick={() => onReject(rejectReason)}

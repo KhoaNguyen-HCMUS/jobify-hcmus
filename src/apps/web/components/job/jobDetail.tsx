@@ -20,17 +20,17 @@ import ApplyJobModal from "./applyJobModal";
 import JobEditModal from "./JobEditModal";
 import CandidateApplication from "./candidateApplication";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Job, updateJob, closeJob, deleteJob } from "../../services/jobs";
+import { Job, updateJob, closeJob } from "../../services/jobs";
 import { useSaveJob } from "../../hooks/useSaveJob";
-import { useCancelApplication } from "../../hooks/useCancelApplication";    
+import { useCancelApplication } from "../../hooks/useCancelApplication";
 import { getUserRole } from "../../utils/auth";
 import { CompanyProfile } from "../../services/companyProfile";
 import GoBack from "../goBack";
 import { toast } from "react-toastify";
 import { getToken } from "../../utils/auth";
 import JobStatusBadge from "./jobStatusBadge";
-import ModeratorNote from "../moderatorNote";
 import { approveJob, rejectJob } from "../../services/admin";
+import { formatDateForDisplay } from "../../utils/dateUtils";
 
 interface JobDetailData {
   company: CompanyProfile;
@@ -45,45 +45,58 @@ interface JobDetailProps {
   isModerator?: boolean;
 }
 
-export default function JobDetail({ job: propJob, jobDetailData, isHR, isModerator, isSaved = false }: JobDetailProps) {
-  const [job, setJob] = useState<Job | null>(propJob || jobDetailData?.job || null);
-  const [company, setCompany] = useState<CompanyProfile | null>(jobDetailData?.company || null);
+export default function JobDetail({
+  job: propJob,
+  jobDetailData,
+  isHR,
+  isModerator,
+  isSaved = false,
+}: JobDetailProps) {
+  const [job, setJob] = useState<Job | null>(
+    propJob || jobDetailData?.job || null
+  );
+  const [company, setCompany] = useState<CompanyProfile | null>(
+    jobDetailData?.company || null
+  );
   const [isSavedState, setIsSavedState] = useState<boolean>(isSaved);
   const [isApplyModalOpen, setIsApplyModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [hasApplied, setHasApplied] = useState<boolean>(false);
   const [applicationId, setApplicationId] = useState<string | null>(null);
   const { handleSaveJob, handleUnsaveJob, isSaving } = useSaveJob();
-  const { handleCancelApplication, isLoading: isCancelling } = useCancelApplication();
+  const { handleCancelApplication, isLoading: isCancelling } =
+    useCancelApplication();
   const userRole = getUserRole();
   const router = useRouter();
   const searchParams = useSearchParams();
-  const isFull = jobDetailData?.job.applications_count === jobDetailData?.job.number_of_openings;
+  const isFull =
+    jobDetailData?.job.applications_count ===
+    jobDetailData?.job.number_of_openings;
   const [showRejectNote, setShowRejectNote] = useState(false);
   const [rejectNote, setRejectNote] = useState("");
 
   const handleSaveClick = async () => {
     if (!job) return;
-    
+
     let newSavedState: boolean;
-    
+
     if (isSavedState) {
       newSavedState = await handleUnsaveJob(job.id);
     } else {
       newSavedState = await handleSaveJob(job.id);
     }
-    
+
     if (newSavedState !== isSavedState) {
       setIsSavedState(newSavedState);
-      
+
       const newUrl = new URL(window.location.href);
       if (newSavedState) {
-        newUrl.searchParams.set('saved', 'true');
+        newUrl.searchParams.set("saved", "true");
       } else {
-        newUrl.searchParams.delete('saved');
+        newUrl.searchParams.delete("saved");
       }
-      window.history.replaceState({}, '', newUrl.toString());
-      
+      window.history.replaceState({}, "", newUrl.toString());
+
       if (!newSavedState && isSaved) {
         const referrer = document.referrer;
       }
@@ -91,7 +104,13 @@ export default function JobDetail({ job: propJob, jobDetailData, isHR, isModerat
   };
 
   const handleEditClick = () => {
-    setIsEditModalOpen(true);
+    if (job) {
+      router.push(
+        `/company/post/edit?jobId=${job.id}&jobTitle=${encodeURIComponent(
+          job.title
+        )}`
+      );
+    }
   };
 
   const handleJobUpdated = () => {
@@ -100,7 +119,7 @@ export default function JobDetail({ job: propJob, jobDetailData, isHR, isModerat
 
   const handleCloseClick = async () => {
     if (!job) return;
-    
+
     if (window.confirm("Are you sure you want to close this job?")) {
       try {
         const token = getToken();
@@ -123,53 +142,32 @@ export default function JobDetail({ job: propJob, jobDetailData, isHR, isModerat
     }
   };
 
-  const handleDeleteClick = async () => {
-    if (!job) return;
-    
-    if (window.confirm("Are you sure you want to delete this job? This action cannot be undone.")) {
-      try {
-        const token = getToken();
-        if (!token) {
-          toast.error("Please login again!");
-          return;
-        }
-
-        const response = await deleteJob(job.id, token);
-        if (response.success) {
-          toast.success("Job deleted successfully!");
-          router.push("/company/jobs");
-        } else {
-          toast.error("Failed to delete job: " + response.message);
-        }
-      } catch (error) {
-        toast.error("Error deleting job, please try again later.");
-        console.error("Error deleting job:", error);
-      }
-    }
-  };
-
   const handleViewApplicationsClick = () => {
     if (job) {
-      router.push(`/company/applications?jobId=${job.id}&jobTitle=${encodeURIComponent(job.title)}`);
+      router.push(
+        `/company/applications?jobId=${job.id}&jobTitle=${encodeURIComponent(
+          job.title
+        )}`
+      );
     }
   };
 
   const handleCancelApplicationClick = async () => {
     if (!job) {
-      toast.error('Job not found');
+      toast.error("Job not found");
       return;
     }
 
-    if (window.confirm('Are you sure you want to cancel your application?')) {
+    if (window.confirm("Are you sure you want to cancel your application?")) {
       const success = await handleCancelApplication(job.id);
       if (success) {
         setHasApplied(false);
         setApplicationId(null);
-        
+
         const newUrl = new URL(window.location.href);
-        newUrl.searchParams.delete('application_id');
-        newUrl.searchParams.delete('from');
-        window.history.replaceState({}, '', newUrl.toString());
+        newUrl.searchParams.delete("application_id");
+        newUrl.searchParams.delete("from");
+        window.history.replaceState({}, "", newUrl.toString());
       }
     }
   };
@@ -177,12 +175,12 @@ export default function JobDetail({ job: propJob, jobDetailData, isHR, isModerat
   const handleApplySuccess = (applicationId: string) => {
     setHasApplied(true);
     setApplicationId(applicationId);
-    
+
     // Update URL params
     const newUrl = new URL(window.location.href);
-    newUrl.searchParams.set('from', 'applied');
-    newUrl.searchParams.set('application_id', applicationId);
-    window.history.replaceState({}, '', newUrl.toString());
+    newUrl.searchParams.set("from", "applied");
+    newUrl.searchParams.set("application_id", applicationId);
+    window.history.replaceState({}, "", newUrl.toString());
   };
 
   const handleApprove = async () => {
@@ -224,9 +222,9 @@ export default function JobDetail({ job: propJob, jobDetailData, isHR, isModerat
   useEffect(() => {
     const checkIfApplied = () => {
       // Check if coming from jobs-applied page
-      const fromAppliedJobs = searchParams.get('from') === 'applied';
-      const appId = searchParams.get('application_id');
-      
+      const fromAppliedJobs = searchParams.get("from") === "applied";
+      const appId = searchParams.get("application_id");
+
       if (fromAppliedJobs) {
         setHasApplied(true);
         if (appId) {
@@ -250,22 +248,27 @@ export default function JobDetail({ job: propJob, jobDetailData, isHR, isModerat
     );
   }
 
-  const salaryText = job.is_salary_negotiable 
-    ? 'Negotiable' 
-    : `${parseInt(job.salary_min).toLocaleString()} - ${parseInt(job.salary_max).toLocaleString()}`;
+  const salaryText = job.is_salary_negotiable
+    ? "Negotiable"
+    : `${parseInt(job.salary_min).toLocaleString()} - ${parseInt(
+        job.salary_max
+      ).toLocaleString()}`;
 
-  const deadlineDate = job.deadline ? new Date(job.deadline).toLocaleDateString() : 'Not specified';
+  const deadlineDate = job.deadline
+    ? new Date(job.deadline).toLocaleDateString()
+    : "Not specified";
+
+  const postedAt = formatDateForDisplay(job.created_at);
 
   return (
-    <div className="bg-neutral-light-40 min-h-screen">
-      <div className="flex flex-col mx-6 my-4">
+    <div className="bg-neutral-light-40 min-h-screen py-4">
+      <div className="flex flex-col mx-6">
         <GoBack />
-        
       </div>
 
-      <div className="flex flex-wrap gap-8 px-6">
-        <div className="flex-2 space-y-4">
-          <div className="flex flex-col justify-between bg-neutral-light-20 shadow-xl rounded-3xl space-y-4 p-6">
+      <div className="grid grid-cols-1 md:grid-cols-[2fr_1fr] gap-10 mx-10 py-6">
+        <div className="flex flex-col gap-8">
+          <div className="flex flex-col justify-between bg-neutral-light-20 shadow-xl rounded-3xl space-y-4 p-4">
             <div className="text-primary font-semibold text-2xl">
               {job.title}
             </div>
@@ -313,90 +316,171 @@ export default function JobDetail({ job: propJob, jobDetailData, isHR, isModerat
                 </div>
               </div>
             </div>
-            <div className="flex flex-wrap gap-4 justify-between">
-              <div className="flex relative bg-highlight rounded-xl px-2">
-                <div className="absolute left-4 top-1/2 transform -translate-y-1/2 text-primary-80">
-                  <Clock size={24} />
+            <div className="flex flex-wrap gap-2 justify-between">
+              <div className="flex flex-wrap gap-2">
+                <div className="flex relative bg-highlight rounded-xl px-2">
+                  <div className="absolute left-2 top-1/2 transform -translate-y-1/2 text-primary-80">
+                    <Clock size={24} />
+                  </div>
+                  <span className="w-full pl-8 pr-2 py-2 font-semibold rounded-xl text-primary-80 ">
+                    Posted Date: {postedAt}
+                  </span>
                 </div>
-                <span className="w-full pl-10 pr-4 py-2 text-lg font-semibold rounded-xl text-primary-80 ">
-                  Deadline: {deadlineDate}
-                </span>
+                <div className="flex relative bg-highlight rounded-xl px-2">
+                  <div className="absolute left-2 top-1/2 transform -translate-y-1/2 text-primary-80">
+                    <Clock size={24} />
+                  </div>
+                  <span className="w-full pl-8 pr-2 py-2 font-semibold rounded-xl text-primary-80 ">
+                    Deadline: {deadlineDate}
+                  </span>
+                </div>
               </div>
-              <div className="flex flex-wrap gap-4">
-                {(!isHR && !isModerator) && (
-                 <button
-                  onClick={hasApplied || isFull ? undefined : () => setIsApplyModalOpen(true)}
-                  disabled={hasApplied || isFull}
-                  className={`px-6 py-2 rounded-full font-semibold text-lg transition-all duration-300 transform ${
-                    hasApplied
-                      ? 'bg-green-600 text-white cursor-not-allowed'
-                      : isFull
-                      ? 'bg-gray-400 text-white cursor-not-allowed'
-                      : 'bg-accent text-background hover:shadow-lg hover:shadow-primary/30 hover:-translate-y-0.5 cursor-pointer'
-                  }`}
-                >
-                  {hasApplied
-                    ? 'Applied ✓'
-                    : isFull
-                    ? 'Full'
-                    : 'Apply now'}
-                </button>
+              <div className="flex flex-wrap gap-2">
+                {!isHR && !isModerator && (
+                  <button
+                    onClick={
+                      hasApplied || isFull
+                        ? undefined
+                        : () => setIsApplyModalOpen(true)
+                    }
+                    disabled={hasApplied || isFull}
+                    className={`px-4 py-2 rounded-full font-semibold transition-all duration-300 transform ${
+                      hasApplied
+                        ? "bg-green-600 text-white cursor-not-allowed"
+                        : isFull
+                        ? "bg-gray-400 text-white cursor-not-allowed"
+                        : "bg-accent text-background hover:shadow-lg hover:shadow-primary/30 hover:-translate-y-0.5 cursor-pointer"
+                    }`}
+                  >
+                    {hasApplied ? "Applied ✓" : isFull ? "Full" : "Apply now"}
+                  </button>
                 )}
-                {!isHR && hasApplied && userRole === 'candidate' && (
+                {!isHR && hasApplied && userRole === "candidate" && (
                   <button
                     onClick={handleCancelApplicationClick}
                     disabled={isCancelling}
-                    className={`px-6 py-2 rounded-full font-semibold text-lg transition-all duration-300 hover:shadow-lg hover:shadow-red-500/30 transform hover:-translate-y-0.5 flex items-center gap-2 bg-red-500 text-white hover:bg-red-600 ${
-                      isCancelling ? 'opacity-50 cursor-not-allowed' : ''
+                    className={`px-4 py-2 rounded-full font-semibold transition-all duration-300 hover:shadow-lg hover:shadow-red-500/30 transform hover:-translate-y-0.5 flex items-center gap-2 bg-primary-60 text-white hover:bg-red-600 cursor-pointer ${
+                      isCancelling ? "opacity-50 cursor-not-allowed" : ""
                     }`}
                   >
                     <X size={20} />
                     Cancel Application
                   </button>
                 )}
-                  <button
-                    disabled
-                    className="px-6 py-2 bg-accent rounded-full text-background font-semibold text-lg cursor-not-allowed"
-                  >
-                    Applied: {job.applications_count}/{job.number_of_openings}
-                  </button>
-                
-                {userRole === 'candidate' && (
+                <button
+                  disabled
+                  className="px-4 py-2 bg-accent rounded-full text-background font-semibold cursor-not-allowed"
+                >
+                  Applied: {job.applications_count}/{job.number_of_openings}
+                </button>
+
+                {userRole === "candidate" && (
                   <button
                     onClick={handleSaveClick}
                     disabled={isSaving}
-                    className={`px-6 py-2 rounded-full font-semibold text-lg transition-all duration-300 hover:shadow-lg hover:shadow-primary/30 transform hover:-translate-y-0.5 flex items-center gap-2 ${
-                      isSavedState 
-                        ? 'bg-red-500 text-white hover:bg-red-600' 
-                        : 'bg-accent text-background hover:bg-accent/90'
-                    } ${isSaving ? 'opacity-50 cursor-not-allowed' : ''}`}
+                    className={`px-4 py-2 rounded-full font-semibold transition-all duration-300 hover:shadow-lg hover:shadow-primary/30 transform hover:-translate-y-0.5 flex items-center gap-2 cursor-pointer ${
+                      isSavedState
+                        ? "bg-red-500 text-white hover:bg-red-600"
+                        : "bg-accent text-background hover:bg-accent/90"
+                    } ${isSaving ? "opacity-50 cursor-not-allowed" : ""}`}
                   >
-                    <Heart 
-                      size={20} 
-                      className={isSavedState ? 'fill-white' : ''}
+                    <Heart
+                      size={20}
+                      className={isSavedState ? "fill-white" : ""}
                     />
-                    {isSavedState ? 'Saved' : 'Save'}
+                    {isSavedState ? "Saved" : "Save"}
                   </button>
                 )}
               </div>
             </div>
           </div>
-        </div>
 
-        <div className="flex-1 space-y-4">
-          <div className="flex flex-col justify-between bg-neutral-light-20 shadow-xl rounded-3xl space-y-4 p-6">
+          <div className="bg-neutral-light-20 shadow-xl rounded-3xl space-y-4">
+            <div className="flex flex-col">
+              <span className="w-full rounded-t-3xl text-background font-semibold text-2xl px-6 py-4 bg-secondary">
+                Job Detail
+              </span>
+              <div className="flex flex-col justify-between px-6 space-y-4 my-4">
+                <div className="">
+                  <h2 className="font-semibold text-accent">Job Description</h2>
+                  <p className="text-primary">
+                    {job.description || "No description available"}
+                  </p>
+                </div>
+                <div>
+                  <h2 className="font-semibold text-accent">
+                    Applicant Requirements
+                  </h2>
+                  <p className="text-primary">
+                    {job.requirements || "No requirements specified"}
+                  </p>
+                </div>
+                <div>
+                  <h2 className="font-semibold text-accent">Benefits</h2>
+                  <p className="text-primary">
+                    {job.benefits || "No benefits specified"}
+                  </p>
+                </div>
+                <div>
+                  <h2 className="font-semibold text-accent">Work Place</h2>
+                  <p className="text-primary">{job.work_place}</p>
+                </div>
+                <div>
+                  <h2 className="font-semibold text-accent">Working Time</h2>
+                  <p className="text-primary">
+                    {job.working_hours || "Not specified"}
+                  </p>
+                </div>
+                <div>
+                  <h2 className="font-semibold text-accent">
+                    {hasApplied ? "Application Status" : "Apply now!"}
+                  </h2>
+                  <p className="text-primary">
+                    {hasApplied
+                      ? "You have already applied for this position."
+                      : "Click the Apply button above to submit your application."}
+                  </p>
+                  {!isHR && !isModerator && (
+                    <button
+                      onClick={
+                        hasApplied || isFull
+                          ? undefined
+                          : () => setIsApplyModalOpen(true)
+                      }
+                      disabled={hasApplied || isFull}
+                      className={`px-4 py-2 mb-4 mt-4 rounded-full font-semibold transition-all duration-300 transform ${
+                        hasApplied
+                          ? "bg-green-600 text-white cursor-not-allowed"
+                          : isFull
+                          ? "bg-gray-400 text-white cursor-not-allowed"
+                          : "bg-accent text-background hover:-translate-y-0.5 cursor-pointer"
+                      }`}
+                    >
+                      {hasApplied ? "Applied ✓" : isFull ? "Full" : "Apply now"}
+                    </button>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div className="flex flex-col gap-8">
+          <div className="flex flex-col justify-between bg-neutral-light-20 shadow-xl rounded-3xl space-y-2 p-4">
             <div className="flex px-2">
               <img
                 src={company?.logo_url || "/logo.png"}
                 alt="Company"
                 className="border-1 rounded-xs w-16 h-16 object-contain"
               />
-              <div className="text-primary ml-4">{company?.company_name || "Company Name"}</div>
+              <div className="text-primary ml-4">
+                {company?.company_name || "Company Name"}
+              </div>
             </div>
-            <div className="px-4 space-y-3">
+
+            <div className="px-4 space-y-2">
               {company?.size && (
                 <div className="flex gap-10">
-                  <div className="flex gap-4">
+                  <div className="flex gap-2">
                     <Users size={24} className="text-primary" />
                     <span className="text-primary font-semibold">Scale: </span>
                   </div>
@@ -416,7 +500,9 @@ export default function JobDetail({ job: propJob, jobDetailData, isHR, isModerat
                 <div className="flex gap-3">
                   <div className="flex gap-2">
                     <MapPin size={24} className="text-primary" />
-                    <span className="text-primary font-semibold">Address: </span>
+                    <span className="text-primary font-semibold">
+                      Address:{" "}
+                    </span>
                   </div>
                   <span className="text-primary-80">{company.address}</span>
                 </div>
@@ -427,10 +513,13 @@ export default function JobDetail({ job: propJob, jobDetailData, isHR, isModerat
                     <Phone size={24} className="text-primary" />
                     <span className="text-primary font-semibold">Phone: </span>
                   </div>
-                  <span className="text-primary-80">{company.phone_number}</span>
+                  <span className="text-primary-80">
+                    {company.phone_number}
+                  </span>
                 </div>
               )}
             </div>
+
             <div className="flex space-x-1 text-accent font-semibold justify-center">
               <a href={`/company-detail/${company?.id}`} className="flex gap-2">
                 <p>View company page </p>
@@ -438,306 +527,219 @@ export default function JobDetail({ job: propJob, jobDetailData, isHR, isModerat
               </a>
             </div>
           </div>
-        </div>
-      </div>
 
-      <div className="flex flex-wrap gap-6 px-6">
-        <div className="flex-2 space-y-4">
           <div className="bg-neutral-light-20 shadow-xl rounded-3xl space-y-4">
             <div className="flex flex-col">
-              <span className="w-full rounded-t-3xl text-background font-semibold text-2xl px-6 py-4 bg-secondary">
-                Job detail
+              <span className="w-full rounded-t-3xl text-background font-semibold text-2xl text-center px-6 py-4 bg-secondary">
+                General Information
               </span>
-              <div className="flex flex-col justify-between px-6 space-y-4 mt-4">
-                <div className="">
-                  <h2 className="font-semibold text-accent">Job Description</h2>
-                  <p className="text-primary">{job.description || 'No description available'}</p>
-                </div>
-                <div>
-                  <h2 className="font-semibold text-accent">
-                    Applicant Requirements
-                  </h2>
-                  <p className="text-primary">{job.requirements || 'No requirements specified'}</p>
-                </div>
-                <div>
-                  <h2 className="font-semibold text-accent">Benefits</h2>
-                  <p className="text-primary">{job.benefits || 'No benefits specified'}</p>
-                </div>
-                <div>
-                  <h2 className="font-semibold text-accent">Work Place</h2>
-                  <p className="text-primary">{job.work_place}</p>
-                </div>
-                <div>
-                  <h2 className="font-semibold text-accent">Working Time</h2>
-                  <p className="text-primary">{job.working_hours || 'Not specified'}</p>
-                </div>
-                <div>
-                  
-                  <h2 className="font-semibold text-accent">
-                    {hasApplied ? 'Application Status' : 'Apply now!'}
-                  </h2>
-                  <p className="text-primary">
-                    {hasApplied 
-                      ? 'You have already applied for this position.' 
-                      : 'Click the Apply button above to submit your application.'
-                    }
-                  </p>
-                  {(!isHR && !isModerator) && (
-                     <button
-    onClick={hasApplied || isFull ? undefined : () => setIsApplyModalOpen(true)}
-    disabled={hasApplied || isFull}
-    className={`px-6 py-2 mb-4 mt-4 rounded-full font-semibold text-lg transition-all duration-300 transform ${
-      hasApplied
-        ? 'bg-green-600 text-white cursor-not-allowed'
-        : isFull
-        ? 'bg-gray-400 text-white cursor-not-allowed'
-        : 'bg-accent text-background hover:-translate-y-0.5 cursor-pointer'
-    }`}
-  >
-    {hasApplied
-      ? 'Applied ✓'
-      : isFull
-      ? 'Full'
-      : 'Apply now'}
-  </button>
-                  )}
-                </div>
-                 
-               </div>
-            </div>
-          </div>
-        </div>
-
-        <div className="flex-1 space-y-4">
-          <div className="flex flex-col justify-between rounded-xl p-4 space-y-4">
-            <div className="bg-neutral-light-20 shadow-xl rounded-3xl space-y-4">
-              <div className="flex flex-col justify-between">
-                <span className="w-full rounded-t-3xl text-background font-semibold text-2xl text-center px-6 py-4 bg-secondary">
-                  General Information
-                </span>
-                <div className="flex flex-col space-y-4 my-6 mx-6">
-                  <div className="flex px-4 gap-4">
-                    <ShieldHalf
-                      size={34}
-                      className="bg-linear-(--gradient-primary-2) rounded-full text-background"
-                    />
-                    <div className="flex flex-col justify-between">
-                      <span className="text-secondary font-semibold">
-                        Position
-                      </span>
-                      <span className="text-secondary-80">{job.position}</span>
-                    </div>
+              <div className="flex flex-col space-y-2 my-4 mx-6">
+                <div className="flex gap-4">
+                  <ShieldHalf
+                    size={44}
+                    className="bg-linear-(--gradient-primary-2) rounded-full text-background"
+                  />
+                  <div className="flex flex-col justify-between">
+                    <span className="text-secondary font-semibold">
+                      Position
+                    </span>
+                    <span className="text-secondary-80">{job.position}</span>
                   </div>
-                  <div className="flex px-4 gap-4">
-                    <GraduationCap
-                      size={34}
-                      className="bg-linear-(--gradient-primary-2) rounded-full text-background"
-                    />
-                    <div className="flex flex-col justify-between">
-                      <span className="text-secondary font-semibold">
-                        Education
-                      </span>
-                      <span className="text-secondary-80">
-                        {job.education_level}
-                      </span>
-                    </div>
+                </div>
+                <div className="flex gap-4">
+                  <GraduationCap
+                    size={44}
+                    className="bg-linear-(--gradient-primary-2) rounded-full text-background"
+                  />
+                  <div className="flex flex-col justify-between">
+                    <span className="text-secondary font-semibold">
+                      Education
+                    </span>
+                    <span className="text-secondary-80">
+                      {job.education_level}
+                    </span>
                   </div>
-                  <div className="flex px-4 gap-4">
-                    <Users
-                      size={34}
-                      className="bg-linear-(--gradient-primary-2) rounded-full text-background"
-                    />
-                    <div className="flex flex-col justify-between">
-                      <span className="text-secondary font-semibold">
-                        Number of openings
-                      </span>
-                      <span className="text-secondary-80">
-                        {job.number_of_openings}
-                      </span>
-                    </div>
+                </div>
+                <div className="flex gap-4">
+                  <Users
+                    size={44}
+                    className="bg-linear-(--gradient-primary-2) rounded-full text-background"
+                  />
+                  <div className="flex flex-col justify-between">
+                    <span className="text-secondary font-semibold">
+                      Number of openings
+                    </span>
+                    <span className="text-secondary-80">
+                      {job.number_of_openings}
+                    </span>
                   </div>
-                  <div className="flex px-4 gap-4">
-                    <BriefcaseBusiness
-                      size={34}
-                      className="bg-linear-(--gradient-primary-2) rounded-full text-background"
-                    />
-                    <div className="flex flex-col">
-                      <span className="text-secondary font-semibold">
-                        Job type
-                      </span>
-                      <span className="text-secondary-80">
-                        {job.job_type}
-                      </span>
-                    </div>
+                </div>
+                <div className="flex gap-4">
+                  <BriefcaseBusiness
+                    size={44}
+                    className="bg-linear-(--gradient-primary-2) rounded-full text-background"
+                  />
+                  <div className="flex flex-col">
+                    <span className="text-secondary font-semibold">
+                      Job type
+                    </span>
+                    <span className="text-secondary-80">{job.job_type}</span>
                   </div>
                 </div>
               </div>
             </div>
           </div>
 
-          <div className="flex flex-col justify-between rounded-xl p-4 space-y-4">
-            <div className="bg-neutral-light-20 shadow-xl rounded-3xl space-y-4">
-              <div className="flex flex-col justify-between">
-                <span className="w-full rounded-t-3xl text-background font-semibold text-2xl text-center px-6 py-4 bg-secondary">
-                  Job Tags
-                </span>
-                <div className="flex flex-col space-y-4 mx-6 my-6">
-                  <div className="flex flex-col space-y-2">
-                    <span className="font-semibold text-xl text-accent">
-                      Experience Level
+          <div className="bg-neutral-light-20 shadow-xl rounded-3xl space-y-4">
+            <div className="flex flex-col">
+              <span className="w-full rounded-t-3xl text-background font-semibold text-2xl text-center px-6 py-4 bg-secondary">
+                Job Tags
+              </span>
+              <div className="flex flex-col space-y-2 mx-6 my-4">
+                <div className="flex flex-col">
+                  <span className="font-semibold text-accent">
+                    Experience Level
+                  </span>
+                  <div className="grid grid-cols-2 gap-4">
+                    <span className="bg-highlight-40 rounded-full px-4 py-2 text-center text-primary font-semibold">
+                      {job.experience_level}
                     </span>
-                    <div className="grid grid-cols-2 gap-4 p-2">
-                      <span className="bg-highlight-40 rounded-full px-4 py-2 text-center text-primary font-semibold">
-                        {job.experience_level}
-                      </span>
-                    </div>
                   </div>
-                  <div className="flex flex-col space-y-2">
-                    <span className="font-semibold text-xl text-accent">
-                      Job Type
-                    </span>
-                    <div className="grid grid-cols-2 gap-4 p-2">
-                      <span className="bg-highlight-40 rounded-full px-4 py-2 text-center text-primary font-semibold">
-                        {job.job_type}
-                      </span>
-                    </div>
-                  </div>
-                  <div className="flex flex-col space-y-2">
-                    <span className="font-semibold text-xl text-accent">
-                      Location
-                    </span>
-                    <div className="grid grid-cols-2 gap-4 p-2">
-                      <span className="bg-highlight-40 rounded-full px-4 py-2 text-center text-primary font-semibold">
-                        {job.province}
-                      </span>
-                    </div>
-                  </div>
-                  {job.skills && (
-                    <div className="flex flex-col space-y-2">
-                      <span className="font-semibold text-xl text-accent">
-                        Skills
-                      </span>
-                      <div className="flex flex-wrap gap-2 p-2">
-                        {job.skills.split(',').map((skill, index) => (
-                          <span 
-                            key={index}
-                            className="bg-highlight-40 rounded-full px-4 py-2 text-center text-primary font-semibold"
-                          >
-                            {skill.trim()}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-                  )}
                 </div>
+                <div className="flex flex-col">
+                  <span className="font-semibold text-accent">Job Type</span>
+                  <div className="grid grid-cols-2 gap-4">
+                    <span className="bg-highlight-40 rounded-full px-4 py-2 text-center text-primary font-semibold">
+                      {job.job_type}
+                    </span>
+                  </div>
+                </div>
+                <div className="flex flex-col">
+                  <span className="font-semibold text-accent">Location</span>
+                  <div className="grid grid-cols-2 gap-4">
+                    <span className="bg-highlight-40 rounded-full px-4 py-2 text-center text-primary font-semibold">
+                      {job.province}
+                    </span>
+                  </div>
+                </div>
+                {job.skills && (
+                  <div className="flex flex-col">
+                    <span className="font-semibold text-accent">Skills</span>
+                    <div className="flex flex-wrap gap-2">
+                      {job.skills.split(",").map((skill, index) => (
+                        <span
+                          key={index}
+                          className="bg-highlight-40 rounded-full px-4 py-2 text-center text-primary font-semibold"
+                        >
+                          {skill.trim()}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           </div>
         </div>
       </div>
 
-      {(isHR) && (
+      {isHR && (
         <div className="flex flex-col gap-6 mx-6 my-4">
           <div className="flex gap-2 items-center">
             <span className="text-primary-80 font-semibold">Status:</span>
-            <JobStatusBadge status={job.status} /> 
+            <JobStatusBadge status={job.status} />
           </div>
-            <div className="flex gap-2 items-center">
-            <span className="text-primary-80 font-semibold">Moderator Notes:</span>
-            <span className="text-primary-80">{job.moderator_notes}</span>
-          </div>
-          
+
           <div className="flex gap-4">
-            <button 
+            <button
               onClick={handleEditClick}
-              className="bg-gray-500 hover:bg-gray-600 text-white px-6 py-2 rounded-full cursor-pointer"
+              className="bg-secondary-60 hover:bg-secondary text-background px-6 py-2 rounded-full cursor-pointer"
             >
               Edit
             </button>
-            <button 
+            <button
               onClick={handleViewApplicationsClick}
-              className="bg-gray-500 hover:bg-gray-600 text-white px-6 py-2 rounded-full cursor-pointer"
+              className="bg-secondary-60 hover:bg-secondary text-background px-6 py-2 rounded-full cursor-pointer"
             >
               View Applications
             </button>
-            <button 
+            <button
               onClick={handleCloseClick}
-              className="bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded-full cursor-pointer"
+              className="bg-secondary-60 hover:bg-secondary text-background px-6 py-2 rounded-full cursor-pointer"
             >
               Close
-            </button>
-            <button 
-              onClick={handleDeleteClick}
-              className="bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded-full cursor-pointer"
-            >
-              Delete
             </button>
           </div>
         </div>
       )}
 
       {isModerator && (
-    <div className="flex flex-col gap-6 mx-6 my-4">
-      <div className="flex gap-2 items-center">
-        <span className="text-primary-80 font-semibold">Status:</span>
-        <JobStatusBadge status={job.status} /> 
-      </div>
-      <div className="flex gap-2 items-center">
-        <span className="text-primary-80 font-semibold">Moderator Notes:</span>
-        <span className="text-primary-80">{job.moderator_notes}</span>
-      </div>
-      <div className="flex gap-2">
-        <button
-          className="bg-accent hover:bg-secondary text-neutral-light-20 px-6 py-2 rounded-full cursor-pointer"
-          onClick={handleApprove}
-        >
-          Approve
-        </button>
-        <button
-          className="bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded-full cursor-pointer"
-          onClick={() => setShowRejectNote(true)}
-        >
-          Reject
-        </button>
-      </div>
-      {showRejectNote && (
-        <div className="flex flex-col gap-2 w-full max-w-2xl">
-          <label className="text-2xl font-bold text-primary mb-1" htmlFor="reject-note">
-            Moderator's Note:
-          </label>
-          <textarea
-            id="reject-note"
-            className="w-full min-h-[80px] border border-primary-40 rounded-lg px-4 py-2 text-primary-80 focus:outline-none focus:ring-2 focus:ring-accent bg-neutral-light-20"
-            placeholder="Enter moderator's note for rejection"
-            value={rejectNote}
-            onChange={e => setRejectNote(e.target.value)}
-          />
+        <div className="flex flex-col gap-6 mx-6 my-4">
+          <div className="flex gap-2 items-center">
+            <span className="text-primary-80 font-semibold">Status:</span>
+            <JobStatusBadge status={job.status} />
+          </div>
+          <div className="flex gap-2 items-center">
+            <span className="text-primary-80 font-semibold">
+              Moderator Notes:
+            </span>
+            <span className="text-primary-80">{job.moderator_notes}</span>
+          </div>
           <div className="flex gap-2">
             <button
-              className="mt-2 bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded-full cursor-pointer font-semibold transition"
-              onClick={handleReject}
+              className="bg-accent hover:bg-secondary text-neutral-light-20 px-6 py-2 rounded-full cursor-pointer"
+              onClick={handleApprove}
             >
-              Confirm Reject
+              Approve
             </button>
             <button
-              className="mt-2 bg-gray-400 hover:bg-gray-500 text-white px-6 py-2 rounded-full cursor-pointer font-semibold transition"
-              onClick={() => setShowRejectNote(false)}
+              className="bg-red-600 hover:bg-red-700 text-background px-6 py-2 rounded-full cursor-pointer"
+              onClick={() => setShowRejectNote(true)}
             >
-              Cancel
+              Reject
             </button>
           </div>
+          {showRejectNote && (
+            <div className="flex flex-col gap-2 w-full max-w-2xl">
+              <label
+                className="text-2xl font-bold text-primary mb-1"
+                htmlFor="reject-note"
+              >
+                Moderator's Note:
+              </label>
+              <textarea
+                id="reject-note"
+                className="w-full min-h-[80px] border border-primary-40 rounded-lg px-4 py-2 text-primary-80 focus:outline-none focus:ring-2 focus:ring-accent bg-neutral-light-20"
+                placeholder="Enter moderator's note for rejection"
+                value={rejectNote}
+                onChange={(e) => setRejectNote(e.target.value)}
+              />
+              <div className="flex gap-2">
+                <button
+                  className="mt-2 bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded-full cursor-pointer font-semibold transition"
+                  onClick={handleReject}
+                >
+                  Confirm Reject
+                </button>
+                <button
+                  className="mt-2 bg-gray-400 hover:bg-gray-500 text-white px-6 py-2 rounded-full cursor-pointer font-semibold transition"
+                  onClick={() => setShowRejectNote(false)}
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          )}
         </div>
       )}
-    </div>
-  )}
-      
+
       {/* Apply Job Modal */}
       {!isHR && !isModerator && job && !hasApplied && (
-        <ApplyJobModal 
-          jobId={job.id} 
-          jobTitle={job.title} 
-          isOpen={isApplyModalOpen} 
-          onClose={() => setIsApplyModalOpen(false)} 
+        <ApplyJobModal
+          jobId={job.id}
+          jobTitle={job.title}
+          isOpen={isApplyModalOpen}
+          onClose={() => setIsApplyModalOpen(false)}
           onApplySuccess={handleApplySuccess}
         />
       )}

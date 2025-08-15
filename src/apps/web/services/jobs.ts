@@ -93,9 +93,9 @@ export interface SaveJobResponse {
 export const getAllJobs = async (): Promise<JobsResponse> => {
   try {
     const response = await fetch(`${API_URL}/jobs`, {
-      method: 'GET',
+      method: "GET",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
     });
 
@@ -104,7 +104,7 @@ export const getAllJobs = async (): Promise<JobsResponse> => {
   } catch (error) {
     return {
       success: false,
-      message: 'Network connection error',
+      message: "Network connection error",
     };
   }
 };
@@ -112,9 +112,9 @@ export const getAllJobs = async (): Promise<JobsResponse> => {
 export const getJobById = async (id: string): Promise<JobDetailResponse> => {
   try {
     const response = await fetch(`${API_URL}/jobs/${id}`, {
-      method: 'GET',
+      method: "GET",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
     });
 
@@ -123,7 +123,7 @@ export const getJobById = async (id: string): Promise<JobDetailResponse> => {
   } catch (error) {
     return {
       success: false,
-      message: 'Network connection error',
+      message: "Network connection error",
     };
   }
 };
@@ -132,10 +132,10 @@ export const getJobsByCompany = async (): Promise<JobsResponse> => {
   try {
     const token = getToken();
     const response = await fetch(`${API_URL}/company/jobs`, {
-      method: 'GET',
+      method: "GET",
       headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`,
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
       },
     });
 
@@ -144,7 +144,7 @@ export const getJobsByCompany = async (): Promise<JobsResponse> => {
   } catch (error) {
     return {
       success: false,
-      message: 'Network connection error',
+      message: "Network connection error",
     };
   }
 };
@@ -155,15 +155,15 @@ export const getSavedJobs = async (): Promise<JobsResponse> => {
     if (!token) {
       return {
         success: false,
-        message: 'Authentication required',
+        message: "Authentication required",
       };
     }
 
     const response = await fetch(`${API_URL}/jobs/saved`, {
-      method: 'GET',
+      method: "GET",
       headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`,
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
       },
     });
 
@@ -172,7 +172,7 @@ export const getSavedJobs = async (): Promise<JobsResponse> => {
   } catch (error) {
     return {
       success: false,
-      message: 'Network connection error',
+      message: "Network connection error",
     };
   }
 };
@@ -183,15 +183,15 @@ export const saveJob = async (jobId: string): Promise<SaveJobResponse> => {
     if (!token) {
       return {
         success: false,
-        message: 'Authentication required',
+        message: "Authentication required",
       };
     }
 
     const response = await fetch(`${API_URL}/jobs/${jobId}/save`, {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`,
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
       },
     });
 
@@ -200,7 +200,7 @@ export const saveJob = async (jobId: string): Promise<SaveJobResponse> => {
   } catch (error) {
     return {
       success: false,
-      message: 'Network connection error',
+      message: "Network connection error",
     };
   }
 };
@@ -211,15 +211,15 @@ export const unsaveJob = async (jobId: string): Promise<SaveJobResponse> => {
     if (!token) {
       return {
         success: false,
-        message: 'Authentication required',
+        message: "Authentication required",
       };
     }
 
     const response = await fetch(`${API_URL}/jobs/${jobId}/save`, {
-      method: 'DELETE',
+      method: "DELETE",
       headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`,
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
       },
     });
 
@@ -228,12 +228,15 @@ export const unsaveJob = async (jobId: string): Promise<SaveJobResponse> => {
   } catch (error) {
     return {
       success: false,
-      message: 'Network connection error',
+      message: "Network connection error",
     };
   }
 };
 
-export const toggleSaveJob = async (jobId: string, isCurrentlySaved: boolean): Promise<SaveJobResponse> => {
+export const toggleSaveJob = async (
+  jobId: string,
+  isCurrentlySaved: boolean
+): Promise<SaveJobResponse> => {
   if (isCurrentlySaved) {
     return await unsaveJob(jobId);
   } else {
@@ -241,13 +244,16 @@ export const toggleSaveJob = async (jobId: string, isCurrentlySaved: boolean): P
   }
 };
 
-export const postNewJob = async (data: any, token: string): Promise<JobResponse> => {
+export const postNewJob = async (
+  data: any,
+  token: string
+): Promise<JobResponse> => {
   try {
     const response = await fetch(`${API_URL}/jobs`, {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`,
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
       },
       body: JSON.stringify(data),
     });
@@ -256,18 +262,22 @@ export const postNewJob = async (data: any, token: string): Promise<JobResponse>
   } catch (error) {
     return {
       success: false,
-      message: 'Network connection error',
+      message: "Network connection error",
     };
   }
 };
 
-export const updateJob = async (jobId: string, data: any, token: string): Promise<JobResponse> => {
+export const updateJob = async (
+  jobId: string,
+  data: any,
+  token: string
+): Promise<JobResponse> => {
   try {
     const response = await fetch(`${API_URL}/jobs/${jobId}`, {
-      method: 'PUT',
+      method: "PUT",
       headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`,
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
       },
       body: JSON.stringify(data),
     });
@@ -276,21 +286,24 @@ export const updateJob = async (jobId: string, data: any, token: string): Promis
   } catch (error) {
     return {
       success: false,
-      message: 'Network connection error',
+      message: "Network connection error",
     };
   }
 };
 
-export const closeJob = async (jobId: string, token: string): Promise<JobResponse> => {
+export const closeJob = async (
+  jobId: string,
+  token: string
+): Promise<JobResponse> => {
   try {
     const response = await fetch(`${API_URL}/jobs/${jobId}/close`, {
-      method: 'PATCH',
+      method: "PATCH",
       headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`,
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
       },
       body: JSON.stringify({
-        status: 'expired'
+        status: "expired",
       }),
     });
     const result = await response.json();
@@ -298,18 +311,21 @@ export const closeJob = async (jobId: string, token: string): Promise<JobRespons
   } catch (error) {
     return {
       success: false,
-      message: 'Network connection error',
+      message: "Network connection error",
     };
   }
 };
 
-export const deleteJob = async (jobId: string, token: string): Promise<JobResponse> => {
+export const deleteJob = async (
+  jobId: string,
+  token: string
+): Promise<JobResponse> => {
   try {
     const response = await fetch(`${API_URL}/jobs/${jobId}`, {
-      method: 'DELETE',
+      method: "DELETE",
       headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`,
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
       },
     });
     const result = await response.json();
@@ -317,7 +333,7 @@ export const deleteJob = async (jobId: string, token: string): Promise<JobRespon
   } catch (error) {
     return {
       success: false,
-      message: 'Network connection error',
+      message: "Network connection error",
     };
   }
 };
@@ -335,24 +351,27 @@ export interface ApplyJobResponse {
   };
 }
 
-export const applyJob = async (jobId: string, data: ApplyJobData): Promise<ApplyJobResponse> => {
+export const applyJob = async (
+  jobId: string,
+  data: ApplyJobData
+): Promise<ApplyJobResponse> => {
   try {
     const token = getToken();
     if (!token) {
       return {
         success: false,
-        message: 'Authentication required',
+        message: "Authentication required",
       };
     }
 
     const formData = new FormData();
-    formData.append('resume', data.resume);
-    formData.append('cover_letter', data.cover_letter);
+    formData.append("resume", data.resume);
+    formData.append("cover_letter", data.cover_letter);
 
     const response = await fetch(`${API_URL}/jobs/${jobId}/apply`, {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Authorization': `Bearer ${token}`,
+        Authorization: `Bearer ${token}`,
       },
       body: formData,
     });
@@ -363,7 +382,7 @@ export const applyJob = async (jobId: string, data: ApplyJobData): Promise<Apply
   } catch (error) {
     return {
       success: false,
-      message: 'Network connection error',
+      message: "Network connection error",
     };
   }
 };
@@ -374,15 +393,15 @@ export const getAppliedJobs = async (): Promise<AppliedJobsResponse> => {
     if (!token) {
       return {
         success: false,
-        message: 'Authentication required',
+        message: "Authentication required",
       };
     }
 
     const response = await fetch(`${API_URL}/jobs/applied`, {
-      method: 'GET',
+      method: "GET",
       headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`,
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
       },
     });
 
@@ -391,7 +410,7 @@ export const getAppliedJobs = async (): Promise<AppliedJobsResponse> => {
   } catch (error) {
     return {
       success: false,
-      message: 'Network connection error',
+      message: "Network connection error",
     };
   }
-}; 
+};

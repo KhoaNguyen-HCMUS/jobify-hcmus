@@ -38,10 +38,10 @@ export default function NavBar() {
     try {
       await logout();
       updateUser();
-      toast.success('Logout successfully!');
-      router.push('/auth/sign-in');
+      toast.success("Logout successfully!");
+      router.push("/auth/sign-in");
     } catch (error) {
-      toast.error('Error when logout!');
+      toast.error("Error when logout!");
     }
   };
 
@@ -71,8 +71,9 @@ export default function NavBar() {
   ];
 
   const adminItems = [
-    { href: "/operator/company-pending", label: "Approvals" },
-    { href: "/operator/reports", label: "Reports" },
+    { href: "/operator/company-pending", label: "Dashboard" },
+    { href: "/support", label: "Support" },
+    { href: "/about", label: "About Us" },
     { href: "/operator/system-settings", label: "Settings" },
     { href: "/operator/logs", label: "Logs" },
   ];
@@ -83,7 +84,10 @@ export default function NavBar() {
     navItems = candidateItems;
   } else if (isAuthenticated && user?.role === "company") {
     navItems = companyItems;
-  } else if (isAuthenticated && user?.role === "admin") {
+  } else if (
+    isAuthenticated &&
+    (user?.role === "admin" || user?.role === "moderator")
+  ) {
     navItems = adminItems;
   }
 
@@ -145,16 +149,21 @@ export default function NavBar() {
                     </div>
                   </div>
                   <div className="flex items-center space-x-2">
-                    
                     <Link
-                      href={user.role === 'candidate' ? '/candidate/profile' : user.role === 'company' ? '/company/profile' : '/profile'}
+                      href={
+                        user.role === "candidate"
+                          ? "/candidate/profile"
+                          : user.role === "company"
+                          ? "/company/profile"
+                          : "/profile"
+                      }
                       className="px-4 py-2 bg-primary text-background rounded-lg font-medium hover:bg-primary/90 transition-colors"
                     >
                       Profile
                     </Link>
                     <button
                       onClick={handleLogout}
-                      className="cursor-pointer px-4 py-2 bg-red-500 text-white rounded-lg font-medium hover:bg-red-600 transition-colors"
+                      className="cursor-pointer px-4 py-2 text-primary border-2 border-primary rounded-lg font-medium hover:bg-primary hover:text-background transition-colors"
                     >
                       Sign out
                     </button>
@@ -224,7 +233,6 @@ export default function NavBar() {
                     </div>
                   </div>
                   <div className="flex flex-col gap-2">
-                    
                     <Link
                       href="/profile"
                       className="block w-full px-4 py-3 text-center bg-primary text-background rounded-lg font-medium hover:bg-primary/90"
@@ -233,9 +241,9 @@ export default function NavBar() {
                     </Link>
                     <button
                       onClick={handleLogout}
-                      className="block w-full px-4 py-3 text-center bg-red-500 text-white rounded-lg font-medium hover:bg-red-600"
+                      className="block w-full px-4 py-3 text-center text-primary border-2 border-primary rounded-lg font-medium hover:bg-primary hover:text-background"
                     >
-                      Logout
+                      Sign out
                     </button>
                   </div>
                 </div>
