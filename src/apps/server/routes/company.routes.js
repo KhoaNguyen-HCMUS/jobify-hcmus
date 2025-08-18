@@ -3,7 +3,7 @@ const router = express.Router();
 const companyController = require('../controllers/company.controller');
 const jobController = require('../controllers/job.controller');
 const applicationController = require('../controllers/application.controller');
-const authenticateToken = require('../middlewares/auth.middleware');
+const { authenticateToken } = require('../middlewares/auth.middleware');
 const authorizeRoles = require('../middlewares/checkRole.middleware');
 
 router.get('/jobs', authenticateToken, authorizeRoles(['admin', 'moderator', 'company']), jobController.getCompanyJobs);

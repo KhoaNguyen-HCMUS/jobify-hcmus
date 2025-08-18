@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const applicationController = require('../controllers/application.controller');
-const authenticateToken = require('../middlewares/auth.middleware');
+const { authenticateToken } = require('../middlewares/auth.middleware');
 const authorizeRoles = require('../middlewares/checkRole.middleware');
 
 router.get('/:id', authenticateToken, applicationController.getApplicationById);

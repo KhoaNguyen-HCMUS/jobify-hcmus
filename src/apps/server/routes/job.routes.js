@@ -2,11 +2,11 @@ const express = require('express');
 const router = express.Router();
 const jobController = require('../controllers/job.controller');
 const applicationController = require('../controllers/application.controller');
-const authenticateToken = require('../middlewares/auth.middleware');
+const { authenticateToken, optionalAuthenticateToken } = require('../middlewares/auth.middleware');
 const authorizeRoles = require('../middlewares/checkRole.middleware');
 const upload = require('../middlewares/upload.middleware');
 
-router.get('/', jobController.getJobs);
+router.get('/', optionalAuthenticateToken, jobController.getJobs);
 router.post('/', authenticateToken, authorizeRoles(['company']), jobController.createJob);
 router.get('/saved', authenticateToken, jobController.getSavedJobs);
 router.get('/recommended', authenticateToken, jobController.getRecommendedJobs);

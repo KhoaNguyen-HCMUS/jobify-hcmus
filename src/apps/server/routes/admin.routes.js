@@ -1,12 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const adminController = require('../controllers/admin.controller');
-const authenticateToken  = require('../middlewares/auth.middleware');
+const { authenticateToken } = require('../middlewares/auth.middleware');
 const authorizeRoles = require('../middlewares/checkRole.middleware');
-
-router.get('/jobs/pending', authenticateToken, authorizeRoles(['moderator', 'admin']), adminController.getPendingJobs);
-router.patch('/jobs/:id/approve', authenticateToken, authorizeRoles(['moderator', 'admin']), adminController.approveJob);
-router.patch('/jobs/:id/reject', authenticateToken, authorizeRoles(['moderator', 'admin']), adminController.rejectJob);
 
 router.get('/companies/pending', authenticateToken, authorizeRoles(['moderator', 'admin']), adminController.getPendingCompanies);
 router.patch('/companies/:id/approve', authenticateToken, authorizeRoles(['moderator', 'admin']), adminController.approveCompany);
