@@ -24,9 +24,10 @@ import {
   getCompanyProfile,
   CompanyProfile,
 } from "../../../../services/companyProfile";
-import { Job, updateJob } from "../../../../services/jobs";
+import { Job, updateJob, getJobById } from "../../../../services/jobs";
 import { toast } from "react-toastify";
 import GoBack from "../../../../components/goBack";
+import { useSearchParams, useRouter } from "next/navigation";
 
 interface JobEditProps {
   isOpen: boolean;
@@ -43,6 +44,7 @@ function RecruiterPostJobEditContent({
   onJobUpdated,
   jobId,
 }: JobEditProps) {
+  const router = useRouter();
   const [title, setTitle] = useState("");
   const [deadline, setDeadline] = useState("");
   const [salaryMin, setSalaryMin] = useState("");
@@ -77,7 +79,8 @@ function RecruiterPostJobEditContent({
   );
   const [isLoading, setIsLoading] = useState(false);
 
-  // Pre-fill form when job data is available
+
+  console.log ("data job", job);
   useEffect(() => {
     if (job) {
       setTitle(job.title || "");
@@ -101,7 +104,7 @@ function RecruiterPostJobEditContent({
       setSelectedProvince(job.province || "");
       setSelectedDistrict(job.ward || "");
       setSelectedIndustry(job.industry_id || "");
-      setSelectedSubIndustry(""); // Will be set after loading industries
+      setSelectedSubIndustry(""); 
     }
   }, [job]);
 
@@ -238,17 +241,16 @@ function RecruiterPostJobEditContent({
         if (status === "pending") {
           toast.success("Job updated successfully!");
         }
-        onClose();
         onJobUpdated?.();
+        router.back();
       } else {
         toast.error("Failed to update job: " + response.message);
       }
     } catch (error) {
       toast.error("Error updating job, please try again later.");
       console.error("Error updating job:", error);
-    } finally {
       setIsLoading(false);
-    }
+    } 
   };
 
   if (!isOpen) return null;
@@ -674,17 +676,50 @@ export default function RecruiterPostJobEditPage() {
   const onClose = () => setIsOpen(false);
 
   const [job, setJob] = useState<Job | null>(null);
+  const [loading, setLoading] = useState(true);
+  const searchParams = useSearchParams();
+
+  useEffect(() => {
+    const jobId = searchParams.get("jobId");
+    const loadJob = async () => {
+      try {
+        if (!jobId) {
+          setLoading(false);
+          toast.error("Missing jobId in URL");
+          return;
+        }
+        const response = await getJobById(jobId);
+        if (response.success && response.data) {
+          setJob(response.data.job);
+        } else {
+          toast.error(response.message || "Failed to load job data");
+        }
+      } catch (error) {
+        toast.error("Error loading job data");
+        console.error(error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadJob();
+  }, [searchParams]);
 
   const onJobUpdated = () => setIsOpen(false);
 
   return (
     <ProtectedRoute allowedRoles={["company"]}>
-      <RecruiterPostJobEditContent
-        isOpen={isOpen}
-        onClose={onClose}
-        job={job}
-        onJobUpdated={onJobUpdated}
-      />
+      {loading ? (
+        <div className="w-full h-full min-h-screen bg-neutral-light-60 flex items-center justify-center">
+          <div className="text-primary text-xl">Loading job...</div>
+        </div>
+      ) : (
+        <RecruiterPostJobEditContent
+          isOpen={isOpen}
+          onClose={onClose}
+          job={job}
+          onJobUpdated={onJobUpdated}
+        />
+      )}
     </ProtectedRoute>
   );
 }
