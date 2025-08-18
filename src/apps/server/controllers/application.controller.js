@@ -119,6 +119,10 @@ exports.getJobApplications = async (req, res) => {
   const { user } = req;
 
   try {
+    const page = parseInt(req.query.page) || 1;
+    const limit = 10;
+    const offset = (page - 1) * limit;
+
     if (user.role === 'company') {
       const job = await prisma.job_posts.findUnique({
         where: { id: job_id },
@@ -127,6 +131,19 @@ exports.getJobApplications = async (req, res) => {
       if (!job || job.created_by !== user.id) {
         return errorResponse(res, 'You are not authorized to view applications for this job', [], 403);
       }
+    }
+
+    const totalApplications = await prisma.job_applications.count({
+      where: { job_id }
+    });
+
+    if (totalApplications === 0) {
+      return successResponse(res, 'No applications found for this job', [], {
+        page,
+        limit,
+        totalPages: 0,
+        hasNextPage: false
+      });
     }
 
     const applications = await prisma.job_applications.findMany({
@@ -149,6 +166,9 @@ exports.getJobApplications = async (req, res) => {
         file_uploads: true,
         application_status_history: true,
       },
+      skip: offset,
+      take: limit,
+      orderBy: { created_at: 'desc' }
     });
 
     const result = await Promise.all(
@@ -167,7 +187,17 @@ exports.getJobApplications = async (req, res) => {
       })
     );
 
-    return successResponse(res, 'Applications fetched successfully', result);
+    const totalPages = Math.ceil(totalApplications / limit);
+    const hasNextPage = page < totalPages;
+
+    const paginationInfo = {
+      page,
+      limit,
+      totalPages,
+      hasNextPage
+    };
+
+    return successResponse(res, 'Applications fetched successfully', result, paginationInfo);
   } catch (err) {
     console.error('Get Job Applications Error:', err);
     return errorResponse(res, 'Failed to fetch applications', [err.message], 500);
