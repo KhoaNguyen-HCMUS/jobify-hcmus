@@ -317,6 +317,7 @@ function CandidateProfileEditContent() {
                     id="fullName"
                     type="text"
                     value={fullName}
+                    aria-label="Full Name"
                     onChange={(e) => setFullName(e.target.value)}
                     placeholder="Enter your full name"
                     className="w-full border border-primary-60 pl-12 pr-4 py-2 bg-neutral-light-20 rounded-xl text-primary-80 outline-none focus:ring-1 focus:primary focus:bg-white transition-all duration-300"
@@ -327,6 +328,7 @@ function CandidateProfileEditContent() {
               <div className="flex flex-col">
                 <label
                   htmlFor="dateOfBirth"
+                  aria-label="Date of Birth"
                   className="block text-sm font-bold text-primary ml-4"
                 >
                   Date of Birth:
@@ -602,6 +604,7 @@ function CandidateProfileEditContent() {
                               setIndustrySearchTerm("");
                             }
                           }}
+                          aria-label="Search industries"
                           className="industry-search-input w-full px-3 py-2 border border-primary-40 rounded-lg text-primary-80 outline-none focus:ring-1 focus:ring-accent focus:border-accent"
                           onClick={(e) => e.stopPropagation()}
                         />
@@ -625,6 +628,8 @@ function CandidateProfileEditContent() {
                                   type="checkbox"
                                   checked={selectedIndustries.includes(industry.name)}
                                   onChange={() => {}}
+                                  aria-label={`Select industry ${industry.name}`}
+                                  title={`Select ${industry.name}`}
                                   className="w-4 h-4 text-accent bg-gray-100 border-gray-300 rounded focus:ring-accent"
                                 />
                                 <span className="flex-1">{industry.name}</span>
@@ -657,6 +662,8 @@ function CandidateProfileEditContent() {
                                       type="checkbox"
                                       checked={selectedIndustries.includes(industry.name)}
                                       onChange={() => {}}
+                                      aria-label={`Select industry ${industry.name}`}
+                                      title={`Select ${industry.name}`}
                                       className="w-4 h-4 text-accent bg-gray-100 border-gray-300 rounded focus:ring-accent"
                                     />
                                     <span className="flex-1">{industry.name}</span>
