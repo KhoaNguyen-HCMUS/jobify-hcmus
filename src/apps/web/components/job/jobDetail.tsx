@@ -69,9 +69,7 @@ export default function JobDetail({
   const userRole = getUserRole();
   const router = useRouter();
   const searchParams = useSearchParams();
-  const isFull =
-    jobDetailData?.job.applications_count ===
-    jobDetailData?.job.number_of_openings;
+  const isFull = jobDetailData?.job?.applications_count === jobDetailData?.job?.number_of_openings;
   const [showRejectNote, setShowRejectNote] = useState(false);
   const [rejectNote, setRejectNote] = useState("");
 
@@ -367,14 +365,14 @@ export default function JobDetail({
                     Cancel Application
                   </button>
                 )}
-                <button
-                  disabled
-                  className="px-4 py-2 bg-accent rounded-full text-background font-semibold cursor-not-allowed"
-                >
-                  Applied: {job.applications_count}/{job.number_of_openings}
-                </button>
-
-                {userRole === "candidate" && (
+                  <button
+                    disabled
+                    className="px-6 py-2 bg-accent rounded-full text-background font-semibold text-lg cursor-not-allowed"
+                  >
+                    Applied: {job?.applications_count || 0}/{job?.number_of_openings || 0}
+                  </button>
+                
+                {userRole === 'candidate' && (
                   <button
                     onClick={handleSaveClick}
                     disabled={isSaving}

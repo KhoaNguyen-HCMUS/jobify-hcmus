@@ -66,12 +66,8 @@ function CandidateProfileContent() {
     );
   }
 
-  const skills = profile.skills
-    ? profile.skills
-        .split(",")
-        .map((skill) => ({ skill: skill.trim() }))
-        .filter((skill) => skill.skill)
-    : [];
+  const skills = profile.skills ? profile.skills.split(',').map(skill => ({ skill: skill.trim() })).filter(skill => skill.skill) : [];
+  const industries = profile.industry ? profile.industry.split(',').map(industry => industry.trim()).filter(industry => industry) : [];
 
   return (
     <div className="w-full h-full bg-neutral-light-60">
@@ -117,21 +113,26 @@ function CandidateProfileContent() {
           </div>
           <div className="flex flex-wrap">
             <div className="flex-1 flex flex-col gap-2">
-              <a
-                href={profile.website}
-                target="_blank"
-                rel="noopener noreferrer"
-                title="Visit personal website"
-                aria-label="Visit personal website"
-              >
-                <PersonalInformation
-                  title="Personal website"
-                  inFor={profile.website}
-                />
-              </a>
-              <a
-                href={profile.github_url}
-                target="_blank"
+              <div className="flex flex-col gap-2">
+                <span className="text-primary text-lg">
+                  <b>Industry:</b>
+                </span>
+                <div className="flex flex-wrap gap-2 items-center text-primary-80 font-semibold">
+                  <Briefcase className="w-4 h-4 mr-1" />
+                  <div className="flex flex-wrap gap-2">
+                    {industries.length > 0 ? (
+                      industries.map((industry, idx) => (
+                        <Skills key={idx} skill={industry} />
+                      ))
+                    ) : (
+                      <span className="text-primary-60">No industry specified</span>
+                    )}
+                  </div>
+                </div>
+              </div>
+              <a 
+                href={profile.github_url} 
+                target="_blank" 
                 rel="noopener noreferrer"
                 title="Visit GitHub profile"
                 aria-label="Visit GitHub profile"
@@ -162,11 +163,9 @@ function CandidateProfileContent() {
               </div>
             </div>
             <div className="flex-1 flex flex-col gap-2">
-              <PersonalInformation title="Email" inFor={profile.email} />
-
-              <a
-                href={profile.linkedin_url}
-                target="_blank"
+              <a 
+                href={profile.linkedin_url} 
+                target="_blank" 
                 rel="noopener noreferrer"
                 title="Visit LinkedIn profile"
                 aria-label="Visit LinkedIn profile"
@@ -176,8 +175,7 @@ function CandidateProfileContent() {
                   inFor={profile.linkedin_url}
                 />
               </a>
-
-              <PersonalInformation title="Industry" inFor={profile.industry} />
+              <PersonalInformation title="Email" inFor={profile.email} />
             </div>
           </div>
 
