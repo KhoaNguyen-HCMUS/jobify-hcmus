@@ -5,7 +5,6 @@ import { Plus } from "lucide-react";
 import usePagination from "../../../hooks/usePagination";
 import Pagination from "../../../components/pagination";
 import KeyWord from "../../../components/keyWord";
-import JobPostModal from "../../../components/job/jobPostModal";
 import ProtectedRoute from "../../../components/ProtectedRoute";
 import { getJobsByCompany, Job } from "../../../services/jobs";
 
