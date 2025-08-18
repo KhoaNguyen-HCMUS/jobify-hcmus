@@ -27,7 +27,7 @@ import {
 import { Job, updateJob, getJobById } from "../../../../services/jobs";
 import { toast } from "react-toastify";
 import GoBack from "../../../../components/goBack";
-import { useSearchParams, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 
 interface JobEditProps {
   isOpen: boolean;
@@ -677,14 +677,13 @@ export default function RecruiterPostJobEditPage() {
 
   const [job, setJob] = useState<Job | null>(null);
   const [loading, setLoading] = useState(true);
-  const searchParams = useSearchParams();
 
   useEffect(() => {
-    const jobId = searchParams.get("jobId");
+    const params = new URLSearchParams(window.location.search);
+    const jobId = params.get("jobId");
     const loadJob = async () => {
       try {
         if (!jobId) {
-          setLoading(false);
           toast.error("Missing jobId in URL");
           return;
         }
@@ -702,7 +701,7 @@ export default function RecruiterPostJobEditPage() {
       }
     };
     loadJob();
-  }, [searchParams]);
+  }, []);
 
   const onJobUpdated = () => setIsOpen(false);
 
