@@ -1,86 +1,43 @@
 const prisma = require('../prisma/client');
 const { successResponse, errorResponse } = require('../utils/response');
 
-exports.getPendingJobs = async (req, res) => {
-  try {
-    const jobs = await prisma.job_posts.findMany({
-      where: { status: 'pending' },
-      orderBy: { created_at: 'desc' }
-    });
-    if (!jobs || jobs.length === 0) {
-      return successResponse([], 'No pending jobs found');
-    }
-
-    return successResponse(res, 'Pending jobs fetched successfully', jobs);
-  } catch (error) {
-    console.error(error);
-    return errorResponse(res, 'Failed to fetch pending jobs', [error.message], 500);
-  }
-};
-
-exports.approveJob = async (req, res) => {
-  const { id } = req.params;
-  const adminId = req.user.id;
-
-  try {
-    const job = await prisma.job_posts.findUnique({ where: { id } });
-    if (!job) return errorResponse(res, 'Job not found', [], 404);
-
-    await prisma.job_posts.update({
-      where: { id },
-      data: {
-        status: 'active',
-        approved_by: adminId,
-        approved_at: new Date(),
-        updated_at: new Date()
-      }
-    });
-
-    return successResponse(res, 'Job approved successfully');
-  } catch (error) {
-    console.error(error);
-    return errorResponse(res, 'Failed to approve job', [error.message], 500);
-  }
-};
-
-exports.rejectJob = async (req, res) => {
-  const { id } = req.params;
-  const adminId = req.user.id;
-  const { moderator_notes } = req.body;
-
-  try {
-    const job = await prisma.job_posts.findUnique({ where: { id } });
-    if (!job) return errorResponse(res, 'Job not found', [], 404);
-
-    await prisma.job_posts.update({
-      where: { id },
-      data: {
-        status: 'rejected',
-        moderator_notes,
-        approved_by: adminId,
-        approved_at: new Date(),
-        updated_at: new Date()
-      }
-    });
-
-    return successResponse(res, 'Job rejected successfully');
-  } catch (error) {
-    console.error(error);
-    return errorResponse(res, 'Failed to reject job', [error.message], 500);
-  }
-};
-
 exports.getPendingCompanies = async (req, res) => {
   try {
-    const companies = await prisma.companies.findMany({
-      where: { status: 'pending' },
-      orderBy: { created_at: 'desc' }
+    const page = parseInt(req.query.page) || 1;
+    const limit = 10;
+    const offset = (page - 1) * limit;
+
+    const totalPendingCompanies = await prisma.companies.count({
+      where: { status: 'pending' }
     });
-    if (!companies || companies.length === 0) {
-      return successResponse(res, 'No pending companies found');
+
+    if (totalPendingCompanies === 0) {
+      return successResponse(res, 'No pending companies found', [], {
+        page,
+        limit,
+        totalPages: 0,
+        hasNextPage: false
+      });
     }
 
-    return successResponse(res, 'Pending companies fetched successfully', companies);
+    const companies = await prisma.companies.findMany({
+      where: { status: 'pending' },
+      skip: offset,
+      take: limit,
+      orderBy: { created_at: 'desc' }
+    });
+
+    const totalPages = Math.ceil(totalPendingCompanies / limit);
+    const hasNextPage = page < totalPages;
+
+    const paginationInfo = {
+      page,
+      limit,
+      totalPages,
+      hasNextPage
+    };
+
+    return successResponse(res, 'Pending companies fetched successfully', companies, paginationInfo);
   } catch (error) {
     console.error(error);
     return errorResponse(res, 'Failed to fetch pending companies', [error.message], 500);
