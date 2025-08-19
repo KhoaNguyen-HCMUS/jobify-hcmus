@@ -155,46 +155,44 @@ model job_matches {
 }
 
 model job_posts {
-  id                                 String             @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-  company_id                         String             @db.Uuid
-  created_by                         String             @db.Uuid
-  title                              String             @db.VarChar(255)
-  province                           String             @db.VarChar(100)
-  ward                               String             @db.VarChar(100)
-  work_place                         String             @db.VarChar(100)
-  salary_min                         Decimal            @db.Decimal
-  salary_max                         Decimal            @db.Decimal
-  is_salary_negotiable               Boolean            @default(false)
-  experience_level                   String             @db.VarChar(50)
-  position                           String             @db.VarChar(100)
-  education_level                    String             @db.VarChar(50)
-  job_type                           String             @db.VarChar(50)
-  number_of_openings                 Int
-  deadline                           DateTime           @db.Date
-  working_hours                      String             @db.VarChar(100)
-  description                        String
-  requirements                       String
-  responsibilities                   String
-  benefits                           String
-  industry_id                        String             @db.Uuid
-  currency                           String             @db.VarChar(10)
-  status                             String             @db.VarChar(50)
-  cost_coin                          Int
-  applications_count                 Int                @default(0)
-  moderator_notes                    String?
-  approved_by                        String?            @db.Uuid
-  approved_at                        DateTime?          @db.Timestamp(6)
-  created_at                         DateTime           @default(now()) @db.Timestamp(6)
-  updated_at                         DateTime           @default(now()) @db.Timestamp(6)
-  skills                             String
-  prev_status                        String?            @db.VarChar
-  job_applications                   job_applications[]
-  job_matches                        job_matches[]
-  users_job_posts_approved_byTousers users?             @relation("job_posts_approved_byTousers", fields: [approved_by], references: [id], onUpdate: NoAction)
-  companies                          companies          @relation(fields: [company_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
-  users_job_posts_created_byTousers  users              @relation("job_posts_created_byTousers", fields: [created_by], references: [id], onDelete: SetNull, onUpdate: NoAction)
-  industries                         industries         @relation(fields: [industry_id], references: [id], onDelete: SetNull, onUpdate: NoAction)
-  saved_jobs                         saved_jobs[]
+  id                                String             @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  company_id                        String             @db.Uuid
+  created_by                        String             @db.Uuid
+  title                             String             @db.VarChar(255)
+  province                          String             @db.VarChar(100)
+  ward                              String             @db.VarChar(100)
+  work_place                        String             @db.VarChar(100)
+  salary_min                        Decimal            @db.Decimal
+  salary_max                        Decimal            @db.Decimal
+  is_salary_negotiable              Boolean            @default(false)
+  experience_level                  String             @db.VarChar(50)
+  position                          String             @db.VarChar(100)
+  education_level                   String             @db.VarChar(50)
+  job_type                          String             @db.VarChar(50)
+  number_of_openings                Int
+  deadline                          DateTime           @db.Date
+  working_hours                     String             @db.VarChar(100)
+  description                       String
+  requirements                      String
+  responsibilities                  String
+  benefits                          String
+  industry_id                       String             @db.Uuid
+  currency                          String             @db.VarChar(10)
+  status                            String             @db.VarChar(50)
+  cost_coin                         Int
+  applications_count                Int                @default(0)
+  moderator_notes                   String?
+  created_at                        DateTime           @default(now()) @db.Timestamp(6)
+  updated_at                        DateTime           @default(now()) @db.Timestamp(6)
+  skills                            String
+  prev_status                       String?            @db.VarChar
+  scheduled_at                      DateTime?          @db.Timestamp(6)
+  job_applications                  job_applications[]
+  job_matches                       job_matches[]
+  companies                         companies          @relation(fields: [company_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  users_job_posts_created_byTousers users              @relation("job_posts_created_byTousers", fields: [created_by], references: [id], onDelete: SetNull, onUpdate: NoAction)
+  industries                        industries         @relation(fields: [industry_id], references: [id], onDelete: SetNull, onUpdate: NoAction)
+  saved_jobs                        saved_jobs[]
 }
 
 model notifications {
@@ -285,33 +283,32 @@ model user_profiles {
 }
 
 model users {
-  id                                     String                       @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-  email                                  String                       @unique @db.VarChar(255)
-  password_hash                          String                       @db.VarChar(255)
-  role                                   String                       @db.VarChar(50)
-  status                                 String                       @db.VarChar(50)
-  email_verified                         Boolean                      @default(false)
-  email_verification_token               String?                      @db.VarChar(255)
-  password_reset_token                   String?                      @db.VarChar(255)
-  password_reset_expires                 DateTime?                    @db.Timestamp(6)
-  last_login                             DateTime?                    @db.Timestamp(6)
-  created_at                             DateTime                     @default(now()) @db.Timestamp(6)
-  updated_at                             DateTime                     @default(now()) @db.Timestamp(6)
-  application_status_history             application_status_history[]
-  audit_logs                             audit_logs[]
-  companies                              companies?
-  file_uploads                           file_uploads[]
-  job_applications                       job_applications[]
-  job_matches                            job_matches[]
-  job_posts_job_posts_approved_byTousers job_posts[]                  @relation("job_posts_approved_byTousers")
-  job_posts_job_posts_created_byTousers  job_posts[]                  @relation("job_posts_created_byTousers")
-  notifications                          notifications[]
-  reports_reports_reported_byTousers     reports[]                    @relation("reports_reported_byTousers")
-  reports_reports_reviewed_byTousers     reports[]                    @relation("reports_reviewed_byTousers")
-  saved_jobs                             saved_jobs[]
-  system_announcements                   system_announcements[]
-  system_settings                        system_settings[]
-  user_profiles                          user_profiles?
+  id                                    String                       @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  email                                 String                       @unique @db.VarChar(255)
+  password_hash                         String                       @db.VarChar(255)
+  role                                  String                       @db.VarChar(50)
+  status                                String                       @db.VarChar(50)
+  email_verified                        Boolean                      @default(false)
+  email_verification_token              String?                      @db.VarChar(255)
+  password_reset_token                  String?                      @db.VarChar(255)
+  password_reset_expires                DateTime?                    @db.Timestamp(6)
+  last_login                            DateTime?                    @db.Timestamp(6)
+  created_at                            DateTime                     @default(now()) @db.Timestamp(6)
+  updated_at                            DateTime                     @default(now()) @db.Timestamp(6)
+  application_status_history            application_status_history[]
+  audit_logs                            audit_logs[]
+  companies                             companies?
+  file_uploads                          file_uploads[]
+  job_applications                      job_applications[]
+  job_matches                           job_matches[]
+  job_posts_job_posts_created_byTousers job_posts[]                  @relation("job_posts_created_byTousers")
+  notifications                         notifications[]
+  reports_reports_reported_byTousers    reports[]                    @relation("reports_reported_byTousers")
+  reports_reports_reviewed_byTousers    reports[]                    @relation("reports_reviewed_byTousers")
+  saved_jobs                            saved_jobs[]
+  system_announcements                  system_announcements[]
+  system_settings                       system_settings[]
+  user_profiles                         user_profiles?
 }
 
 model industries {
