@@ -147,10 +147,21 @@ exports.getJobById = async (req, res) => {
 exports.createJob = async (req, res) => {
   const { user } = req;
   try {
-    const { status, deadline, ...jobData } = req.body;
+    const { status, deadline, scheduled_at, ...jobData } = req.body;
     
     if (!status || !['draft', 'schedule', 'active'].includes(status)) {
       return errorResponse(res, 'Invalid job status', [], 400);
+    }
+
+    if (status === 'schedule') {
+      if (!scheduled_at) {
+        return errorResponse(res, 'scheduled_at is required when status is schedule', [], 400);
+      }
+
+      const scheduledDate = new Date(scheduled_at);
+      if (scheduledDate <= new Date()) {
+        return errorResponse(res, 'scheduled_at must be in the future', [], 400);
+      }
     }
 
     const company = await prisma.companies.findUnique({ where: { user_id: user.id } });
@@ -167,7 +178,8 @@ exports.createJob = async (req, res) => {
         ...jobData,
         company_id: company.id,
         created_by: user.id,
-        deadline: deadline ? new Date(deadline) : undefined,
+        deadline: deadline ? new Date(deadline) : null,
+        scheduled_at: status === 'schedule' ? new Date(scheduled_at) : null,
         status
       },
     });
@@ -221,10 +233,22 @@ exports.updateJob = async (req, res) => {
       cost_coin,
       moderator_notes,
       status,
+      scheduled_at,
     } = req.body;
 
     if (!status || !['draft', 'schedule', 'active', 'expired'].includes(status)) {
       return errorResponse(res, 'Invalid job status', [], 400);
+    }
+
+    if (status === 'schedule') {
+      if (!scheduled_at) {
+        return errorResponse(res, 'scheduled_at is required when status is schedule', [], 400);
+      }
+      
+      const scheduledDate = new Date(scheduled_at);
+      if (scheduledDate <= new Date()) {
+        return errorResponse(res, 'scheduled_at must be in the future', [], 400);
+      }
     }
 
     const updatedJob = await prisma.job_posts.update({
@@ -242,7 +266,7 @@ exports.updateJob = async (req, res) => {
         education_level,
         job_type,
         number_of_openings,
-        deadline: deadline ? new Date(deadline) : undefined,
+        deadline: deadline ? new Date(deadline) : null,
         working_hours,
         description,
         requirements,
@@ -253,6 +277,7 @@ exports.updateJob = async (req, res) => {
         currency,
         cost_coin,
         moderator_notes,
+        scheduled_at: status === 'schedule' ? new Date(scheduled_at) : null,
         prev_status: existingJob.status,
         status,
         updated_at: new Date(),
@@ -521,7 +546,7 @@ exports.getAppliedJobs = async (req, res) => {
       select: {
         id: true,         
         status: true,
-        created_at: true,
+        applied_at: true,
         job_posts: {
           select: {
             id: true,
@@ -541,7 +566,7 @@ exports.getAppliedJobs = async (req, res) => {
       },
       skip: offset,
       take: limit,
-      orderBy: { created_at: 'desc' }
+      orderBy: { applied_at: 'desc' }
     });
 
     const result = applications.map(app => {
@@ -624,5 +649,61 @@ exports.createIndustry = async (req, res) => {
   } catch (err) {
     console.error(err);
     return errorResponse(res, 'Failed to create industry', [err.message], 500);
+  }
+};
+
+exports.refreshScheduledJobs = async (req, res) => {
+  try {
+    const now = new Date();
+    
+    const jobsToActivate = await prisma.job_posts.findMany({
+      where: {
+        status: 'schedule',
+        scheduled_at: {
+          lte: now
+        }
+      },
+      select: {
+        id: true,
+        title: true,
+        scheduled_at: true,
+        prev_status: true,
+        company_id: true
+      }
+    });
+
+    if (jobsToActivate.length === 0) {
+      return successResponse(res, 'No scheduled jobs found to activate', {
+        activatedCount: 0,
+        checkedAt: now.toISOString()
+      });
+    }
+
+    // Use transaction to ensure data consistency
+    const result = await prisma.$transaction(async (tx) => {
+      // Update all jobs that need to be activated
+      const updateResult = await tx.job_posts.updateMany({
+        where: {
+          status: 'schedule',
+          scheduled_at: {
+            lte: now
+          }
+        },
+        data: {
+          prev_status: 'schedule',
+          status: 'active',
+          updated_at: now
+        }
+      });
+
+      return updateResult;
+    });
+
+    return successResponse(res, `Successfully activated ${result.count} scheduled job(s)`, {
+    });
+
+  } catch (error) {
+    console.error('Error refreshing scheduled jobs:', error);
+    return errorResponse(res, 'Failed to refresh scheduled jobs', [error.message], 500);
   }
 };
