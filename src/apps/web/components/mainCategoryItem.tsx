@@ -10,12 +10,14 @@ interface MainCategoryItemProps {
     id: string;
     isSelected?: boolean;
     onSelect?: (id: string) => void;
+    onSubSelect?: (id: string) => void;
+    selectedSubId?: string;
   };
 }
 
 export default function MainCategoryItem({ main }: MainCategoryItemProps) {
   const [open, setOpen] = useState(false);
-  const [subCategories, setSubCategories] = useState<string[]>([]);
+  const [subCategories, setSubCategories] = useState<{ id: string; name: string }[]>([]);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -29,7 +31,7 @@ export default function MainCategoryItem({ main }: MainCategoryItemProps) {
           const categories = getIndustriesByCategory(response.data);
           const mainCategory = categories.find(cat => cat.name === main.category);
           if (mainCategory) {
-            setSubCategories(mainCategory.children.map(child => child.name));
+            setSubCategories(mainCategory.children.map(child => ({ id: child.id, name: child.name })));
           }
         }
       } catch (error) {
@@ -76,7 +78,9 @@ export default function MainCategoryItem({ main }: MainCategoryItemProps) {
 
       {open && (
         <SubCategoryList 
-          subCategories={loading ? ['Loading...'] : subCategories} 
+          subCategories={loading ? [] : subCategories}
+          selectedId={main.selectedSubId}
+          onSelect={main.onSubSelect}
         />
       )}
     </div>

@@ -103,9 +103,44 @@ export interface JobsPaginationResponse {
   };
 }
 
-export const getAllJobs = async (page: number = 1, limit: number = 10): Promise<JobsPaginationResponse> => {
+export interface JobQueryParams {
+  salary?: string;
+  exp?: string;
+  edu?: string;
+  type?: string;
+  location?: string;
+  keyword?: string;
+  industry?: string;
+}
+
+const buildJobsQueryString = (
+  page: number,
+  limit: number,
+  filters?: JobQueryParams
+): string => {
+  const params = new URLSearchParams();
+  params.set("page", String(page));
+  params.set("limit", String(limit));
+
+  if (filters) {
+    Object.entries(filters).forEach(([key, value]) => {
+      if (value !== undefined && value !== null && String(value).trim() !== "") {
+        params.set(key, String(value));
+      }
+    });
+  }
+
+  return params.toString();
+};
+
+export const getAllJobs = async (
+  page: number = 1,
+  limit: number = 10,
+  filters?: JobQueryParams
+): Promise<JobsPaginationResponse> => {
   try {
-    const response = await fetch(`${API_URL}/jobs?page=${page}&limit=${limit}`, {
+    const qs = buildJobsQueryString(page, limit, filters);
+    const response = await fetch(`${API_URL}/jobs?${qs}`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",

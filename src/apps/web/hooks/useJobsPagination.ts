@@ -1,10 +1,11 @@
-import { useState, useEffect, useCallback } from 'react';
-import { getAllJobs, Job, JobsPaginationResponse } from '../services/jobs';
+import { useState, useEffect, useCallback, useMemo } from 'react';
+import { getAllJobs, Job, JobsPaginationResponse, JobQueryParams } from '../services/jobs';
 
 interface UseJobsPaginationOptions {
   initialPage?: number;
   limit?: number;
   autoLoad?: boolean;
+  filters?: JobQueryParams;
 }
 
 interface UseJobsPaginationReturn {
@@ -24,7 +25,8 @@ export const useJobsPagination = (options: UseJobsPaginationOptions = {}): UseJo
   const {
     initialPage = 1,
     limit = 10,
-    autoLoad = true
+    autoLoad = true,
+    filters
   } = options;
 
   const [jobs, setJobs] = useState<Job[]>([]);
@@ -34,12 +36,15 @@ export const useJobsPagination = (options: UseJobsPaginationOptions = {}): UseJo
   const [totalPages, setTotalPages] = useState(0);
   const [hasNextPage, setHasNextPage] = useState(false);
 
+  // Stabilize filters to avoid multiple fetches due to object identity changes
+  const filtersKey = useMemo(() => JSON.stringify(filters ?? {}), [filters]);
+
   const loadJobs = useCallback(async (page: number, append: boolean = false) => {
     setLoading(true);
     setError(null);
 
     try {
-      const response: JobsPaginationResponse = await getAllJobs(page, limit);
+      const response: JobsPaginationResponse = await getAllJobs(page, limit, filters);
       
       if (response.success && response.data) {
         if (append) {
@@ -62,7 +67,7 @@ export const useJobsPagination = (options: UseJobsPaginationOptions = {}): UseJo
     } finally {
       setLoading(false);
     }
-  }, [limit]);
+  }, [limit, filtersKey]);
 
   const loadNextPage = useCallback(async () => {
     if (!loading && hasNextPage) {
@@ -88,7 +93,7 @@ export const useJobsPagination = (options: UseJobsPaginationOptions = {}): UseJo
     setError(null);
   }, [initialPage]);
 
-  // Auto load initial data
+  // Auto load initial data and refetch when filters change (via loadJobs dependency)
   useEffect(() => {
     if (autoLoad) {
       loadJobs(initialPage, false);

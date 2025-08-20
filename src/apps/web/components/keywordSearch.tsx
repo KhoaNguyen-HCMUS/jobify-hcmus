@@ -1,7 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
-import { Search, MapPin, ChevronDown } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { Search, MapPin, ChevronDown, X } from "lucide-react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { getProvinces, Province } from "../services/location";
 
 interface KeywordSearchProps {
@@ -12,6 +12,7 @@ export default function KeywordSearch({
   targetUrl = "/jobs",
 }: KeywordSearchProps) {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [keyword, setKeyword] = useState("");
   const [selectedProvince, setSelectedProvince] = useState("");
   const [provinces, setProvinces] = useState<Province[]>([]);
@@ -36,6 +37,15 @@ export default function KeywordSearch({
     fetchProvinces();
   }, []);
 
+  // Initialize keyword/location from URL once on mount
+  useEffect(() => {
+    const initialKeyword = searchParams.get("keyword") || "";
+    const initialLocation = searchParams.get("location") || "";
+    if (initialKeyword) setKeyword(initialKeyword);
+    if (initialLocation) setSelectedProvince(initialLocation);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const handleFind = (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -50,6 +60,16 @@ export default function KeywordSearch({
     const queryString = params.toString();
     const url = queryString ? `${targetUrl}?${queryString}` : targetUrl;
     router.push(url);
+  };
+
+  const clearKeywordInURL = () => {
+    const current = new URLSearchParams(searchParams.toString());
+    if (current.has("keyword")) {
+      current.delete("keyword");
+      const queryString = current.toString();
+      const url = queryString ? `${targetUrl}?${queryString}` : targetUrl;
+      router.replace(url);
+    }
   };
 
   const handleProvinceSelect = (province: Province) => {
@@ -68,9 +88,27 @@ export default function KeywordSearch({
             type="text"
             value={keyword}
             onChange={(e) => setKeyword(e.target.value)}
+            onBlur={() => {
+              if (keyword.trim() === "") {
+                clearKeywordInURL();
+              }
+            }}
             placeholder="Enter keyword..."
             className="w-full pl-12 pr-4 py-4 bg-accent-20 rounded-md text-primary-80 outline-none focus:ring-2 focus:ring-blue-400 focus:bg-white transition-all duration-300"
           />
+          {keyword && (
+            <button
+              type="button"
+              onClick={() => {
+                setKeyword("");
+                clearKeywordInURL();
+              }}
+              className="absolute right-4 top-1/2 -translate-y-1/2 text-primary-80 hover:text-primary cursor-pointer"
+              aria-label="Clear keyword"
+            >
+              <X size={24} />
+            </button>
+          )}
         </div>
 
         <div className="relative mr-10">

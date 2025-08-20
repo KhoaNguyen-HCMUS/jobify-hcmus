@@ -7,7 +7,6 @@ import { Job } from "../../services/jobs";
 import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { toast } from "react-toastify";
-import { getAllJobs } from "../../services/jobs";
 import { getAllIndustries } from "../../services/industries";
 import { getIndustriesByCategory } from "../../services/industries";
 import { IndustryCategory } from "../../services/industries";
@@ -51,8 +50,7 @@ function JobsPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  const [jobs, setJobs] = useState<Job[]>([]);
-  const [loading, setLoading] = useState(true);
+  // Local state only for industries sidebar
   const [industries, setIndustries] = useState<IndustryCategory[]>([]);
   const [industriesLoading, setIndustriesLoading] = useState(true);
 
@@ -64,88 +62,13 @@ function JobsPageContent() {
   const salary = searchParams.get("salary") || "allSalary";
   const typeOfWork = searchParams.get("typeOfWork") || "allTypeOfWork";
   const education = searchParams.get("education") || "allEducation";
-  // Filter jobs based on URL params
-  const filteredJobs = jobs.filter((job) => {
-    // Filter by keyword
-    if (keyword && keyword.trim()) {
-      const searchTerm = keyword.toLowerCase();
-      const jobTitle = job.title.toLowerCase();
-      const jobDescription = job.description?.toLowerCase() || "";
-      if (
-        !jobTitle.includes(searchTerm) &&
-        !jobDescription.includes(searchTerm)
-      ) {
-        return false;
-      }
-    }
-
-    // Filter by location
-    if (location && location !== "All locations") {
-      if (job.province !== location) {
-        return false;
-      }
-    }
-
-    // Filter by industry
-    if (industryId && industryId !== "all") {
-      if (job.industry_id !== industryId) {
-        return false;
-      }
-    }
-
-    if (experience !== "allExperience") {
-      if (job.experience_level !== experience) {
-        return false;
-      }
-    }
-
-    if (education !== "allEducation") {
-      if (job.education_level !== education) {
-        return false;
-      }
-    }
-
-    // Filter by salary
-    if (salary !== "allSalary") {
-      const minSalary = parseInt(job.salary_min);
-      const maxSalary = parseInt(job.salary_max);
-
-      // Convert to millions for easier comparison
-      const minSalaryM = minSalary / 1000000;
-      const maxSalaryM = maxSalary / 1000000;
-
-      if (salary === "lessThan10" && minSalaryM >= 10) {
-        return false;
-      }
-      if (salary === "10-15" && (minSalaryM > 15 || maxSalaryM < 10)) {
-        return false;
-      }
-      if (salary === "15-20" && (minSalaryM > 20 || maxSalaryM < 15)) {
-        return false;
-      }
-      if (salary === "20-25" && (minSalaryM > 25 || maxSalaryM < 20)) {
-        return false;
-      }
-      if (salary === "25-30" && (minSalaryM > 30 || maxSalaryM < 25)) {
-        return false;
-      }
-      if (salary === "30-50" && (minSalaryM > 50 || maxSalaryM < 30)) {
-        return false;
-      }
-      if (salary === "over50" && maxSalaryM < 50) {
-        return false;
-      }
-    }
-
-    // Filter by type of work
-    if (typeOfWork !== "allTypeOfWork") {
-      if (job.job_type !== typeOfWork) {
-        return false;
-      }
-    }
-
-    return true;
-  });
+  // Build filters for API
+  const mapSalaryFilter = (value: string | null) => {
+    if (!value || value === "allSalary") return undefined;
+    if (value === "lessThan10") return "0-10";
+    if (value === "over50") return "50+";
+    return value; // e.g. "10-15", "15-20", etc.
+  };
 
   // Transform Job data to match JobCard interface
   const transformJobForCard = (job: Job) => ({
@@ -178,8 +101,17 @@ function JobsPageContent() {
     refresh,
     reset
   } = useJobsPagination({
-    limit: 9,
-    autoLoad: true
+    limit: 15,
+    autoLoad: true,
+    filters: {
+      salary: mapSalaryFilter(salary),
+      exp: experience !== "allExperience" ? experience : undefined,
+      edu: education !== "allEducation" ? education : undefined,
+      type: typeOfWork !== "allTypeOfWork" ? typeOfWork : undefined,
+      location: location && location !== "All locations" ? location : undefined,
+      keyword: keyword || undefined,
+      industry: industryId && industryId !== "all" ? industryId : undefined,
+    },
   });
 
   // Update URL params function
@@ -204,26 +136,7 @@ function JobsPageContent() {
     router.push(newURL);
   };
 
-  useEffect(() => {
-    const fetchJobs = async () => {
-      try {
-        setLoading(true);
-        const response = await getAllJobs();
-        if (response.success && response.data) {
-          setJobs(response.data);
-          console.log(response.data);
-        } else {
-          toast.error(response.message || "Unable to load job list");
-        }
-      } catch (error) {
-        toast.error("Error loading data");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchJobs();
-  }, []);
+  // Remove old client-side jobs fetch; pagination hook manages data
 
   useEffect(() => {
     const fetchIndustries = async () => {
@@ -246,7 +159,7 @@ function JobsPageContent() {
 
 
 
-  if (loading) {
+  if (paginationLoading && paginatedJobs.length === 0) {
     return (
       <div className="bg-neutral-light-40 min-h-screen flex items-center justify-center">
         <div className="text-primary text-xl">Loading...</div>
@@ -302,6 +215,9 @@ function JobsPageContent() {
                         isSelected: industryId === main.id,
                         onSelect: (id: string) =>
                           updateURLParams({ industry: id }),
+                        onSubSelect: (subId: string) =>
+                          updateURLParams({ industry: subId }),
+                        selectedSubId: industryId || undefined,
                       }}
                     />
                   ))}
@@ -351,6 +267,19 @@ function JobsPageContent() {
                 Education
               </div>
               <div className="flex flex-col">
+                <label className="px-4 py-2 text-primary hover:bg-neutral-light-80 cursor-pointer">
+                  <input
+                    type="radio"
+                    name="education"
+                    value="allEducation"
+                    checked={education === "allEducation"}
+                    onChange={(e) =>
+                      updateURLParams({ education: e.target.value })
+                    }
+                    className="mr-2 bg-accent accent-accent"
+                  />
+                  All
+                </label>
                 {EDUCATION_LEVELS.map((level) => (
                   <label
                     key={level}

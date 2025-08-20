@@ -3,6 +3,7 @@ import KeywordSearch from "../../components/keywordSearch";
 import { Suspense } from "react";
 import { ChevronDown } from "lucide-react";
 import { Job } from "../../services/jobs";
+import { useSearchParams } from "next/navigation";
 import { useJobsPagination } from "../../hooks/useJobsPagination";
 import PaginationComponent from "../../components/PaginationComponent";
 import JobItem from "../../components/job/jobItem";
@@ -35,6 +36,16 @@ const adaptJobForComponent = (job: Job) => {
 };
 
 function RecommendedPageContent() {
+  const searchParams = useSearchParams();
+  const filters = {
+    salary: searchParams.get("salary") || undefined,
+    exp: searchParams.get("exp") || undefined,
+    edu: searchParams.get("edu") || undefined,
+    type: searchParams.get("type") || undefined,
+    location: searchParams.get("location") || undefined,
+    keyword: searchParams.get("keyword") || undefined,
+    industry: searchParams.get("industry") || undefined,
+  };
   const {
     jobs,
     loading,
@@ -43,7 +54,7 @@ function RecommendedPageContent() {
     currentPage,
     totalPages,
     loadPage,
-  } = useJobsPagination({ limit: 10, autoLoad: true });
+  } = useJobsPagination({ limit: 10, autoLoad: true, filters });
 
   if (loading && jobs.length === 0) {
     return (
