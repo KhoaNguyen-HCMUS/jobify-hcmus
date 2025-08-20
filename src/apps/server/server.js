@@ -30,6 +30,8 @@ const announcementRoutes = require('./routes/announcement.routes');
 app.use('/api/announcements', announcementRoutes);
 const reportRoutes = require('./routes/report.routes');
 app.use('/api/reports', reportRoutes);
+const recommendationRoutes = require('./routes/recommendation.routes');
+app.use('/api/recommendations', recommendationRoutes);
 
 // Health check route
 app.get('/api/health', (req, res) => {
