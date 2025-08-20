@@ -168,7 +168,7 @@ exports.getJobApplications = async (req, res) => {
       },
       skip: offset,
       take: limit,
-      orderBy: { created_at: 'desc' }
+      orderBy: { updated_at: 'desc' }
     });
 
     const result = await Promise.all(
