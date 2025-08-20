@@ -2,6 +2,7 @@
 import FeaturedJob from "../components/job/featuredJob";
 import CategoryGrid from "../components/categoryGrid";
 import KeywordSearch from "../components/keywordSearch";
+import { Suspense } from "react";
 
 export default function HomePage() {
   return (
@@ -17,7 +18,9 @@ export default function HomePage() {
       </div>
       <div>
         <div className="mx-16 mb-16">
-          <KeywordSearch />
+          <Suspense fallback={<div />}> 
+            <KeywordSearch />
+          </Suspense>
         </div>
         <div className="bg-neutral-light-40">
           <div className="flex justify-between font-bold text-4xl text-primary px-10 w-full mb-6 pt-6">
