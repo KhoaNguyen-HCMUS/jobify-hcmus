@@ -3,7 +3,7 @@ import { MapPin, Search, Unlink2, Users } from "lucide-react";
 import { useState, useEffect } from "react";
 import JobCard from "../../components/job/jobCard";
 import usePagination from "../../hooks/usePagination";
-import Pagination from "../../components/pagination";
+import Pagination from "../PaginationComponent";
 import { useParams } from "next/navigation";
 import { jobs } from "../../components/fakeJob";
 import { companies } from "../../components/fakeCompany";

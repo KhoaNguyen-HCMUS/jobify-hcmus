@@ -1,91 +1,62 @@
 "use client";
-import JobCard from "../../components/job/jobCard";
 import KeywordSearch from "../../components/keywordSearch";
-import { useState, useEffect, Suspense } from "react";
+import { Suspense } from "react";
 import { ChevronDown } from "lucide-react";
-import usePagination from "../../hooks/usePagination";
-import Pagination from "../../components/pagination";
-import { getAllJobs, Job } from "../../services/jobs";
-import { toast } from 'react-toastify';
-import { useSearchParams } from 'next/navigation';
+import { Job } from "../../services/jobs";
+import { useJobsPagination } from "../../hooks/useJobsPagination";
+import PaginationComponent from "../../components/PaginationComponent";
+import JobItem from "../../components/job/jobItem";
 
 const adaptJobForComponent = (job: Job) => {
+  const salaryText = `${parseInt(job.salary_min).toLocaleString()} - ${parseInt(
+    job.salary_max
+  ).toLocaleString()} ${job.currency || "VNĐ"}`;
+
+  const postedDate = new Date(job.created_at);
+  const now = new Date();
+  const diffTime = Math.abs(now.getTime() - postedDate.getTime());
+  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+  const postedAtText = diffDays === 1 ? "1 day ago" : `${diffDays} days ago`;
+
   return {
     id: job.id,
     logo: "/logo.png",
     name: job.title,
     title: job.title,
-    company_name: job.company_name || null,
-    salary_min: job.salary_min,
-    salary_max: job.salary_max,
-    currency: job.currency || 'VNĐ',
+    company_name: job.company_name || "Unknown Company",
     province: job.province,
-    status: job.status,
-    created_at: new Date(job.created_at),
-    is_saved: false
+    experience: job.experience_level,
+    salary: salaryText,
+    postedAt: postedAtText,
+    is_salary_negotiable: job.is_salary_negotiable,
+    status: job.approved_by ? "approved" : "pending",
   };
 };
 
 function RecommendedPageContent() {
-  const searchParams = useSearchParams();
-  const [jobs, setJobs] = useState<Job[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [filteredJobs, setFilteredJobs] = useState<Job[]>([]);
+  const {
+    jobs,
+    loading,
+    error,
+    hasNextPage,
+    currentPage,
+    totalPages,
+    loadPage,
+  } = useJobsPagination({ limit: 10, autoLoad: true });
 
-  // Get URL params
-  const keyword = searchParams.get('keyword');
-  const location = searchParams.get('location');
-
-  useEffect(() => {
-    const fetchJobs = async () => {
-      try {
-        setLoading(true);
-        const response = await getAllJobs();
-        if (response.success && response.data) {
-          const sortedJobs = response.data.sort((a, b) => 
-            new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
-          );
-          setJobs(sortedJobs);
-          
-          // Apply filters based on URL params
-          let filtered = sortedJobs;
-          
-          if (keyword && keyword.trim()) {
-            const searchTerm = keyword.toLowerCase();
-            filtered = filtered.filter(job => {
-              const jobTitle = job.title.toLowerCase();
-              const jobDescription = job.description?.toLowerCase() || '';
-              return jobTitle.includes(searchTerm) || jobDescription.includes(searchTerm);
-            });
-          }
-          
-          if (location && location !== 'All locations') {
-            filtered = filtered.filter(job => job.province === location);
-          }
-          
-          setFilteredJobs(filtered);
-        } else {
-          toast.error(response.message || 'Unable to load job list');
-        }
-      } catch (error) {
-        toast.error('Error loading data');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchJobs();
-  }, [keyword, location]);
-
-
-
-  const adaptedJobs = filteredJobs.map(adaptJobForComponent);
-  const { page, maxPage, current, next, prev } = usePagination(adaptedJobs, 10);
-
-  if (loading) {
+  if (loading && jobs.length === 0) {
     return (
       <div className="bg-neutral-light-40 min-h-screen flex items-center justify-center">
         <div className="text-primary text-xl">Loading...</div>
+      </div>
+    );
+  }
+  
+  if (error) {
+    return (
+      <div className="bg-neutral-light-40 min-h-screen flex items-center justify-center">
+        <div className="text-primary text-xl">{error}</div>
       </div>
     );
   }
@@ -138,18 +109,19 @@ function RecommendedPageContent() {
               </button>
             </div>
             <div className="px-6 pb-4">
-              {current.length > 0 ? (
+              {jobs.length > 0 ? (
                 <>
                   <div className="w-full grid grid-cols-1 md:grid-cols-2 gap-x-20 gap-y-10 p-4">
-                    {current.map((job) => (
-                      <JobCard key={job.id} job={job} />
+                    {jobs.map((job: Job) => (
+                      <JobItem key={job.id} job={adaptJobForComponent(job)} />
                     ))}
                   </div>
-                  <Pagination
-                    page={page}
-                    maxPage={maxPage}
-                    onNext={next}
-                    onPrev={prev}
+                  <PaginationComponent
+                    currentPage={currentPage}
+                    totalPages={totalPages}
+                    hasNextPage={hasNextPage}
+                    onPageChange={loadPage}
+                    loading={loading}
                   />
                 </>
               ) : (

@@ -1,9 +1,11 @@
 import JobCard from "./jobCard";
 import LocationFilter from "../locationFilter";
 import usePagination from "../../hooks/usePagination";
-import Pagination from "../../components/pagination";
+import Pagination from "../PaginationComponent";
 import { getAllJobs, Job } from "../../services/jobs";
 import { useEffect, useState } from "react";
+import { useJobsPagination } from "../../hooks/useJobsPagination";
+import PaginationComponent from "../PaginationComponent";
 
 const transformJobForCard = (job: Job) => ({
   id: job.id,
@@ -36,22 +38,26 @@ export default function FeaturedJob() {
     fetchJobs();
   }, []);
 
-  const { page, maxPage, current, next, prev } = usePagination(jobs, 12);
+  const { jobs: paginatedJobs, loading: paginationLoading, error: paginationError, hasNextPage, currentPage, totalPages, loadNextPage, loadPage, refresh, reset } = useJobsPagination({
+    limit: 12,
+    autoLoad: true
+  });
 
   return (
     <div>
       <div className="mx-7">
         <div className="w-full grid grid-cols-1 md:grid-cols-3 gap-4">
-          {current.map((job) => (
+          {paginatedJobs.map((job) => (
             <JobCard key={job.id} job={transformJobForCard(job)} />
           ))}
         </div>
         <div className="py-4">
-          <Pagination
-            page={page}
-            maxPage={maxPage}
-            onNext={next}
-            onPrev={prev}
+          <PaginationComponent
+            currentPage={currentPage}
+            totalPages={totalPages}
+            hasNextPage={hasNextPage}
+            onPageChange={loadPage}
+            loading={paginationLoading}
           />
         </div>
       </div>

@@ -18,6 +18,7 @@ export default function Pagination({
     <div className="w-full flex justify-center">
       <div className="flex items-center space-x-4">
         <button
+          aria-label="Previous Page"
           onClick={onPrev}
           disabled={page === 1}
           className={`transition ${
@@ -32,6 +33,7 @@ export default function Pagination({
         </span>
 
         <button
+          aria-label="Next Page"
           onClick={onNext}
           disabled={page === maxPage}
           className={`transition ${

@@ -91,9 +91,21 @@ export interface SaveJobResponse {
   };
 }
 
-export const getAllJobs = async (): Promise<JobsResponse> => {
+export interface JobsPaginationResponse {
+  success: boolean;
+  message: string;
+  data?: Job[];
+  pagination?: {
+    page: number;
+    limit: number;
+    totalPages: number;
+    hasNextPage: boolean;
+  };
+}
+
+export const getAllJobs = async (page: number = 1, limit: number = 10): Promise<JobsPaginationResponse> => {
   try {
-    const response = await fetch(`${API_URL}/jobs`, {
+    const response = await fetch(`${API_URL}/jobs?page=${page}&limit=${limit}`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -101,6 +113,7 @@ export const getAllJobs = async (): Promise<JobsResponse> => {
     });
 
     const result = await response.json();
+    console.log(result);
     return result;
   } catch (error) {
     return {
