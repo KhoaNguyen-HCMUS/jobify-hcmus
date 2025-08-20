@@ -244,6 +244,15 @@ export default function JobDetail({
   const handleReopenJob = async () => {
     if (!job) return;
 
+    if (job.deadline) {
+      const deadline = new Date(job.deadline);
+      const now = new Date();
+      if (deadline < now) {
+        toast.error("Job deadline has already passed. Please update the deadline.");
+        return;
+      }
+    }
+
     if (window.confirm("Are you sure you want to reopen this job?")) {
       try {
         const token = getToken();
@@ -755,7 +764,6 @@ export default function JobDetail({
               </button>
             )}
             
-                         {/* Show Schedule Again button for draft jobs */}
              {job.status === "draft" && (
                <button
                  onClick={() => setIsScheduleModalOpen(true)}
@@ -765,11 +773,10 @@ export default function JobDetail({
                </button>
              )}
              
-             {/* Show Reopen Job button for expired jobs */}
              {job.status === "expired" && (
                <button
                  onClick={handleReopenJob}
-                 className="bg-green-600 hover:bg-green-700 text-background px-6 py-2 rounded-full cursor-pointer"
+                 className="bg-accent hover:bg-secondary text-background px-6 py-2 rounded-full cursor-pointer"
                >
                  Reopen Job
                </button>
