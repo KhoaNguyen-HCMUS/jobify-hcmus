@@ -1,6 +1,6 @@
 export default function Footer() {
   return (
-    <div className="bg-primary z-50 relative">
+    <div className="bg-primary z-30 relative">
       <div className="flex px-8 py-4">
         <div className="flex-1 flex flex-col items-center justify-center gap-2 relative">
           <img

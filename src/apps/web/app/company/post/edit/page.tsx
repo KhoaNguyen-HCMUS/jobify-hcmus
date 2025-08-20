@@ -148,12 +148,20 @@ function RecruiterPostJobEditContent({
         setIndustryCategories(categories);
 
         if (job?.industry_id) {
-          const mainIndustry = categories.find((cat) =>
+          // If job.industry_id is a child, set parent + sub
+          const parent = categories.find((cat) =>
             cat.children.some((sub) => sub.id === job.industry_id)
           );
-          if (mainIndustry) {
-            setSelectedIndustry(mainIndustry.id);
+          if (parent) {
+            setSelectedIndustry(parent.id);
             setSelectedSubIndustry(job.industry_id);
+          } else {
+            // Otherwise treat as parent industry id
+            const parentExists = categories.some((cat) => cat.id === job.industry_id);
+            if (parentExists) {
+              setSelectedIndustry(job.industry_id);
+              setSelectedSubIndustry("");
+            }
           }
         }
       }
@@ -412,6 +420,32 @@ function RecruiterPostJobEditContent({
                     </select>
                   </div>
                 </div>
+
+                {/* Industry (parent) */}
+                <div className="flex flex-col">
+                  <label
+                    htmlFor="industry"
+                    className="block text-sm font-bold text-primary"
+                  >
+                    Industry*:
+                  </label>
+                  <div className="relative">
+                    <select
+                      id="industry"
+                      value={selectedIndustry}
+                      onChange={(e) => setSelectedIndustry(e.target.value)}
+                      className="w-full border border-primary-80 pl-4 pr-4 py-2 bg-neutral-light-20 rounded-xl text-primary-80 outline-none focus:ring-1 focus:bg-white transition-all duration-300"
+                      required
+                    >
+                      <option value="">Select industry category</option>
+                      {industryCategories.map((category) => (
+                        <option key={category.id} value={category.id}>
+                          {category.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
                 <div className="flex flex-col">
                   <label
                     htmlFor="deadline"
@@ -539,6 +573,35 @@ function RecruiterPostJobEditContent({
                           {level}
                         </option>
                       ))}
+                    </select>
+                  </div>
+                </div>
+
+                {/* Specialization (sub-industry, optional) */}
+                <div className="flex flex-col">
+                  <label
+                    htmlFor="subIndustry"
+                    className="block text-sm font-bold text-primary"
+                  >
+                    Specialization (Optional):
+                  </label>
+                  <div className="relative">
+                    <select
+                      id="subIndustry"
+                      value={selectedSubIndustry}
+                      onChange={(e) => setSelectedSubIndustry(e.target.value)}
+                      className="w-full border border-primary-80 pl-4 pr-4 py-2 bg-neutral-light-20 rounded-xl text-primary-80 outline-none focus:ring-1 focus:bg-white transition-all duration-300"
+                      disabled={!selectedIndustry}
+                    >
+                      <option value="">Select specialization (optional)</option>
+                      {selectedIndustry &&
+                        industryCategories
+                          .find((cat) => cat.id === selectedIndustry)
+                          ?.children.map((sub) => (
+                            <option key={sub.id} value={sub.id}>
+                              {sub.name}
+                            </option>
+                          ))}
                     </select>
                   </div>
                 </div>

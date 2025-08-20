@@ -165,7 +165,7 @@ export default function SideBar() {
   if (!user) return null;
   return (
     <aside
-      className={`fixed md:flex top-20 left-0 bottom-0 z-40 w-72 transition-all duration-300 bg-neutral-light-40 backdrop-blur-md shadow-lg min-h-screen`}
+      className={`fixed md:flex top-20 left-0 bottom-0 z-20 w-72 transition-all duration-300 bg-neutral-light-40 backdrop-blur-md shadow-lg min-h-screen`}
     >
       <div className="container">
         <div className="flex flex-col">
