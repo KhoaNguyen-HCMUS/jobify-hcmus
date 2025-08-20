@@ -293,6 +293,8 @@ function RecruiterPostJobContent({ isOpen, onClose }: JobPostProps) {
         setScheduledAt("");
         setShowScheduleModal(false);
         setCompanyProfile(null);
+        router.push("/company/jobs");
+
       } else {
         toast.error("Failed to post job: " + response.message);
       }
@@ -301,7 +303,6 @@ function RecruiterPostJobContent({ isOpen, onClose }: JobPostProps) {
       console.error("Error posting job:", error);
     } finally {
       setIsLoading(false);
-      router.push("/company/jobs");
     }
   };
 

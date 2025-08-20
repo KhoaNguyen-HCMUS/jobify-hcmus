@@ -33,6 +33,7 @@ import JobStatusBadge from "./jobStatusBadge";
 import { approveJob, rejectJob } from "../../services/admin";
 import { formatDateForDisplay } from "../../utils/dateUtils";
 import { localToUTC } from "../../utils/timezoneUtils";
+import { renderTextWithLineBreaks } from "../../utils/textUtils";
 
 interface JobDetailData {
   company: CompanyProfile;
@@ -240,6 +241,35 @@ export default function JobDetail({
     }
   };
 
+  const handleReopenJob = async () => {
+    if (!job) return;
+
+    if (window.confirm("Are you sure you want to reopen this job?")) {
+      try {
+        const token = getToken();
+        if (!token) {
+          toast.error("Please login again!");
+          return;
+        }
+
+        const updateData = {
+          status: "active",
+        };
+
+        const response = await updateJob(job.id, updateData, token);
+        if (response.success) {
+          toast.success("Job reopened successfully!");
+          window.location.reload();
+        } else {
+          toast.error("Failed to reopen job: " + response.message);
+        }
+      } catch (error) {
+        toast.error("Error reopening job, please try again later.");
+        console.error("Error reopening job:", error);
+      }
+    }
+  };
+
   const handleUpdateNotes = async (notes: string) => {
     if (!job) return;
     const token = getToken();
@@ -381,9 +411,9 @@ export default function JobDetail({
                     disabled={hasApplied || isFull}
                     className={`px-4 py-2 rounded-full font-semibold transition-all duration-300 transform ${
                       hasApplied
-                        ? "bg-green-600 text-white cursor-not-allowed"
+                        ? "bg-accent text-background cursor-not-allowed"
                         : isFull
-                        ? "bg-gray-400 text-white cursor-not-allowed"
+                        ? "bg-accent text-background cursor-not-allowed"
                         : "bg-accent text-background hover:shadow-lg hover:shadow-primary/30 hover:-translate-y-0.5 cursor-pointer"
                     }`}
                   >
@@ -439,7 +469,7 @@ export default function JobDetail({
                 <div className="">
                   <h2 className="font-semibold text-accent">Job Description</h2>
                   <p className="text-primary">
-                    {job.description || "No description available"}
+                    {renderTextWithLineBreaks(job.description, "No description available")}
                   </p>
                 </div>
                 <div>
@@ -447,23 +477,23 @@ export default function JobDetail({
                     Applicant Requirements
                   </h2>
                   <p className="text-primary">
-                    {job.requirements || "No requirements specified"}
+                    {renderTextWithLineBreaks(job.requirements, "No requirements specified")}
                   </p>
                 </div>
                 <div>
                   <h2 className="font-semibold text-accent">Benefits</h2>
                   <p className="text-primary">
-                    {job.benefits || "No benefits specified"}
+                    {renderTextWithLineBreaks(job.benefits, "No benefits specified")}
                   </p>
                 </div>
                 <div>
                   <h2 className="font-semibold text-accent">Work Place</h2>
-                  <p className="text-primary">{job.work_place}</p>
+                  <p className="text-primary">{renderTextWithLineBreaks(job.work_place)}</p>
                 </div>
                 <div>
                   <h2 className="font-semibold text-accent">Working Time</h2>
                   <p className="text-primary">
-                    {job.working_hours || "Not specified"}
+                    {renderTextWithLineBreaks(job.working_hours, "Not specified")}
                   </p>
                 </div>
                 <div>
@@ -539,7 +569,7 @@ export default function JobDetail({
                       Address:{" "}
                     </span>
                   </div>
-                  <span className="text-primary-80">{company.address}</span>
+                  <span className="text-primary-80">{renderTextWithLineBreaks(company.address)}</span>
                 </div>
               )}
               {company?.phone_number && (
@@ -725,15 +755,25 @@ export default function JobDetail({
               </button>
             )}
             
-            {/* Show Schedule Again button for draft jobs */}
-            {job.status === "draft" && (
-              <button
-                onClick={() => setIsScheduleModalOpen(true)}
-                className="bg-accent hover:bg-secondary text-background px-6 py-2 rounded-full cursor-pointer"
-              >
-                Schedule Again
-              </button>
-            )}
+                         {/* Show Schedule Again button for draft jobs */}
+             {job.status === "draft" && (
+               <button
+                 onClick={() => setIsScheduleModalOpen(true)}
+                 className="bg-accent hover:bg-secondary text-background px-6 py-2 rounded-full cursor-pointer"
+               >
+                 Schedule Again
+               </button>
+             )}
+             
+             {/* Show Reopen Job button for expired jobs */}
+             {job.status === "expired" && (
+               <button
+                 onClick={handleReopenJob}
+                 className="bg-green-600 hover:bg-green-700 text-background px-6 py-2 rounded-full cursor-pointer"
+               >
+                 Reopen Job
+               </button>
+             )}
           </div>
         </div>
       )}
@@ -748,7 +788,7 @@ export default function JobDetail({
             <span className="text-primary-80 font-semibold">
               Moderator Notes:
             </span>
-            <span className="text-primary-80">{job.moderator_notes}</span>
+            <span className="text-primary-80">{renderTextWithLineBreaks(job.moderator_notes, "No notes available")}</span>
           </div>
           <div className="flex gap-2">
             <button

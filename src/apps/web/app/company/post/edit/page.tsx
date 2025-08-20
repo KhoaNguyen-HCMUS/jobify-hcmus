@@ -717,7 +717,7 @@ function RecruiterPostJobEditContent({
                   </button>
                   
                   {/* Show Publish Now button for draft and schedule jobs */}
-                  {(job.status === "draft" || job.status === "schedule") && (
+                  {(job.status === "draft" || job.status === "schedule" || job.status === "expired") && (
                     <button
                       onClick={handlePublishNow}
                       disabled={isLoading}
@@ -728,7 +728,7 @@ function RecruiterPostJobEditContent({
                   )}
                   
                   {/* Show Schedule button for draft jobs */}
-                  {job.status === "draft" && (
+                  {(job.status === "draft" || job.status === "expired") && (
                     <button
                       onClick={handleScheduleClick}
                       disabled={isLoading}
