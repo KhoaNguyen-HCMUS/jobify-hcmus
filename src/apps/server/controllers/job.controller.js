@@ -4,17 +4,96 @@ const { successResponse, errorResponse } = require('../utils/response');
 exports.getJobs = async (req, res) => {
   try {
     const page = parseInt(req.query.page) || 1;
-    const limit = 10; 
+    const limit = parseInt(req.query.limit) || 10;
     const offset = (page - 1) * limit;
     
     const userId = req.user ? req.user.id : null;
 
+    const { 
+      exp, 
+      edu, 
+      type, 
+      salary, 
+      location,
+      industry,
+      keyword
+    } = req.query;
+
+    const whereClause = { status: 'active' };
+
+    if (exp) {
+      const validExperienceLevels = ["Intern", "Fresher", "Junior", "Mid-level", "Senior", "Leader", "Manager", "Director"];
+      if (validExperienceLevels.includes(exp)) {
+        whereClause.experience_level = exp;
+      }
+    }
+
+    if (edu) {
+      const validEducationLevels = ["High School", "College", "University", "Master", "PhD"];
+      if (validEducationLevels.includes(edu)) {
+        whereClause.education_level = edu;
+      }
+    }
+
+    if (type) {
+      const validJobTypes = ["Full-time", "Part-time"];
+      if (validJobTypes.includes(type)) {
+        whereClause.job_type = type;
+      }
+    }
+
+    if (salary) {
+      const salaryParts = salary.split('-');
+      if (salaryParts.length === 2) {
+        const minSalaryMillion = parseFloat(salaryParts[0]);
+        const maxSalaryMillion = parseFloat(salaryParts[1]);
+        
+        if (!isNaN(minSalaryMillion) && !isNaN(maxSalaryMillion) && minSalaryMillion >= 0 && maxSalaryMillion >= 0) {
+          const minSalary = minSalaryMillion * 1000000;
+          const maxSalary = maxSalaryMillion * 1000000;
+          
+          whereClause.AND = [
+            { salary_max: { gt: minSalary } }, // Job's max salary > requested min
+            { salary_min: { lt: maxSalary } }  // Job's min salary < requested max
+          ];
+        }
+      }
+    }
+
+    if (location) {
+      whereClause.province = {
+        contains: location,
+        mode: 'insensitive'
+      };
+    }
+
+    if (industry) {
+      whereClause.industry_id = industry;
+    }
+
+    if (keyword) {
+      whereClause.OR = [
+        {
+          title: {
+            contains: keyword,
+            mode: 'insensitive'
+          }
+        },
+        {
+          description: {
+            contains: keyword,
+            mode: 'insensitive'
+          }
+        }
+      ];
+    }
+
     const totalJobs = await prisma.job_posts.count({ 
-      where: { status: 'active' } 
+      where: whereClause 
     });
 
     const jobs = await prisma.job_posts.findMany({ 
-      where: { status: 'active' },
+      where: whereClause,
       skip: offset,
       take: limit,
       orderBy: { created_at: 'desc' } 
@@ -170,7 +249,7 @@ exports.createJob = async (req, res) => {
     }
 
     if (company.status !== 'active' && status !== 'draft') {
-      return errorResponse(res, 'You cannot post jobs while your company profile is not active', [], 403);
+      return errorResponse(res, 'You cannot post jobs while your company profile is not active, draft jobs are allowed', [], 403);
     }
 
     const newJob = await prisma.job_posts.create({
@@ -266,7 +345,7 @@ exports.updateJob = async (req, res) => {
         education_level,
         job_type,
         number_of_openings,
-        deadline: deadline ? new Date(deadline) : null,
+        deadline: deadline ? new Date(deadline) : undefined,
         working_hours,
         description,
         requirements,
@@ -489,7 +568,10 @@ exports.getRecommendedJobs = async (req, res) => {
     const matchedJobIds = await prisma.job_matches.findMany({
       where: { user_id: userId, is_dismissed: false },
       orderBy: { match_score: 'desc' },
-      select: { job_id: true },
+      select: { 
+        job_id: true,
+        match_score: true
+      },
       skip: offset,
       take: limit,
     });
@@ -500,8 +582,17 @@ exports.getRecommendedJobs = async (req, res) => {
 
     const jobsWithCompany = await Promise.all(jobs.map(async (job) => {
       const company = await prisma.companies.findUnique({ where: { id: job.company_id }, select: { company_name: true } });
-      return { ...job, company_name: company ? company.company_name : 'Unknown' };
+      
+      const matchData = matchedJobIds.find(match => match.job_id === job.id);
+      
+      return { 
+        ...job, 
+        company_name: company ? company.company_name : 'Unknown',
+        match_score: matchData ? matchData.match_score : 0
+      };
     }));
+
+    const sortedJobsWithCompany = jobsWithCompany.sort((a, b) => b.match_score - a.match_score);
 
     const totalPages = Math.ceil(totalRecommendedJobs / limit);
     const hasNextPage = page < totalPages;
@@ -513,7 +604,7 @@ exports.getRecommendedJobs = async (req, res) => {
       hasNextPage
     };
 
-    return successResponse(res, 'Recommended jobs fetched successfully', jobsWithCompany, paginationInfo);
+    return successResponse(res, 'Recommended jobs fetched successfully', sortedJobsWithCompany, paginationInfo);
   } catch (err) {
     console.error(err);
     return errorResponse(res, 'Failed to fetch recommended jobs', [err.message], 500);
@@ -652,7 +743,7 @@ exports.createIndustry = async (req, res) => {
   }
 };
 
-exports.refreshScheduledJobs = async (req, res) => {
+exports.refreshJobs = async (req, res) => {
   try {
     const now = new Date();
     
@@ -662,48 +753,81 @@ exports.refreshScheduledJobs = async (req, res) => {
         scheduled_at: {
           lte: now
         }
-      },
-      select: {
-        id: true,
-        title: true,
-        scheduled_at: true,
-        prev_status: true,
-        company_id: true
       }
     });
 
-    if (jobsToActivate.length === 0) {
-      return successResponse(res, 'No scheduled jobs found to activate', {
+    const jobsToExpire = await prisma.job_posts.findMany({
+      where: {
+        status: 'active',
+        deadline: {
+          lt: now
+        }
+      }
+    });
+
+    if (jobsToActivate.length === 0 && jobsToExpire.length === 0) {
+      return successResponse(res, 'No jobs found to update', {
         activatedCount: 0,
+        expiredCount: 0,
         checkedAt: now.toISOString()
       });
     }
 
-    // Use transaction to ensure data consistency
-    const result = await prisma.$transaction(async (tx) => {
-      // Update all jobs that need to be activated
-      const updateResult = await tx.job_posts.updateMany({
-        where: {
-          status: 'schedule',
-          scheduled_at: {
-            lte: now
-          }
-        },
-        data: {
-          prev_status: 'schedule',
-          status: 'active',
-          updated_at: now
-        }
-      });
+    const results = await prisma.$transaction(async (tx) => {
+      let activatedCount = 0;
+      let expiredCount = 0;
 
-      return updateResult;
+      if (jobsToActivate.length > 0) {
+        const activateResult = await tx.job_posts.updateMany({
+          where: {
+            status: 'schedule',
+            scheduled_at: {
+              lte: now
+            }
+          },
+          data: {
+            prev_status: 'schedule',
+            status: 'active',
+            updated_at: now
+          }
+        });
+        activatedCount = activateResult.count;
+      }
+
+      if (jobsToExpire.length > 0) {
+        const expireResult = await tx.job_posts.updateMany({
+          where: {
+            status: 'active',
+            deadline: {
+              lt: now
+            }
+          },
+          data: {
+            prev_status: 'active',
+            status: 'expired',
+            updated_at: now
+          }
+        });
+        expiredCount = expireResult.count;
+      }
+
+      return { activatedCount, expiredCount };
     });
 
-    return successResponse(res, `Successfully activated ${result.count} scheduled job(s)`, {
+    const message = [];
+    if (results.activatedCount > 0) {
+      message.push(`activated ${results.activatedCount} scheduled job(s)`);
+    }
+    if (results.expiredCount > 0) {
+      message.push(`expired ${results.expiredCount} overdue job(s)`);
+    }
+
+    return successResponse(res, `Successfully ${message.join(' and ')}`, {
+      checkedAt: now.toISOString()
     });
 
   } catch (error) {
-    console.error('Error refreshing scheduled jobs:', error);
-    return errorResponse(res, 'Failed to refresh scheduled jobs', [error.message], 500);
+    console.error('Error refreshing jobs:', error);
+    return errorResponse(res, 'Failed to refresh jobs', [error.message], 500);
   }
 };

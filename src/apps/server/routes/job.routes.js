@@ -8,7 +8,7 @@ const upload = require('../middlewares/upload.middleware');
 
 router.get('/', optionalAuthenticateToken, jobController.getJobs);
 router.post('/', authenticateToken, authorizeRoles(['company']), jobController.createJob);
-router.post('/refresh-scheduled', optionalAuthenticateToken, jobController.refreshScheduledJobs);
+router.post('/refresh', optionalAuthenticateToken, jobController.refreshJobs);
 router.get('/saved', authenticateToken, jobController.getSavedJobs);
 router.get('/recommended', authenticateToken, jobController.getRecommendedJobs);
 router.get('/applied', authenticateToken, jobController.getAppliedJobs);
