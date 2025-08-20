@@ -32,6 +32,7 @@ export interface Job {
   moderator_notes: string | null;
   approved_by: string | null;
   approved_at: string | null;
+  scheduled_at?: string | null;
   created_at: string;
   updated_at: string;
   skills: string;

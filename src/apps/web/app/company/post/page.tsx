@@ -1,6 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
-import { CircleX } from "lucide-react";
+
 import { postNewJob } from "../../../services/jobs";
 import { getToken } from "../../../utils/auth";
 import ProtectedRoute from "../../../components/ProtectedRoute";
@@ -27,6 +27,14 @@ import {
 } from "../../../services/companyProfile";
 import { toast } from "react-toastify";
 import GoBack from "../../../components/goBack";
+import { 
+  getTomorrowLocalTimeISO, 
+  localToUTC, 
+  isLocalDateTimeInFuture
+} from "../../../utils/timezoneUtils";
+import { parseAddressToLocation } from "../../../utils/addressUtils";
+import { useRouter } from "next/navigation";
+import ScheduleModal from "../../../components/ScheduleModal";
 
 interface JobPostProps {
   isOpen: boolean;
@@ -69,6 +77,10 @@ function RecruiterPostJobContent({ isOpen, onClose }: JobPostProps) {
   );
 
   const [isLoading, setIsLoading] = useState(false);
+  const [scheduledAt, setScheduledAt] = useState("");
+  const [showScheduleModal, setShowScheduleModal] = useState(false);
+
+  const router = useRouter();
 
   useEffect(() => {
     const loadProvinces = async () => {
@@ -128,15 +140,47 @@ function RecruiterPostJobContent({ isOpen, onClose }: JobPostProps) {
         setWorkPlace(companyProfile.address);
       }
 
-      if (!workingTime) {
-        setWorkingTime("Monday - Friday, 8:00 AM - 5:00 PM");
+      // Auto-fill province and district from company address
+      if (companyProfile.address && provinces.length > 0) {
+        const location = parseAddressToLocation(companyProfile.address, provinces, districts);
+        if (location) {
+          if (!selectedProvince) {
+            setSelectedProvince(location.province);
+          }
+          if (!selectedDistrict && location.district) {
+            setSelectedDistrict(location.district);
+          }
+        }
       }
     }
-  }, [companyProfile, workPlace, workingTime, jobDescription]);
+  }, [companyProfile, workPlace, provinces, districts, selectedProvince, selectedDistrict]);
+
+  // Set default working time only once when component mounts
+  useEffect(() => {
+    if (companyProfile && !workingTime) {
+      setWorkingTime("Monday - Friday, 8:00 AM - 5:00 PM");
+    }
+  }, [companyProfile]);
 
   useEffect(() => {
     setSelectedSubIndustry("");
   }, [selectedIndustry]);
+
+  // Auto-fill district when districts are loaded and province is already selected
+  useEffect(() => {
+    if (companyProfile?.address && selectedProvince && districts.length > 0) {
+      const location = parseAddressToLocation(companyProfile.address, provinces, districts);
+      if (location && location.province === selectedProvince && !selectedDistrict && location.district) {
+        setSelectedDistrict(location.district);
+      }
+    }
+  }, [districts, selectedProvince, companyProfile, provinces, selectedDistrict]);
+
+  const handleScheduleClick = () => {
+    setShowScheduleModal(true);
+    // Set default time to tomorrow at 9 AM in user's local timezone
+    setScheduledAt(getTomorrowLocalTimeISO(9, 0));
+  };
 
   const handleSubmit = async (status: "draft" | "active" | "schedule") => {
     if (
@@ -155,6 +199,18 @@ function RecruiterPostJobContent({ isOpen, onClose }: JobPostProps) {
     ) {
       toast.error("Please fill in all required fields!");
       return;
+    }
+
+    if (status === "schedule" && !scheduledAt) {
+      toast.error("Please select schedule time!");
+      return;
+    }
+
+    if (status === "schedule" && scheduledAt) {
+      if (!isLocalDateTimeInFuture(scheduledAt)) {
+        toast.error("Schedule time must be in the future!");
+        return;
+      }
     }
 
     if (
@@ -198,6 +254,7 @@ function RecruiterPostJobContent({ isOpen, onClose }: JobPostProps) {
         cost_coin: 10,
         status: status,
         skills: skill,
+        ...(status === "schedule" && scheduledAt && { scheduled_at: localToUTC(scheduledAt) }),
       };
 
       const response = await postNewJob(jobData, token);
@@ -215,7 +272,6 @@ function RecruiterPostJobContent({ isOpen, onClose }: JobPostProps) {
         onClose();
         setTitle("");
         setDeadline("");
-        setLocation("");
         setSalaryMin("");
         setSalaryMax("");
         setIsSalaryNegotiable(false);
@@ -234,6 +290,8 @@ function RecruiterPostJobContent({ isOpen, onClose }: JobPostProps) {
         setSelectedDistrict("");
         setSelectedIndustry("");
         setSelectedSubIndustry("");
+        setScheduledAt("");
+        setShowScheduleModal(false);
         setCompanyProfile(null);
       } else {
         toast.error("Failed to post job: " + response.message);
@@ -243,6 +301,7 @@ function RecruiterPostJobContent({ isOpen, onClose }: JobPostProps) {
       console.error("Error posting job:", error);
     } finally {
       setIsLoading(false);
+      router.push("/company/jobs");
     }
   };
 
@@ -363,6 +422,31 @@ function RecruiterPostJobContent({ isOpen, onClose }: JobPostProps) {
 
                 <div className="flex flex-col">
                   <label
+                    htmlFor="industry"
+                    className="block text-sm font-bold text-primary"
+                  >
+                    Industry*:
+                  </label>
+                  <div className="relative">
+                    <select
+                      id="industry"
+                      value={selectedIndustry}
+                      onChange={(e) => setSelectedIndustry(e.target.value)}
+                      className="cursor-pointer w-full border border-primary-80 pl-4 pr-4 py-2 bg-neutral-light-20 rounded-xl text-primary-80 outline-none focus:ring-1 focus:bg-white transition-all duration-300"
+                      required
+                    >
+                      <option value="">Select industry category</option>
+                      {industryCategories.map((category) => (
+                        <option key={category.id} value={category.id}>
+                          {category.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+
+                <div className="flex flex-col">
+                  <label
                     htmlFor="deadline"
                     className="block text-sm font-bold text-primary"
                   >
@@ -380,6 +464,8 @@ function RecruiterPostJobContent({ isOpen, onClose }: JobPostProps) {
                     />
                   </div>
                 </div>
+
+
 
                 <div className="flex flex-col">
                   <label
@@ -489,6 +575,33 @@ function RecruiterPostJobContent({ isOpen, onClose }: JobPostProps) {
                           {level}
                         </option>
                       ))}
+                    </select>
+                  </div>
+                </div>
+
+                <div className="flex flex-col">
+                  <label
+                    htmlFor="subIndustry"
+                    className="block text-sm font-bold text-primary"
+                  >
+                    Specialization (Optional):
+                  </label>
+                  <div className="relative">
+                    <select
+                      id="subIndustry"
+                      value={selectedSubIndustry}
+                      onChange={(e) => setSelectedSubIndustry(e.target.value)}
+                      className="cursor-pointer w-full border border-primary-80 pl-4 pr-4 py-2 bg-neutral-light-20 rounded-xl text-primary-80 outline-none focus:ring-1 focus:bg-white transition-all duration-300"
+                      disabled={!selectedIndustry}
+                    >
+                      <option value="">Select specialization (optional)</option>
+                      {selectedIndustry && industryCategories
+                        .find(cat => cat.id === selectedIndustry)
+                        ?.children.map((subIndustry) => (
+                          <option key={subIndustry.id} value={subIndustry.id}>
+                            {subIndustry.name}
+                          </option>
+                        ))}
                     </select>
                   </div>
                 </div>
@@ -658,19 +771,33 @@ function RecruiterPostJobContent({ isOpen, onClose }: JobPostProps) {
                 {isLoading ? "Đang đăng..." : "Post"}
               </button>
               <button
-                onClick={() => handleSubmit("schedule")}
+                onClick={handleScheduleClick}
                 disabled={isLoading}
                 className="bg-primary-60 text-neutral-light-20 hover:bg-secondary-80 px-6 py-2 rounded-full font-semibold cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {isLoading ? "Đang lên lịch..." : "Schedule"}
+                Schedule
               </button>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
+                         </div>
+           </div>
+         </div>
+       </div>
+
+               {/* Schedule Modal */}
+        <ScheduleModal
+          isOpen={showScheduleModal}
+          onClose={() => {
+            setShowScheduleModal(false);
+            setScheduledAt("");
+          }}
+          scheduledAt={scheduledAt}
+          onScheduledAtChange={setScheduledAt}
+          onSchedule={() => handleSubmit("schedule")}
+          isLoading={isLoading}
+          title="Schedule Job Post"
+        />
+     </div>
+   );
+ }
 
 export default function RecruiterPostJobPage() {
   const [isOpen, setIsOpen] = useState(true);

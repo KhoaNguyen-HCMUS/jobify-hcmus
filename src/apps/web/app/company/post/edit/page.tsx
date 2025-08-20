@@ -28,6 +28,8 @@ import { Job, updateJob, getJobById } from "../../../../services/jobs";
 import { toast } from "react-toastify";
 import GoBack from "../../../../components/goBack";
 import { useRouter } from "next/navigation";
+import ScheduleModal from "../../../../components/ScheduleModal";
+import { getTomorrowLocalTimeISO, localToUTC, isLocalDateTimeInFuture } from "../../../../utils/timezoneUtils";
 
 interface JobEditProps {
   isOpen: boolean;
@@ -78,6 +80,8 @@ function RecruiterPostJobEditContent({
     null
   );
   const [isLoading, setIsLoading] = useState(false);
+  const [isScheduleModalOpen, setIsScheduleModalOpen] = useState(false);
+  const [scheduledAt, setScheduledAt] = useState("");
 
 
   console.log ("data job", job);
@@ -173,7 +177,47 @@ function RecruiterPostJobEditContent({
     setSelectedSubIndustry("");
   }, [selectedIndustry]);
 
-  const handleSubmit = async (status: "draft" | "pending") => {
+  const handleScheduleClick = () => {
+    setIsScheduleModalOpen(true);
+    // Set default time to tomorrow at 9 AM in user's local timezone
+    setScheduledAt(getTomorrowLocalTimeISO(9, 0));
+  };
+
+  const handlePublishNow = async () => {
+    if (!job) {
+      toast.error("No job data to update!");
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      const token = getToken();
+      if (!token) {
+        toast.error("Please login again!");
+        return;
+      }
+
+      const updateData = {
+        status: "active",
+      };
+
+      const response = await updateJob(job.id, updateData, token);
+      if (response.success) {
+        toast.success("Job published successfully!");
+        onJobUpdated?.();
+        router.back();
+      } else {
+        toast.error("Failed to publish job: " + response.message);
+      }
+    } catch (error) {
+      toast.error("Error publishing job, please try again later.");
+      console.error("Error publishing job:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleSubmit = async (status: "draft" | "pending" | "active") => {
     if (
       !title ||
       !deadline ||
@@ -234,23 +278,25 @@ function RecruiterPostJobEditContent({
 
       const response = await updateJob(job.id, jobData, token);
 
-      if (response.success) {
-        if (status === "draft") {
-          toast.success("Job saved as draft successfully!");
-        }
-        if (status === "pending") {
-          toast.success("Job updated successfully!");
-        }
-        onJobUpdated?.();
-        router.back();
-      } else {
-        toast.error("Failed to update job: " + response.message);
-      }
+             if (response.success) {
+         if (status === "draft") {
+           toast.success("Job saved as draft successfully!");
+         } else if (status === "pending") {
+           toast.success("Job updated successfully!");
+         } else if (status === "active") {
+           toast.success("Job updated successfully!");
+         }
+         onJobUpdated?.();
+         router.back();
+       } else {
+         toast.error("Failed to update job: " + response.message);
+       }
     } catch (error) {
       toast.error("Error updating job, please try again later.");
       console.error("Error updating job:", error);
+    } finally {
       setIsLoading(false);
-    } 
+    }
   };
 
   if (!isOpen) return null;
@@ -647,25 +693,102 @@ function RecruiterPostJobEditContent({
                 ></textarea>
               </div>
             </div>
-            <div className="flex gap-4">
-              <button
-                onClick={() => handleSubmit("draft")}
-                disabled={isLoading}
-                className="bg-secondary-60 text-neutral-light-20 hover:bg-secondary px-6 py-2 rounded-full font-semibold cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {isLoading ? "Đang lưu..." : "Save as Draft"}
-              </button>
-              <button
-                onClick={() => handleSubmit("pending")}
-                disabled={isLoading}
-                className="bg-secondary text-neutral-light-20 hover:bg-secondary-60 px-6 py-2 rounded-full font-semibold cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {isLoading ? "Đang cập nhật..." : "Update Job"}
-              </button>
+            <div className="flex gap-4 flex-wrap">
+              {/* If status is active, show Update button */}
+              {job && job.status === "active" && (
+                <button
+                  onClick={() => handleSubmit("active")}
+                  disabled={isLoading}
+                  className="bg-secondary text-neutral-light-20 hover:bg-secondary-60 px-6 py-2 rounded-full font-semibold cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {isLoading ? "Updating..." : "Update Job"}
+                </button>
+              )}
+              
+              {/* If status is not active, show Save as Draft, Publish Now, and Schedule buttons */}
+              {job && job.status !== "active" && (
+                <>
+                  <button
+                    onClick={() => handleSubmit("draft")}
+                    disabled={isLoading}
+                    className="bg-secondary-60 text-neutral-light-20 hover:bg-secondary px-6 py-2 rounded-full font-semibold cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {isLoading ? "Saving..." : "Save as Draft"}
+                  </button>
+                  
+                  {/* Show Publish Now button for draft and schedule jobs */}
+                  {(job.status === "draft" || job.status === "schedule") && (
+                    <button
+                      onClick={handlePublishNow}
+                      disabled={isLoading}
+                      className="bg-accent hover:bg-secondary text-background px-6 py-2 rounded-full font-semibold cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      {isLoading ? "Publishing..." : "Publish Now"}
+                    </button>
+                  )}
+                  
+                  {/* Show Schedule button for draft jobs */}
+                  {job.status === "draft" && (
+                    <button
+                      onClick={handleScheduleClick}
+                      disabled={isLoading}
+                      className="bg-accent hover:bg-secondary text-background px-6 py-2 rounded-full font-semibold cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      Schedule
+                    </button>
+                  )}
+                </>
+              )}
             </div>
           </div>
         </div>
       </div>
+
+      {/* Schedule Modal */}
+      <ScheduleModal
+        isOpen={isScheduleModalOpen}
+        onClose={() => {
+          setIsScheduleModalOpen(false);
+          setScheduledAt("");
+        }}
+        scheduledAt={scheduledAt}
+        onScheduledAtChange={setScheduledAt}
+                 onSchedule={async () => {
+           if (!job) return;
+           
+           setIsLoading(true);
+           try {
+             const token = getToken();
+             if (!token) {
+               toast.error("Please login again!");
+               return;
+             }
+
+             const updateData = {
+               status: "schedule",
+               scheduled_at: localToUTC(scheduledAt),
+             };
+
+             const response = await updateJob(job.id, updateData, token);
+             if (response.success) {
+               toast.success("Job scheduled successfully!");
+               setIsScheduleModalOpen(false);
+               setScheduledAt("");
+               onJobUpdated?.();
+               router.back();
+             } else {
+               toast.error(`Failed to schedule job: ${response.message}`);
+             }
+           } catch (error) {
+             toast.error("Error scheduling job, please try again later.");
+             console.error("Error scheduling job:", error);
+           } finally {
+             setIsLoading(false);
+           }
+         }}
+        isLoading={isLoading}
+        title="Schedule Job"
+      />
     </div>
   );
 }

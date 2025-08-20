@@ -19,6 +19,7 @@ import {
 import ApplyJobModal from "./applyJobModal";
 import JobEditModal from "./JobEditModal";
 import CandidateApplication from "./candidateApplication";
+import ScheduleModal from "../ScheduleModal";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Job, updateJob, closeJob } from "../../services/jobs";
 import { useSaveJob } from "../../hooks/useSaveJob";
@@ -31,6 +32,7 @@ import { getToken } from "../../utils/auth";
 import JobStatusBadge from "./jobStatusBadge";
 import { approveJob, rejectJob } from "../../services/admin";
 import { formatDateForDisplay } from "../../utils/dateUtils";
+import { localToUTC } from "../../utils/timezoneUtils";
 
 interface JobDetailData {
   company: CompanyProfile;
@@ -61,6 +63,8 @@ export default function JobDetail({
   const [isSavedState, setIsSavedState] = useState<boolean>(isSaved);
   const [isApplyModalOpen, setIsApplyModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isScheduleModalOpen, setIsScheduleModalOpen] = useState(false);
+  const [scheduledAt, setScheduledAt] = useState("");
   const [hasApplied, setHasApplied] = useState<boolean>(false);
   const [applicationId, setApplicationId] = useState<string | null>(null);
   const { handleSaveJob, handleUnsaveJob, isSaving } = useSaveJob();
@@ -200,6 +204,39 @@ export default function JobDetail({
       window.location.reload();
     } else {
       toast.error("Failed to reject job: " + result.message);
+    }
+  };
+
+  const handleStatusChange = async (newStatus: "active" | "schedule") => {
+    if (!job) return;
+
+    try {
+      const token = getToken();
+      if (!token) {
+        toast.error("Please login again!");
+        return;
+      }
+
+      const updateData: any = {
+        status: newStatus,
+      };
+
+      // If changing to schedule, we need to open schedule modal
+      if (newStatus === "schedule") {
+        setIsScheduleModalOpen(true);
+        return;
+      }
+
+      const response = await updateJob(job.id, updateData, token);
+      if (response.success) {
+        toast.success(`Job ${newStatus === "active" ? "published" : "scheduled"} successfully!`);
+        window.location.reload();
+      } else {
+        toast.error(`Failed to update job: ${response.message}`);
+      }
+    } catch (error) {
+      toast.error("Error updating job, please try again later.");
+      console.error("Error updating job:", error);
     }
   };
 
@@ -648,7 +685,7 @@ export default function JobDetail({
             <JobStatusBadge status={job.status} />
           </div>
 
-          <div className="flex gap-4">
+          <div className="flex gap-4 flex-wrap">
             <button
               onClick={handleEditClick}
               className="bg-secondary-60 hover:bg-secondary text-background px-6 py-2 rounded-full cursor-pointer"
@@ -667,6 +704,36 @@ export default function JobDetail({
             >
               Close
             </button>
+            
+            {/* Show Publish Now button for draft jobs */}
+            {job.status === "draft" && (
+              <button
+                onClick={() => handleStatusChange("active")}
+                className="bg-accent hover:bg-secondary text-background px-6 py-2 rounded-full cursor-pointer"
+              >
+                Publish Now
+              </button>
+            )}
+            
+            {/* Show Reschedule button for scheduled jobs */}
+            {job.status === "schedule" && (
+              <button
+                onClick={() => handleStatusChange("active")}
+                className="bg-accent hover:bg-secondary text-background px-6 py-2 rounded-full cursor-pointer"
+              >
+                Publish Now
+              </button>
+            )}
+            
+            {/* Show Schedule Again button for draft jobs */}
+            {job.status === "draft" && (
+              <button
+                onClick={() => setIsScheduleModalOpen(true)}
+                className="bg-accent hover:bg-secondary text-background px-6 py-2 rounded-full cursor-pointer"
+              >
+                Schedule Again
+              </button>
+            )}
           </div>
         </div>
       )}
@@ -756,6 +823,48 @@ export default function JobDetail({
           onJobUpdated={handleJobUpdated}
         />
       )}
+
+      {/* Schedule Modal */}
+      <ScheduleModal
+        isOpen={isScheduleModalOpen}
+        onClose={() => {
+          setIsScheduleModalOpen(false);
+          setScheduledAt("");
+        }}
+        scheduledAt={scheduledAt}
+        onScheduledAtChange={setScheduledAt}
+        onSchedule={async () => {
+          if (!job) return;
+          
+          try {
+            const token = getToken();
+            if (!token) {
+              toast.error("Please login again!");
+              return;
+            }
+
+            const updateData = {
+              status: "schedule",
+              scheduled_at: localToUTC(scheduledAt),
+            };
+
+            const response = await updateJob(job.id, updateData, token);
+            if (response.success) {
+              toast.success("Job scheduled successfully!");
+              setIsScheduleModalOpen(false);
+              setScheduledAt("");
+              window.location.reload();
+            } else {
+              toast.error(`Failed to schedule job: ${response.message}`);
+            }
+          } catch (error) {
+            toast.error("Error scheduling job, please try again later.");
+            console.error("Error scheduling job:", error);
+          }
+        }}
+        isLoading={false}
+        title="Schedule Job"
+      />
     </div>
   );
 }
