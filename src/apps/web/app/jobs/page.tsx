@@ -17,19 +17,12 @@ import MainCategoryItem from "../../components/mainCategoryItem";
 import KeywordSearch from "../../components/keywordSearch";
 import JobItem from "../../components/job/jobItem";
 import { Suspense } from "react";
-
+import { getDaysAgo } from "../../utils/dateUtils";
 
 const adaptJobForComponent = (job: Job) => {
   const salaryText = `${parseInt(job.salary_min).toLocaleString()} - ${parseInt(
     job.salary_max
-  ).toLocaleString()} ${job.currency || "VNĐ"}`;
-
-  const postedDate = new Date(job.created_at);
-  const now = new Date();
-  const diffTime = Math.abs(now.getTime() - postedDate.getTime());
-  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-
-  const postedAtText = diffDays === 1 ? "1 day ago" : `${diffDays} days ago`;
+  ).toLocaleString()} ${job.currency || "VND"}`;
 
   return {
     id: job.id,
@@ -40,7 +33,7 @@ const adaptJobForComponent = (job: Job) => {
     province: job.province,
     experience: job.experience_level,
     salary: salaryText,
-    postedAt: postedAtText,
+    postedAt: getDaysAgo(job.created_at),
     is_salary_negotiable: job.is_salary_negotiable,
     status: job.approved_by ? "approved" : "pending",
   };
