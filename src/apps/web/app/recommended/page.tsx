@@ -1,24 +1,17 @@
 "use client";
 import KeywordSearch from "../../components/keywordSearch";
-import { Suspense } from "react";
-import { ChevronDown } from "lucide-react";
-import { Job } from "../../services/jobs";
-import { useSearchParams } from "next/navigation";
-import { useJobsPagination } from "../../hooks/useJobsPagination";
-import PaginationComponent from "../../components/PaginationComponent";
+import { Suspense, useState, useEffect } from "react";
+import { JobRecommendation, getRecommendedJobs, generateRecommendations } from "../../services/recommend";
 import JobItem from "../../components/job/jobItem";
+import { useRouter } from "next/navigation";
+import { useSearchParams } from "next/navigation";
+import PaginationComponent from "../../components/PaginationComponent";
+import { getDaysAgo } from "../../utils/dateUtils";
 
-const adaptJobForComponent = (job: Job) => {
+const adaptJobForComponent = (job: JobRecommendation) => {
   const salaryText = `${parseInt(job.salary_min).toLocaleString()} - ${parseInt(
     job.salary_max
-  ).toLocaleString()} ${job.currency || "VNĐ"}`;
-
-  const postedDate = new Date(job.created_at);
-  const now = new Date();
-  const diffTime = Math.abs(now.getTime() - postedDate.getTime());
-  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-
-  const postedAtText = diffDays === 1 ? "1 day ago" : `${diffDays} days ago`;
+  ).toLocaleString()} ${job.currency || "VND"}`;
 
   return {
     id: job.id,
@@ -29,32 +22,133 @@ const adaptJobForComponent = (job: Job) => {
     province: job.province,
     experience: job.experience_level,
     salary: salaryText,
-    postedAt: postedAtText,
+    postedAt: getDaysAgo(job.created_at),
     is_salary_negotiable: job.is_salary_negotiable,
     status: job.approved_by ? "approved" : "pending",
+    match_score: job.match_score,
   };
 };
 
 function RecommendedPageContent() {
+  const [jobs, setJobs] = useState<JobRecommendation[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [generating, setGenerating] = useState(false);
+  const [pagination, setPagination] = useState({
+    currentPage: 1,
+    totalPages: 0,
+    hasNextPage: false,
+  });
+  const router = useRouter();
   const searchParams = useSearchParams();
+  
+  // Get filters from URL params
   const filters = {
-    salary: searchParams.get("salary") || undefined,
-    exp: searchParams.get("exp") || undefined,
-    edu: searchParams.get("edu") || undefined,
-    type: searchParams.get("type") || undefined,
+    page: parseInt(searchParams.get("page") || "1"),
+    limit: 10,
     location: searchParams.get("location") || undefined,
     keyword: searchParams.get("keyword") || undefined,
-    industry: searchParams.get("industry") || undefined,
   };
-  const {
-    jobs,
-    loading,
-    error,
-    hasNextPage,
-    currentPage,
-    totalPages,
-    loadPage,
-  } = useJobsPagination({ limit: 10, autoLoad: true, filters });
+
+  const loadRecommendedJobs = async (params?: any) => {
+    try {
+      setLoading(true);
+      setError(null);
+      
+      const response = await getRecommendedJobs(params || filters);
+      
+      if (response.success && response.data) {
+        setJobs(response.data);
+        if (response.pagination) {
+          setPagination({
+            currentPage: response.pagination.page,
+            totalPages: response.pagination.totalPages,
+            hasNextPage: response.pagination.hasNextPage,
+          });
+        }
+      } else {
+        setError(response.message || 'Could not load recommended job list');
+      }
+    } catch (err) {
+      setError('Network connection error');
+      console.error('Error loading recommended jobs:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleGenerateRecommendations = async () => {
+    try {
+      setGenerating(true);
+      const response = await generateRecommendations();
+      
+      if (response.success) {
+        await loadRecommendedJobs();
+      } else {
+        setError(response.message || 'Could not generate job recommendations');
+      }
+    } catch (err) {
+      setError('Could not generate job recommendations');
+      console.error('Error generating recommendations:', err);
+    } finally {
+      setGenerating(false);
+    }
+  };
+
+  const handlePageChange = async (page: number) => {
+    const newParams = { ...filters, page };
+    await loadRecommendedJobs(newParams);
+  };
+
+  const initializeRecommendations = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      
+      const jobsResponse = await getRecommendedJobs(filters);
+      
+      if (jobsResponse.success && jobsResponse.data && jobsResponse.data.length > 0) {
+        setJobs(jobsResponse.data);
+        if (jobsResponse.pagination) {
+          setPagination({
+            currentPage: jobsResponse.pagination.page,
+            totalPages: jobsResponse.pagination.totalPages,
+            hasNextPage: jobsResponse.pagination.hasNextPage,
+          });
+        }
+      } else {
+        const generateResponse = await generateRecommendations();
+        
+        if (generateResponse.success) {
+          const newJobsResponse = await getRecommendedJobs(filters);
+          
+          if (newJobsResponse.success && newJobsResponse.data && newJobsResponse.data.length > 0) {
+            setJobs(newJobsResponse.data);
+            if (newJobsResponse.pagination) {
+              setPagination({
+                currentPage: newJobsResponse.pagination.page,
+                totalPages: newJobsResponse.pagination.totalPages,
+                hasNextPage: newJobsResponse.pagination.hasNextPage,
+              });
+            }
+          } else {
+            setJobs([]);
+          }
+        } else {
+          setError(generateResponse.message || 'Could not generate job recommendations');
+        }
+      }
+    } catch (err) {
+      setError('Network connection error');
+      console.error('Error initializing recommendations:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    initializeRecommendations();
+  }, [searchParams]);
 
   if (loading && jobs.length === 0) {
     return (
@@ -80,8 +174,7 @@ function RecommendedPageContent() {
             The right job - the right person
           </h1>
           <p className="font-semibold text-primary-80">
-            Approach 60,000+ job recruitment news every day from thousands of
-            reputable businesses in Vietnam
+            Access 60,000+ job postings daily from thousands of reputable businesses in Vietnam
           </p>
         </div>
         <KeywordSearch targetUrl="/recommended" />  
@@ -92,8 +185,8 @@ function RecommendedPageContent() {
         </h2>
         <div className="flex-3">
           <div className="flex flex-col gap-4">
-            <div className="flex flex-wrap justify-between gap-4 p-4">
-              <div className="flex justify-between items-center bg-highlight-40 rounded-2xl gap-x-60 p-4">
+            {/* <div className="flex flex-wrap justify-between gap-4 p-4">
+              <div className="flex flex-wrap justify-between items-center bg-highlight-40 rounded-2xl gap-x-60 p-4 flex-1">
                 <div className="flex flex-wrap gap-4">
                   <div className="text-primary bg-highlight-60 hover:bg-highlight cursor-pointer shadow-md rounded-full px-6 py-1">
                     Skills
@@ -115,29 +208,53 @@ function RecommendedPageContent() {
                   <ChevronDown size={24} className="cursor-pointer" />
                 </div>
               </div>
-              <button className="cursor-pointer bg-accent-80 hover:bg-accent text-background font-semibold rounded-full p-4">
-                Apply priority
-              </button>
-            </div>
+            </div> */}
             <div className="px-6 pb-4">
               {jobs.length > 0 ? (
                 <>
                   <div className="w-full grid grid-cols-1 md:grid-cols-2 gap-x-20 gap-y-10 p-4">
-                    {jobs.map((job: Job) => (
-                      <JobItem key={job.id} job={adaptJobForComponent(job)} />
+                    {jobs.map((job: JobRecommendation) => (
+                      <div key={job.id} className="relative">
+                        <JobItem job={adaptJobForComponent(job)} />
+                        <div className="absolute top-2 right-2 bg-accent-80 text-white px-2 py-1 rounded-full text-sm font-semibold">
+                          Match Score: {job.match_score}
+                        </div>
+                      </div>
                     ))}
                   </div>
-                  <PaginationComponent
-                    currentPage={currentPage}
-                    totalPages={totalPages}
-                    hasNextPage={hasNextPage}
-                    onPageChange={loadPage}
-                    loading={loading}
-                  />
+                  {pagination.totalPages > 1 && (
+                    <PaginationComponent
+                      currentPage={pagination.currentPage}
+                      totalPages={pagination.totalPages}
+                      hasNextPage={pagination.hasNextPage}
+                      onPageChange={handlePageChange}
+                      loading={loading}
+                    />
+                  )}
                 </>
               ) : (
                 <div className="text-center py-8">
-                  <p className="text-primary text-lg">No recommended jobs available</p>
+                  <p className="text-primary text-lg mb-2">
+                    No matching jobs found
+                  </p>
+                  <p className="text-primary-80 text-sm mb-4">
+                    You may need to complete your profile or there are no jobs matching your skills
+                  </p>
+                  <div className="flex justify-center gap-4">
+                    <button
+                      onClick={() => router.push('/candidate/profile')}
+                      className="bg-accent-80 hover:bg-accent text-background font-semibold rounded-full px-6 py-2 transition-colors cursor-pointer"
+                    >
+                      Update Profile
+                    </button>
+                    <button
+                      onClick={handleGenerateRecommendations}
+                      disabled={generating}
+                      className="bg-highlight-60 hover:bg-highlight text-primary font-semibold rounded-full px-6 py-2 transition-colors disabled:opacity-50 cursor-pointer"
+                    >
+                      {generating ? 'Generating...' : 'Generate Again'}
+                    </button>
+                  </div>
                 </div>
               )}
             </div>
