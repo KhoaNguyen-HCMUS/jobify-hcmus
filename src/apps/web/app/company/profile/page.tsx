@@ -1,10 +1,7 @@
 "use client";
 import { MapPin, Briefcase, Mail, Phone, Globe, Building, Users } from "lucide-react";
-import CompanyInformation from "../../../components/companyInformation";
-import Industry from "../../../components/industry";
 import { getCompanyProfile, CompanyProfile } from "../../../services/companyProfile";
 import { useState, useEffect } from "react";
-import {DEFAULT_COVER_IMAGE, DEFAULT_AVATAR_IMAGE} from "../../../constants/imgConstants";
 import ProtectedRoute from "../../../components/ProtectedRoute";
 
 function RecruiterProfileContent() {
@@ -85,10 +82,7 @@ function RecruiterProfileContent() {
                 </div>
               </div>
               
-              <div className="flex flex-col gap-2">
-                <b className="text-primary">Description:</b>
-                <span className="text-primary-80">{companyProfile.description || "No description available"}</span>
-              </div>
+              
               
               <div className="flex flex-col gap-1">
                 <b className="text-primary">Company Size:</b>
@@ -118,6 +112,7 @@ function RecruiterProfileContent() {
                   </div>
                 </div>
               </div>
+              
             </div>
             
             <div className="flex-1 flex flex-col gap-4">
@@ -144,25 +139,45 @@ function RecruiterProfileContent() {
                   <span className="text-primary-80">{companyProfile.phone_number || "N/A"}</span>
                 </div>
               </div>
+                
             </div>
           </div>
+            <div className="flex flex-col gap-2">
+                <b className="text-primary">Description:</b>
+                <span className="text-primary-80">{companyProfile.description || "No description available"}</span>
+              </div>
         </div>
-        
-        <div className="flex justify-between items-center mt-8">
-          <div className="flex items-center gap-2">
-            <b className="text-primary">Status:</b>
-            <div className="bg-accent hover:bg-primary-80 text-neutral-light-20 font-semibold rounded-2xl px-6 py-2">
-              {companyProfile.status}
-            </div>
-          </div>
-          <a href="/company/profile/edit">
-          <div className="bg-primary-80 hover:bg-accent cursor-pointer text-neutral-light-20 font-semibold rounded-2xl px-6 py-2">
-            Edit
-          </div>
-          </a>
+      
+      <div className="mt-8">
+  <div className="flex flex-col md:flex-row justify-between gap-4">
+    <div className="flex flex-col md:flex-row items-start md:items-center gap-4">
+      <div className="flex items-center gap-2">
+        <b className="text-primary">Status:</b>
+        <div className="bg-accent hover:bg-primary-80 text-neutral-light-20 font-semibold rounded-2xl px-6 py-2">
+          {companyProfile.status}
         </div>
       </div>
+      
+    
+    
     </div>
+    
+    <a href="/company/profile/edit" className="self-start md:self-auto">
+      <div className="bg-primary-80 hover:bg-accent cursor-pointer text-neutral-light-20 font-semibold rounded-2xl px-6 py-2">
+        Edit
+      </div>
+    </a>
+  </div>
+    {companyProfile.status === 'rejected' && (
+          <div className="flex items-center gap-2 mt-2 ">
+        <b className="text-primary">Moderator's Note:</b>
+        <div className="flex items-center gap-2 text-primary">{companyProfile.moderator_notes || "No note available"}</div>
+      </div>)
+        }
+</div>
+          
+        </div>
+      </div>
   );
 }
 

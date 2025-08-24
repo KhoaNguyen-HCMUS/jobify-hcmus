@@ -356,23 +356,7 @@ function RecruiterProfileEditContent() {
               </div>
             </div>
           </div>
-          <div className="flex flex-col gap-2 px-4">
-            <label
-              htmlFor="description"
-              className="block text-sm font-bold text-primary ml-4"
-            >
-              Description:
-            </label>
-            <div className="relative">
-              <textarea
-                id="description"
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                placeholder="Enter company description"
-                className="w-full border border-primary-60 pl-4 pr-4 py-2 h-24 bg-neutral-light-20 rounded-xl text-primary-80 outline-none focus:ring-1 focus:bg-white transition-all duration-300 resize-none"
-              />
-            </div>
-          </div>
+          
           <div className="flex flex-col gap-2 px-4">
             <label
               htmlFor="address"
@@ -394,6 +378,7 @@ function RecruiterProfileEditContent() {
               />
             </div>
           </div>
+          
           <div className="flex flex-col gap-2 px-4">
             <label
               htmlFor="industry"
@@ -536,6 +521,23 @@ function RecruiterProfileEditContent() {
                   </div>
                 </div>
               )}
+            </div>
+          </div>
+          <div className="flex flex-col gap-2 px-4">
+            <label
+              htmlFor="description"
+              className="block text-sm font-bold text-primary ml-4"
+            >
+              Description:
+            </label>
+            <div className="relative">
+              <textarea
+                id="description"
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                placeholder="Enter company description"
+                className="w-full border border-primary-60 pl-4 pr-4 py-2 h-24 bg-neutral-light-20 rounded-xl text-primary-80 outline-none focus:ring-1 focus:bg-white transition-all duration-300 resize-none"
+              />
             </div>
           </div>
         </div>
