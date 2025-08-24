@@ -1,10 +1,10 @@
 export default function AboutUsPage() {
   return (
-    <div className="flex flex-col my-20 gap-20 mx-30">
-      <div className="shadow-xl bg-neutral-light-20 rounded-2xl pt-10 pb-6">
+    <div className="flex flex-col my-10 gap-10 mx-30">
+      <div className="shadow-xl bg-neutral-light-20 rounded-2xl py-10">
         <div className="flex flex-col items-center text-center space-y-6">
           <span className="font-bold text-4xl text-accent">ABOUT US</span>
-          <p className="text-primary-80 font-semibold text-2xl">
+          <p className="text-primary-80 font-semibold text-xl">
             Empowering careers and connecting talent with opportunity across
             Vietnam.
           </p>
@@ -12,29 +12,31 @@ export default function AboutUsPage() {
       </div>
       <div className="flex flex-col gap-10">
         <div className="shadow-xl rounded-2xl space-y-4">
-          <div className="flex flex-col bg-neutral-light-20 space-y-4">
+          <div className="flex flex-col bg-neutral-light-20 space-y-8">
             <span className="rounded-t-3xl text-background text-center font-semibold text-3xl px-10 py-4 bg-primary">
               GET TO KNOW US
             </span>
-            <div className="flex flex-col gap-2 px-10">
-              <span className="text-accent font-semibold text-xl ">
-                Our Mission
-              </span>
+            <div className="flex flex-col gap-4 px-10">
               <div>
-                <span className="text-primary">
-                  <i>
-                    “Connect the right people with the right opportunities.”
-                  </i>
-                  <p>
-                    Jobify was created to bridge the gap between top talent and
-                    growing companies in Vietnam. We help job seekers find
-                    meaningful careers, and employers find the right match
-                    faster.
-                  </p>
+                <span className="text-accent font-semibold text-2xl">
+                  Our Mission
                 </span>
+                <div>
+                  <span className="text-primary">
+                    <i>
+                      “Connect the right people with the right opportunities.”
+                    </i>
+                    <p>
+                      Jobify was created to bridge the gap between top talent
+                      and growing companies in Vietnam. We help job seekers find
+                      meaningful careers, and employers find the right match
+                      faster.
+                    </p>
+                  </span>
+                </div>
               </div>
               <div>
-                <span className="text-accent font-semibold text-xl ">
+                <span className="text-accent font-semibold text-2xl">
                   Our Vision
                 </span>
                 <div>
@@ -47,7 +49,7 @@ export default function AboutUsPage() {
                 </div>
               </div>
               <div>
-                <span className="text-accent font-semibold text-xl ">
+                <span className="text-accent font-semibold text-2xl">
                   Partners & Achievements
                 </span>
                 <span className="text-primary">

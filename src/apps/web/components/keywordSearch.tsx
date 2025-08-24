@@ -82,7 +82,7 @@ export default function KeywordSearch({
       <div className="w-full grid grid-cols-1 md:grid-cols-3 gap-10">
         <div className="relative mr-10">
           <div className="absolute left-4 top-1/2 transform -translate-y-1/2 text-primary">
-            <Search size={24} />
+            <Search size={20} />
           </div>
           <input
             type="text"
@@ -94,7 +94,7 @@ export default function KeywordSearch({
               }
             }}
             placeholder="Enter keyword..."
-            className="w-full pl-12 pr-4 py-4 bg-accent-20 rounded-md text-primary-80 outline-none focus:ring-2 focus:ring-blue-400 focus:bg-white transition-all duration-300"
+            className="w-full pl-12 pr-4 py-3 bg-accent-20 rounded-md text-primary-80 outline-none focus:ring-2 focus:ring-blue-400 focus:bg-white transition-all duration-300"
           />
           {keyword && (
             <button
@@ -113,10 +113,10 @@ export default function KeywordSearch({
 
         <div className="relative mr-10">
           <div className="absolute left-4 top-1/2 transform -translate-y-1/2 text-primary">
-            <MapPin size={24} />
+            <MapPin size={20} />
           </div>
           <div
-            className="w-full pl-12 pr-4 py-4 bg-accent-20 rounded-md text-primary-80 outline-none focus:ring-2 focus:ring-blue-400 focus:bg-white transition-all duration-300 cursor-pointer flex justify-between items-center"
+            className="w-full pl-12 pr-4 py-3 bg-accent-20 rounded-md text-primary-80 outline-none focus:ring-2 focus:ring-blue-400 focus:bg-white transition-all duration-300 cursor-pointer flex justify-between items-center"
             onClick={() => setIsDropdownOpen(!isDropdownOpen)}
           >
             <span
@@ -157,7 +157,7 @@ export default function KeywordSearch({
         <div className="relative">
           <button
             type="submit"
-            className="cursor-pointer absolute left-4 top-1/2 transform -translate-y-1/2 text-secondary-20 font-semibold text-2xl bg-secondary px-6 py-3.5 rounded-md hover:bg-secondary/90 transition-colors"
+            className="cursor-pointer absolute left-4 top-1/2 transform -translate-y-1/2 text-neutral-light-20 font-semibold text-xl bg-secondary px-6 py-2 rounded-md hover:bg-secondary/90 transition-colors"
           >
             Search
           </button>

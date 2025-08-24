@@ -1,23 +1,23 @@
 "use client";
 import { useJobsPagination } from "../../hooks/useJobsPagination";
 import PaginationComponent from "../../components/PaginationComponent";
-import JobCard from "../../components/job/jobCard";
 import { DEFAULT_LOGO_IMAGE } from "../../constants/imgConstants";
 import { Job } from "../../services/jobs";
 import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { toast } from "react-toastify";
 import { getAllIndustries } from "../../services/industries";
 import { getIndustriesByCategory } from "../../services/industries";
 import { IndustryCategory } from "../../services/industries";
-import { EXPERIENCE_LEVELS, EDUCATION_LEVELS } from "../../constants/jobConstants";
+import {
+  EXPERIENCE_LEVELS,
+  EDUCATION_LEVELS,
+} from "../../constants/jobConstants";
 import { JOB_TYPES } from "../../constants/jobConstants";
 import CategoryGrid from "../../components/categoryGrid";
 import MainCategoryItem from "../../components/mainCategoryItem";
 import KeywordSearch from "../../components/keywordSearch";
 import JobItem from "../../components/job/jobItem";
 import { Suspense } from "react";
-
 
 const adaptJobForComponent = (job: Job) => {
   const salaryText = `${parseInt(job.salary_min).toLocaleString()} - ${parseInt(
@@ -74,18 +74,18 @@ function JobsPageContent() {
   const transformJobForCard = (job: Job) => ({
     id: job.id,
     title: job.title,
-    company_name: job.company_name || 'Unknown Company',
+    company_name: job.company_name || "Unknown Company",
     salary_min: job.salary_min,
     salary_max: job.salary_max,
     currency: job.currency,
     province: job.province,
     logo: DEFAULT_LOGO_IMAGE,
-    name: job.company_name || 'Unknown Company',
+    name: job.company_name || "Unknown Company",
     status: job.status,
     created_at: new Date(job.created_at),
     is_saved: false,
     is_applied: false,
-    fromApplied: false
+    fromApplied: false,
   });
 
   // Use the new pagination hook
@@ -99,7 +99,7 @@ function JobsPageContent() {
     loadNextPage,
     loadPage,
     refresh,
-    reset
+    reset,
   } = useJobsPagination({
     limit: 15,
     autoLoad: true,
@@ -157,8 +157,6 @@ function JobsPageContent() {
     fetchIndustries();
   }, []);
 
-
-
   if (paginationLoading && paginatedJobs.length === 0) {
     return (
       <div className="bg-neutral-light-40 min-h-screen flex items-center justify-center">
@@ -169,25 +167,25 @@ function JobsPageContent() {
 
   return (
     <div className="bg-neutral-light-40">
-      <div className="flex flex-col justify-center items-center space-y-4">
-        <div className="text-center">
-          <h1 className="font-bold text-3xl text-primary mt-6">
+      <div className="flex flex-col justify-center items-center">
+        <div className="text-center space-y-4">
+          <h1 className="font-bold text-4xl text-primary mt-6">
             The right job - the right person
           </h1>
-          <p className="font-semibold text-primary-80">
+          <p className="font-semibold text-xl text-primary-80">
             Approach 60,000+ job recruitment news every day from thousands of
             reputable businesses in Vietnam
           </p>
         </div>
-        <div className="pb-6">
-          <KeywordSearch />
-        </div>
+      </div>
+      <div className="ml-40 py-4">
+        <KeywordSearch />
       </div>
       <div className="bg-neutral-light-60">
         <div className="flex gap-2 py-4">
           <div className="flex-1 hidden md:block bg-neutral-light-20 shadow-2xs">
             <div>
-              <div className="bg-primary text-highlight-20 px-4 py-2 font-semibold">
+              <div className="bg-primary text-highlight-20 px-4 py-2 font-semibold rounded-tr-md">
                 Industry
               </div>
               {industriesLoading ? (
@@ -199,7 +197,7 @@ function JobsPageContent() {
                       onClick={() => updateURLParams({ industry: "all" })}
                       className={`flex justify-between items-center cursor-pointer w-full text-left ${
                         !industryId || industryId === "all"
-                          ? "bg-accent text-white"
+                          ? "bg-accent text-neutral-light-20"
                           : ""
                       }`}
                     >
@@ -450,43 +448,43 @@ function JobsPageContent() {
               </div>
             </div>
           </div>
-                     <div className="flex-3">
-             {paginationLoading && paginatedJobs.length === 0 ? (
-               <div className="text-center py-8">
-                 <p className="text-primary text-lg">Loading...</p>
-               </div>
-             ) : paginationError ? (
-               <div className="text-center py-8">
-                 <p className="text-red-500 text-lg">Error: {paginationError}</p>
-                 <button
-                   onClick={refresh}
-                   className="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 mt-4"
-                 >
-                   Try Again
-                 </button>
-               </div>
-             ) : paginatedJobs.length > 0 ? (
-               <>
-                 {paginatedJobs.map((job: Job) => (
-                   <JobItem key={job.id} job={adaptJobForComponent(job)} />
-                 ))}
-                 <div className="py-4">
-                   <PaginationComponent
-                     currentPage={currentPage}
-                     totalPages={totalPages}
-                     hasNextPage={hasNextPage}
-                     onPageChange={loadPage}
-                     loading={paginationLoading}
-                     className="mt-8"
-                   />
-                 </div>
-               </>
-             ) : (
-               <div className="text-center py-8">
-                 <p className="text-primary text-lg">No jobs available</p>
-               </div>
-             )}
-           </div>   
+          <div className="flex-3">
+            {paginationLoading && paginatedJobs.length === 0 ? (
+              <div className="text-center py-8">
+                <p className="text-primary text-lg">Loading...</p>
+              </div>
+            ) : paginationError ? (
+              <div className="text-center py-8">
+                <p className="text-red-500 text-lg">Error: {paginationError}</p>
+                <button
+                  onClick={refresh}
+                  className="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 mt-4"
+                >
+                  Try Again
+                </button>
+              </div>
+            ) : paginatedJobs.length > 0 ? (
+              <>
+                {paginatedJobs.map((job: Job) => (
+                  <JobItem key={job.id} job={adaptJobForComponent(job)} />
+                ))}
+                <div className="py-4">
+                  <PaginationComponent
+                    currentPage={currentPage}
+                    totalPages={totalPages}
+                    hasNextPage={hasNextPage}
+                    onPageChange={loadPage}
+                    loading={paginationLoading}
+                    className="mt-8"
+                  />
+                </div>
+              </>
+            ) : (
+              <div className="text-center py-8">
+                <p className="text-primary text-lg">No jobs available</p>
+              </div>
+            )}
+          </div>
         </div>
       </div>
       <div>
