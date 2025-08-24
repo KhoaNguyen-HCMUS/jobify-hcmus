@@ -1,7 +1,7 @@
 const prisma = require('../prisma/client');
 const { successResponse, errorResponse } = require('../utils/response');
 
-// ✅ Education level mapping for Vietnamese/English
+// Education level mapping for Vietnamese/English
 const EDUCATION_MAPPING = {
   'trung học': ['high school', 'secondary', 'trung học', 'thpt'],
   'trung cấp': ['vocational', 'technical', 'trung cấp', 'certificate'],
@@ -12,7 +12,7 @@ const EDUCATION_MAPPING = {
   'giáo sư': ['professor', 'giáo sư']
 };
 
-// ✅ Get education level from string
+// Get education level from string
 function getEducationLevel(degreeStr) {
   if (!degreeStr || degreeStr.length < 3) return null;
   
@@ -26,7 +26,7 @@ function getEducationLevel(degreeStr) {
   return null;
 }
 
-// ✅ Check if user meets education requirement
+// Check if user meets education requirement
 function meetsEducationRequirement(userEducationLevels, requiredEducation) {
   if (!requiredEducation || requiredEducation.length < 3) return 0.3; // Default score
   
@@ -47,7 +47,6 @@ function meetsEducationRequirement(userEducationLevels, requiredEducation) {
   return 0.1; // Doesn't meet requirement
 }
 
-// Helper function to normalize skills string (if not available in string utils)
 const normalizeListString = (str) => {
   if (!str) return [];
   return str.toLowerCase().split(',').map(s => s.trim()).filter(Boolean);
@@ -59,7 +58,6 @@ exports.generateJobMatchesForUser = async (req, res) => {
   try {
     console.log(`🚀 Starting job matching for user: ${userId}`);
     
-    // Get user profile with related data
     const userProfile = await prisma.user_profiles.findUnique({
       where: { user_id: userId },
       include: {
@@ -78,19 +76,19 @@ exports.generateJobMatchesForUser = async (req, res) => {
 
     // Get active jobs with industry info
     const allJobs = await prisma.job_posts.findMany({
-      where: { status: 'active' }, // ✅ Fixed field name
+      where: { status: 'active' },
       select: {
         id: true,
         title: true,
         description: true,
         skills: true,
         industry_id: true,
-        education_level: true, // Use this instead of required_degree
+        education_level: true,
         experience_level: true,
-        province: true, // ✅ Add province for location matching
+        province: true,
         industries: {
           select: {
-            name: true // ✅ Fixed field name
+            name: true
           }
         }
       }
@@ -99,14 +97,14 @@ exports.generateJobMatchesForUser = async (req, res) => {
     const userSkills = normalizeListString(userProfile.skills);
     const userIndustries = normalizeListString(userProfile.industry);
 
-    // ✅ Extract user education levels using mapping system
+    // Extract user education levels using mapping system
     const userDegrees = userProfile.educations
       .map(e => getEducationLevel(e.degree))
       .filter(level => level !== null);
     
     const userFields = userProfile.educations
       .map(e => e.field_of_study?.toLowerCase())
-      .filter(field => field && field.length >= 3); // ✅ Filter out short/invalid entries
+      .filter(field => field && field.length >= 3); // Filter out short/invalid entries
     const userJobTitles = userProfile.experiences.map(e => e.job_title?.toLowerCase()).filter(Boolean);
 
     console.log(`📚 User education levels: [${userDegrees.join(', ')}]`);
@@ -122,19 +120,28 @@ exports.generateJobMatchesForUser = async (req, res) => {
 
     const matches = [];
 
+    const SCORING_WEIGHTS = {
+      LOCATION_MAX: 30,     // Highest priority
+      INDUSTRY_MAX: 25,     // Second priority  
+      EXPERIENCE_MAX: 20,   // Tied third priority
+      EDUCATION_MAX: 20,    // Tied third priority
+      SKILL_PER_MATCH: 2,   // 2 points per skill (max ~10-15 skills)
+      FIELD_BONUS: 5        // Bonus for field expertise
+    };
+
     for (const job of allJobs) {
       let score = 0;
       const reasons = [];
-      const debugScores = { jobId: job.id, jobTitle: job.title }; // Debug object
+      const debugScores = { jobId: job.id, jobTitle: job.title };
 
       // 1. Skill Matching
       const jobSkills = normalizeListString(job.skills);
       const commonSkills = jobSkills.filter(skill => userSkills.includes(skill));
-      const skillScore = commonSkills.length * 5;
+      const skillScore = commonSkills.length * SCORING_WEIGHTS.SKILL_PER_MATCH;
       debugScores.skillScore = skillScore;
       debugScores.commonSkills = commonSkills;
-      debugScores.jobSkills = jobSkills; // Debug: show job skills
-      debugScores.userSkills = userSkills; // Debug: show user skills
+      debugScores.jobSkills = jobSkills;
+      debugScores.userSkills = userSkills;
       if (commonSkills.length) {
         score += skillScore;
         reasons.push(`Matched skills: ${commonSkills.join(', ')}`);
@@ -142,19 +149,19 @@ exports.generateJobMatchesForUser = async (req, res) => {
 
       // 2. Industry Matching
       const industryName = job.industries?.name?.toLowerCase();
-      const industryScore = (industryName && userIndustries.includes(industryName)) ? 10 : 0;
+      const industryScore = (industryName && userIndustries.includes(industryName)) ? SCORING_WEIGHTS.INDUSTRY_MAX : 0;
       debugScores.industryScore = industryScore;
       debugScores.matchedIndustry = industryName;
-      debugScores.userIndustries = userIndustries; // Debug: show user industries
+      debugScores.userIndustries = userIndustries;
       if (industryScore > 0) {
         score += industryScore;
         reasons.push(`Matched industry: ${industryName}`);
       }
 
-      // 3. Education Level Matching - ✅ Using proper mapping system
+      // 3. Education Level Matching
       let educationScore = 0;
       if (job.education_level) {
-        educationScore = meetsEducationRequirement(userDegrees, job.education_level) * 7;
+        educationScore = meetsEducationRequirement(userDegrees, job.education_level) * SCORING_WEIGHTS.EDUCATION_MAX;
         if (educationScore > 0) {
           score += educationScore;
           reasons.push(`Meets education requirement: ${job.education_level}`);
@@ -162,9 +169,9 @@ exports.generateJobMatchesForUser = async (req, res) => {
       }
       debugScores.educationScore = educationScore;
       debugScores.jobEducationLevel = job.education_level;
-      debugScores.userEducationLevels = userDegrees; // ✅ Debug: show mapped education levels
+      debugScores.userEducationLevels = userDegrees;
 
-      // 4. Field of Study Matching
+      // 4. Field of Study Matching 
       let fieldScore = 0;
       let matchedFields = [];
       if (job.description && userFields.length > 0) {
@@ -174,25 +181,33 @@ exports.generateJobMatchesForUser = async (req, res) => {
           field.length >= 3 && jobDescLower.includes(field)
         );
         if (matchedFields.length > 0) {
-          fieldScore = 6;
+          fieldScore = SCORING_WEIGHTS.FIELD_BONUS;
           score += fieldScore;
           reasons.push(`Matched field expertise: ${matchedFields.join(', ')}`);
         }
       }
       debugScores.fieldScore = fieldScore;
       debugScores.matchedFields = matchedFields;
-      debugScores.userFields = userFields; // Debug: show what user fields we have
+      debugScores.userFields = userFields;
 
       // 5. Experience Matching
       let experienceScore = 0;
       let matchedExp = [];
       if (job.title) {
         const jobTitle = job.title.toLowerCase();
-        matchedExp = userJobTitles.filter(t => 
-          jobTitle.includes(t) || t.includes(jobTitle)
-        );
+        matchedExp = userJobTitles.filter(userTitle => {
+          if (userTitle.length < 3) return false; // Skip very short titles
+          // More precise matching: require significant overlap
+          const shorterLength = Math.min(userTitle.length, jobTitle.length);
+          const longerLength = Math.max(userTitle.length, jobTitle.length);
+          
+          // Avoid matching very short strings against long ones
+          if (shorterLength < 4 && longerLength > 10) return false;
+          
+          return jobTitle.includes(userTitle) || userTitle.includes(jobTitle);
+        });
         if (matchedExp.length) {
-          experienceScore = 8;
+          experienceScore = SCORING_WEIGHTS.EXPERIENCE_MAX;
           score += experienceScore;
           reasons.push(`Matched experience: ${matchedExp.join(', ')}`);
         }
@@ -200,13 +215,13 @@ exports.generateJobMatchesForUser = async (req, res) => {
       debugScores.experienceScore = experienceScore;
       debugScores.matchedExp = matchedExp;
 
-      // 6. Location Matching (Province)
+      // 6. Location Matching 
       let locationScore = 0;
       const userProvince = userProfile.province?.toLowerCase();
       const jobProvince = job.province?.toLowerCase();
       if (userProvince && jobProvince) {
         if (userProvince === jobProvince) {
-          locationScore = 10; 
+          locationScore = SCORING_WEIGHTS.LOCATION_MAX; 
           score += locationScore;
           reasons.push(`Matched location: ${job.province}`);
         } 
@@ -218,24 +233,24 @@ exports.generateJobMatchesForUser = async (req, res) => {
       debugScores.totalScore = score;
 
       // Debug logging (detailed)
-      if (score >= 15) {
+      if (score >= 25) {
         console.log(`\n🎯 Job Match Found:`);
         console.log(`   Job: "${job.title}" (${job.id})`);
         console.log(`   Location: ${job.province || 'Not specified'}`);
-        console.log(`   Total Score: ${score}`);
+        console.log(`   Total Score: ${score}/100`);
         console.log(`   Score Breakdown:`);
-        console.log(`     ├── Skills: ${skillScore} (matched: [${debugScores.commonSkills.join(', ')}])`);
-        console.log(`     ├── Industry: ${industryScore} (job: ${industryName || 'none'}, user: [${userIndustries.join(', ')}])`);
-        console.log(`     ├── Education: ${educationScore} (job: ${job.education_level || 'none'}, user: [${userDegrees.join(', ')}])`);
-        console.log(`     ├── Field: ${fieldScore} (matched: [${debugScores.matchedFields.join(', ')}])`);
-        console.log(`     ├── Experience: ${experienceScore} (matched: [${debugScores.matchedExp.join(', ')}])`);
-        console.log(`     └── Location: ${locationScore} (job: ${jobProvince || 'none'}, user: ${userProvince || 'none'})`);
+        console.log(`     ├── Location: ${locationScore}/${SCORING_WEIGHTS.LOCATION_MAX} (job: ${jobProvince || 'none'}, user: ${userProvince || 'none'})`);
+        console.log(`     ├── Industry: ${industryScore}/${SCORING_WEIGHTS.INDUSTRY_MAX} (job: ${industryName || 'none'}, user: [${userIndustries.join(', ')}])`);
+        console.log(`     ├── Experience: ${experienceScore}/${SCORING_WEIGHTS.EXPERIENCE_MAX} (matched: [${debugScores.matchedExp.join(', ')}])`);
+        console.log(`     ├── Education: ${educationScore}/${SCORING_WEIGHTS.EDUCATION_MAX} (job: ${job.education_level || 'none'}, user: [${userDegrees.join(', ')}])`);
+        console.log(`     ├── Skills: ${skillScore}/~20 (matched: [${debugScores.commonSkills.join(', ')}])`);
+        console.log(`     └── Field: ${fieldScore}/${SCORING_WEIGHTS.FIELD_BONUS} (matched: [${debugScores.matchedFields.join(', ')}])`);
         console.log(`   Reasons: ${reasons.join('; ')}`);
       }
 
       // Only save if score meets minimum threshold
-      const MIN_MATCH_SCORE = 15; // Minimum score for reasonable accuracy
-      if (score >= MIN_MATCH_SCORE) {
+      const MIN_MATCH_SCORE = 0; 
+      if (score > MIN_MATCH_SCORE) {
         matches.push({
           user_id: userId,
           job_id: job.id,
@@ -246,19 +261,24 @@ exports.generateJobMatchesForUser = async (req, res) => {
     }
 
     // Delete old matches for user and insert new ones in a transaction
-    await prisma.$transaction(async (tx) => {
-      // Delete old matches
-      await tx.job_matches.deleteMany({ 
-        where: { user_id: userId } 
+    try {
+      await prisma.$transaction(async (tx) => {
+        await tx.job_matches.deleteMany({ 
+          where: { user_id: userId } 
+        });
+
+        if (matches.length > 0) {
+          await tx.job_matches.createMany({
+            data: matches
+          });
+        }
       });
 
-      // Insert new matches in batch (more efficient)
-      if (matches.length > 0) {
-        await tx.job_matches.createMany({
-          data: matches
-        });
-      }
-    });
+      console.log(`✅ Successfully saved ${matches.length} job matches for user ${userId}`);
+    } catch (dbError) {
+      console.error('❌ Database transaction failed:', dbError);
+      throw new Error(`Failed to save job matches: ${dbError.message}`);
+    }
 
     return successResponse(res, 'Job matches generated successfully', {
       totalMatches: matches.length,
