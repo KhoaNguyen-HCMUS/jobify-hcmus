@@ -29,7 +29,11 @@ import { toast } from "react-toastify";
 import GoBack from "../../../../components/goBack";
 import { useRouter } from "next/navigation";
 import ScheduleModal from "../../../../components/ScheduleModal";
-import { getTomorrowLocalTimeISO, localToUTC, isLocalDateTimeInFuture } from "../../../../utils/timezoneUtils";
+import {
+  getTomorrowLocalTimeISO,
+  localToUTC,
+  isLocalDateTimeInFuture,
+} from "../../../../utils/timezoneUtils";
 
 interface JobEditProps {
   isOpen: boolean;
@@ -83,8 +87,7 @@ function RecruiterPostJobEditContent({
   const [isScheduleModalOpen, setIsScheduleModalOpen] = useState(false);
   const [scheduledAt, setScheduledAt] = useState("");
 
-
-  console.log ("data job", job);
+  console.log("data job", job);
   useEffect(() => {
     if (job) {
       setTitle(job.title || "");
@@ -108,7 +111,7 @@ function RecruiterPostJobEditContent({
       setSelectedProvince(job.province || "");
       setSelectedDistrict(job.ward || "");
       setSelectedIndustry(job.industry_id || "");
-      setSelectedSubIndustry(""); 
+      setSelectedSubIndustry("");
     }
   }, [job]);
 
@@ -157,7 +160,9 @@ function RecruiterPostJobEditContent({
             setSelectedSubIndustry(job.industry_id);
           } else {
             // Otherwise treat as parent industry id
-            const parentExists = categories.some((cat) => cat.id === job.industry_id);
+            const parentExists = categories.some(
+              (cat) => cat.id === job.industry_id
+            );
             if (parentExists) {
               setSelectedIndustry(job.industry_id);
               setSelectedSubIndustry("");
@@ -286,19 +291,19 @@ function RecruiterPostJobEditContent({
 
       const response = await updateJob(job.id, jobData, token);
 
-             if (response.success) {
-         if (status === "draft") {
-           toast.success("Job saved as draft successfully!");
-         } else if (status === "pending") {
-           toast.success("Job updated successfully!");
-         } else if (status === "active") {
-           toast.success("Job updated successfully!");
-         }
-         onJobUpdated?.();
-         router.back();
-       } else {
-         toast.error("Failed to update job: " + response.message);
-       }
+      if (response.success) {
+        if (status === "draft") {
+          toast.success("Job saved as draft successfully!");
+        } else if (status === "pending") {
+          toast.success("Job updated successfully!");
+        } else if (status === "active") {
+          toast.success("Job updated successfully!");
+        }
+        onJobUpdated?.();
+        router.back();
+      } else {
+        toast.error("Failed to update job: " + response.message);
+      }
     } catch (error) {
       toast.error("Error updating job, please try again later.");
       console.error("Error updating job:", error);
@@ -490,7 +495,7 @@ function RecruiterPostJobEditContent({
                     htmlFor="numberOfRecruits"
                     className="block text-sm font-bold text-primary"
                   >
-                    Number of recruits*:
+                    Number of opening*:
                   </label>
                   <div className="relative">
                     <input
@@ -717,7 +722,7 @@ function RecruiterPostJobEditContent({
                   id="jobDescription"
                   value={jobDescription}
                   onChange={(e) => setJobDescription(e.target.value)}
-                  className="w-full border border-primary-80 h-16 px-4 py-2 text-primary-80 focus:outline-none resize-none bg-neutral-light-20 rounded-xl focus:ring-1 focus:bg-white transition-all duration-300"
+                  className="w-full border border-primary-80 h-35 px-4 py-2 text-primary-80 focus:outline-none resize-none bg-neutral-light-20 rounded-xl focus:ring-1 focus:bg-white transition-all duration-300"
                   placeholder="Enter description"
                 ></textarea>
               </div>
@@ -734,7 +739,7 @@ function RecruiterPostJobEditContent({
                   id="applicantRequirements"
                   value={applicantRequirements}
                   onChange={(e) => setApplicantRequirements(e.target.value)}
-                  className="w-full border border-primary-80 h-16 px-4 py-2 text-primary-80 focus:outline-none resize-none bg-neutral-light-20 rounded-xl focus:ring-1 focus:bg-white transition-all duration-300"
+                  className="w-full border border-primary-80 h-35 px-4 py-2 text-primary-80 focus:outline-none resize-none bg-neutral-light-20 rounded-xl focus:ring-1 focus:bg-white transition-all duration-300"
                   placeholder="Enter applicant requirements"
                 ></textarea>
               </div>
@@ -751,7 +756,7 @@ function RecruiterPostJobEditContent({
                   id="benefit"
                   value={benefit}
                   onChange={(e) => setBenefit(e.target.value)}
-                  className="w-full border border-primary-80 h-16 px-4 py-2 text-primary-80 focus:outline-none resize-none bg-neutral-light-20 rounded-xl focus:ring-1 focus:bg-white transition-all duration-300"
+                  className="w-full border border-primary-80 h-30 px-4 py-2 text-primary-80 focus:outline-none resize-none bg-neutral-light-20 rounded-xl focus:ring-1 focus:bg-white transition-all duration-300"
                   placeholder="Enter benefit"
                 ></textarea>
               </div>
@@ -767,7 +772,7 @@ function RecruiterPostJobEditContent({
                   {isLoading ? "Updating..." : "Update Job"}
                 </button>
               )}
-              
+
               {/* If status is not active, show Save as Draft, Publish Now, and Schedule buttons */}
               {job && job.status !== "active" && (
                 <>
@@ -778,9 +783,11 @@ function RecruiterPostJobEditContent({
                   >
                     {isLoading ? "Saving..." : "Save as Draft"}
                   </button>
-                  
+
                   {/* Show Publish Now button for draft and schedule jobs */}
-                  {(job.status === "draft" || job.status === "schedule" || job.status === "expired") && (
+                  {(job.status === "draft" ||
+                    job.status === "schedule" ||
+                    job.status === "expired") && (
                     <button
                       onClick={handlePublishNow}
                       disabled={isLoading}
@@ -789,7 +796,7 @@ function RecruiterPostJobEditContent({
                       {isLoading ? "Publishing..." : "Publish Now"}
                     </button>
                   )}
-                  
+
                   {/* Show Schedule button for draft jobs */}
                   {(job.status === "draft" || job.status === "expired") && (
                     <button
@@ -816,39 +823,39 @@ function RecruiterPostJobEditContent({
         }}
         scheduledAt={scheduledAt}
         onScheduledAtChange={setScheduledAt}
-                 onSchedule={async () => {
-           if (!job) return;
-           
-           setIsLoading(true);
-           try {
-             const token = getToken();
-             if (!token) {
-               toast.error("Please login again!");
-               return;
-             }
+        onSchedule={async () => {
+          if (!job) return;
 
-             const updateData = {
-               status: "schedule",
-               scheduled_at: localToUTC(scheduledAt),
-             };
+          setIsLoading(true);
+          try {
+            const token = getToken();
+            if (!token) {
+              toast.error("Please login again!");
+              return;
+            }
 
-             const response = await updateJob(job.id, updateData, token);
-             if (response.success) {
-               toast.success("Job scheduled successfully!");
-               setIsScheduleModalOpen(false);
-               setScheduledAt("");
-               onJobUpdated?.();
-               router.back();
-             } else {
-               toast.error(`Failed to schedule job: ${response.message}`);
-             }
-           } catch (error) {
-             toast.error("Error scheduling job, please try again later.");
-             console.error("Error scheduling job:", error);
-           } finally {
-             setIsLoading(false);
-           }
-         }}
+            const updateData = {
+              status: "schedule",
+              scheduled_at: localToUTC(scheduledAt),
+            };
+
+            const response = await updateJob(job.id, updateData, token);
+            if (response.success) {
+              toast.success("Job scheduled successfully!");
+              setIsScheduleModalOpen(false);
+              setScheduledAt("");
+              onJobUpdated?.();
+              router.back();
+            } else {
+              toast.error(`Failed to schedule job: ${response.message}`);
+            }
+          } catch (error) {
+            toast.error("Error scheduling job, please try again later.");
+            console.error("Error scheduling job:", error);
+          } finally {
+            setIsLoading(false);
+          }
+        }}
         isLoading={isLoading}
         title="Schedule Job"
       />

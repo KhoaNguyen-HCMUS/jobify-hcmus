@@ -136,7 +136,7 @@ export default function NavBar() {
                     onClick={() => setVisible(!visible)}
                     className="relative cursor-pointer px-4 py-2 text-primary border-2 border-primary rounded-3xl font-medium transition-all duration-300 hover:bg-primary hover:text-white hover:shadow-lg hover:shadow-primary/30 transform hover:-translate-y-0.5"
                   >
-                    <Bell size={35} />
+                    <Bell size={30} />
                   </button>
                   <div>
                     <div

@@ -15,9 +15,26 @@ import {
   X,
   Mail,
 } from "lucide-react";
-import { getProfile, updateProfile, Profile, Experience, Education, UpdateProfileData } from "../../../../services/candidateProfile";
-import { getProvinces, getDistrictsByProvince, Province, District } from "../../../../services/location";
-import { getAllIndustries, Industry, getIndustriesByCategory, IndustryCategory } from "../../../../services/industries";
+import {
+  getProfile,
+  updateProfile,
+  Profile,
+  Experience,
+  Education,
+  UpdateProfileData,
+} from "../../../../services/candidateProfile";
+import {
+  getProvinces,
+  getDistrictsByProvince,
+  Province,
+  District,
+} from "../../../../services/location";
+import {
+  getAllIndustries,
+  Industry,
+  getIndustriesByCategory,
+  IndustryCategory,
+} from "../../../../services/industries";
 import { toast } from "react-toastify";
 import ProtectedRoute from "../../../../components/ProtectedRoute";
 import WorkExperience from "../../../../components/workExperience";
@@ -53,13 +70,17 @@ function CandidateProfileEditContent() {
   // Location data
   const [provinces, setProvinces] = useState<Province[]>([]);
   const [districts, setDistricts] = useState<District[]>([]);
-  const [selectedProvinceCode, setSelectedProvinceCode] = useState<number | null>(null);
+  const [selectedProvinceCode, setSelectedProvinceCode] = useState<
+    number | null
+  >(null);
   const [showProvinceDropdown, setShowProvinceDropdown] = useState(false);
   const [showDistrictDropdown, setShowDistrictDropdown] = useState(false);
 
   // Industry data
   const [industries, setIndustries] = useState<Industry[]>([]);
-  const [industryCategories, setIndustryCategories] = useState<IndustryCategory[]>([]);
+  const [industryCategories, setIndustryCategories] = useState<
+    IndustryCategory[]
+  >([]);
   const [showIndustryDropdown, setShowIndustryDropdown] = useState(false);
   const [industrySearchTerm, setIndustrySearchTerm] = useState("");
 
@@ -70,11 +91,11 @@ function CandidateProfileEditContent() {
       if (response.success && response.data?.profile) {
         const profileData = response.data.profile;
         setProfile(profileData);
-        
+
         // Set basic fields
         setFullName(profileData.full_name || "");
         setGender(profileData.gender || "");
-                 setDateOfBirth(formatDateForInput(profileData.date_of_birth));
+        setDateOfBirth(formatDateForInput(profileData.date_of_birth));
         setPhone(profileData.phone || "");
         setBio(profileData.bio || "");
         setProvince(profileData.province || "");
@@ -83,22 +104,25 @@ function CandidateProfileEditContent() {
         setIndustry(profileData.industry || "");
         // Parse industries from string to array if they exist
         if (profileData.industry) {
-          const industriesArray = profileData.industry.split(',').map(ind => ind.trim()).filter(ind => ind);
+          const industriesArray = profileData.industry
+            .split(",")
+            .map((ind) => ind.trim())
+            .filter((ind) => ind);
           setSelectedIndustries(industriesArray);
         }
         setGithubUrl(profileData.github_url || "");
         setLinkedinUrl(profileData.linkedin_url || "");
         setWebsite(profileData.website || "");
         setSkills(profileData.skills || "");
-        
+
         // Set experiences and educations
         setExperiences(profileData.experiences || []);
         setEducations(profileData.educations || []);
       } else {
-        toast.error(response.message || 'Failed to load profile');
+        toast.error(response.message || "Failed to load profile");
       }
     } catch (error) {
-      toast.error('Error loading profile data');
+      toast.error("Error loading profile data");
     } finally {
       setLoading(false);
     }
@@ -111,7 +135,7 @@ function CandidateProfileEditContent() {
         setProvinces(response.data);
       }
     } catch (error) {
-      console.error('Error fetching provinces:', error);
+      console.error("Error fetching provinces:", error);
     }
   };
 
@@ -124,7 +148,7 @@ function CandidateProfileEditContent() {
         setIndustryCategories(categories);
       }
     } catch (error) {
-      console.error('Error fetching industries:', error);
+      console.error("Error fetching industries:", error);
     }
   };
 
@@ -139,7 +163,7 @@ function CandidateProfileEditContent() {
         setDistricts(response.data);
       }
     } catch (error) {
-      console.error('Error fetching districts:', error);
+      console.error("Error fetching districts:", error);
     }
   };
 
@@ -156,9 +180,9 @@ function CandidateProfileEditContent() {
   }, [selectedProvinceCode]);
 
   const handleIndustryToggle = (industryName: string) => {
-    setSelectedIndustries(prev => {
+    setSelectedIndustries((prev) => {
       if (prev.includes(industryName)) {
-        return prev.filter(ind => ind !== industryName);
+        return prev.filter((ind) => ind !== industryName);
       } else {
         return [...prev, industryName];
       }
@@ -166,51 +190,53 @@ function CandidateProfileEditContent() {
   };
 
   const removeIndustry = (industryName: string) => {
-    setSelectedIndustries(prev => prev.filter(ind => ind !== industryName));
+    setSelectedIndustries((prev) => prev.filter((ind) => ind !== industryName));
   };
 
-  const filteredIndustries = industries.filter(industry =>
+  const filteredIndustries = industries.filter((industry) =>
     industry.name.toLowerCase().includes(industrySearchTerm.toLowerCase())
   );
 
-  const filteredCategories = industrySearchTerm 
-    ? industryCategories.map(category => ({
-        ...category,
-        children: category.children.filter(industry =>
-          industry.name.toLowerCase().includes(industrySearchTerm.toLowerCase())
-        )
-      })).filter(category => category.children.length > 0)
+  const filteredCategories = industrySearchTerm
+    ? industryCategories
+        .map((category) => ({
+          ...category,
+          children: category.children.filter((industry) =>
+            industry.name
+              .toLowerCase()
+              .includes(industrySearchTerm.toLowerCase())
+          ),
+        }))
+        .filter((category) => category.children.length > 0)
     : industryCategories;
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       const target = event.target as Element;
-      if (!target.closest('.province-dropdown')) {
+      if (!target.closest(".province-dropdown")) {
         setShowProvinceDropdown(false);
       }
-      if (!target.closest('.district-dropdown')) {
+      if (!target.closest(".district-dropdown")) {
         setShowDistrictDropdown(false);
       }
-      if (!target.closest('.industry-dropdown')) {
+      if (!target.closest(".industry-dropdown")) {
         setShowIndustryDropdown(false);
         setIndustrySearchTerm(""); // Clear search when dropdown closes
       }
     };
 
-    document.addEventListener('mousedown', handleClickOutside);
+    document.addEventListener("mousedown", handleClickOutside);
     return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
-
-
 
   const handleSubmit = async () => {
     try {
       setSaving(true);
-      
+
       if (!profile) {
-        toast.error('No profile data available');
+        toast.error("No profile data available");
         return;
       }
 
@@ -223,7 +249,10 @@ function CandidateProfileEditContent() {
         province: province.trim() || undefined,
         ward: ward.trim() || undefined,
         address_detail: addressDetail.trim() || undefined,
-        industry: selectedIndustries.length > 0 ? selectedIndustries.join(', ') : undefined,
+        industry:
+          selectedIndustries.length > 0
+            ? selectedIndustries.join(", ")
+            : undefined,
         github_url: githubUrl.trim() || undefined,
         linkedin_url: linkedinUrl.trim() || undefined,
         website: website.trim() || undefined,
@@ -231,54 +260,69 @@ function CandidateProfileEditContent() {
       };
 
       if (experiences.length > 0) {
-        updateData.experiences = experiences.map(exp => ({
-          company_name: exp.company_name?.trim() || undefined,
-          job_title: exp.job_title?.trim() || undefined,
-          description: exp.description?.trim() || undefined,
-          location: exp.location?.trim() || undefined,
-          start_date: exp.start_date || undefined,
-          end_date: exp.end_date || undefined,
-          is_current: exp.is_current
-        })).filter(exp => 
-          exp.company_name || exp.job_title || exp.description || 
-          exp.location || exp.start_date || exp.end_date
-        );
+        updateData.experiences = experiences
+          .map((exp) => ({
+            company_name: exp.company_name?.trim() || undefined,
+            job_title: exp.job_title?.trim() || undefined,
+            description: exp.description?.trim() || undefined,
+            location: exp.location?.trim() || undefined,
+            start_date: exp.start_date || undefined,
+            end_date: exp.end_date || undefined,
+            is_current: exp.is_current,
+          }))
+          .filter(
+            (exp) =>
+              exp.company_name ||
+              exp.job_title ||
+              exp.description ||
+              exp.location ||
+              exp.start_date ||
+              exp.end_date
+          );
       }
 
       if (educations.length > 0) {
-        updateData.educations = educations.map(edu => ({
-          institution: edu.institution?.trim() || undefined,
-          degree: edu.degree?.trim() || undefined,
-          field_of_study: edu.field_of_study?.trim() || undefined,
-          grade: edu.grade?.trim() || undefined,
-          description: edu.description?.trim() || undefined,
-          start_date: edu.start_date || undefined,
-          end_date: edu.end_date || undefined
-        })).filter(edu => 
-          edu.institution || edu.degree || edu.field_of_study || 
-          edu.grade || edu.description || edu.start_date || edu.end_date
-        );
+        updateData.educations = educations
+          .map((edu) => ({
+            institution: edu.institution?.trim() || undefined,
+            degree: edu.degree?.trim() || undefined,
+            field_of_study: edu.field_of_study?.trim() || undefined,
+            grade: edu.grade?.trim() || undefined,
+            description: edu.description?.trim() || undefined,
+            start_date: edu.start_date || undefined,
+            end_date: edu.end_date || undefined,
+          }))
+          .filter(
+            (edu) =>
+              edu.institution ||
+              edu.degree ||
+              edu.field_of_study ||
+              edu.grade ||
+              edu.description ||
+              edu.start_date ||
+              edu.end_date
+          );
       }
 
-      Object.keys(updateData).forEach(key => {
+      Object.keys(updateData).forEach((key) => {
         if (updateData[key as keyof UpdateProfileData] === undefined) {
           delete updateData[key as keyof UpdateProfileData];
         }
       });
 
-      console.log('Sending update data:', updateData);
+      console.log("Sending update data:", updateData);
 
       const response = await updateProfile(updateData);
-      
+
       if (response.success) {
-        toast.success('Profile updated successfully!');
-        router.push('/candidate/profile');
+        toast.success("Profile updated successfully!");
+        router.push("/candidate/profile");
       } else {
-        toast.error(response.message || 'Failed to update profile');
+        toast.error(response.message || "Failed to update profile");
         console.log(response);
       }
     } catch (error) {
-      toast.error('Error updating profile');
+      toast.error("Error updating profile");
       console.error(error);
     } finally {
       setSaving(false);
@@ -401,7 +445,7 @@ function CandidateProfileEditContent() {
               htmlFor="bio"
               className="block text-sm font-bold text-primary ml-4"
             >
-              Introduce yourself:
+              Introduce Yourself:
             </label>
             <div className="relative">
               <textarea
@@ -422,10 +466,7 @@ function CandidateProfileEditContent() {
               >
                 Province:
               </label>
-              <div className="relative province-dropdown">
-                <div className="absolute left-4 top-1/2 transform -translate-y-1/2 text-primary">
-                  <MapPin size={18} />
-                </div>
+              <div className="relative province-dropdown z-20">
                 <div className="relative">
                   <input
                     id="province"
@@ -433,8 +474,10 @@ function CandidateProfileEditContent() {
                     value={province}
                     onChange={(e) => setProvince(e.target.value)}
                     placeholder="Select province"
-                    className="w-full border border-primary-60 pl-12 pr-10 py-2 bg-neutral-light-20 rounded-xl text-primary-80 outline-none focus:ring-1 focus:primary focus:bg-white transition-all duration-300 cursor-pointer"
-                    onClick={() => setShowProvinceDropdown(!showProvinceDropdown)}
+                    className="w-full border border-primary-60 pl-4 pr-10 py-2 bg-neutral-light-20 rounded-xl text-primary-80 outline-none focus:ring-1 focus:primary focus:bg-white transition-all duration-300 cursor-pointer"
+                    onClick={() =>
+                      setShowProvinceDropdown(!showProvinceDropdown)
+                    }
                     readOnly
                   />
                   <div className="absolute right-4 top-1/2 transform -translate-y-1/2 text-primary cursor-pointer">
@@ -446,19 +489,19 @@ function CandidateProfileEditContent() {
                     {provinces
                       .sort((a, b) => a.name.localeCompare(b.name))
                       .map((prov) => (
-                      <div
-                        key={prov.code}
-                        className="px-4 py-2 hover:bg-neutral-light-80 cursor-pointer text-primary-80"
-                        onClick={() => {
-                          setProvince(prov.name);
-                          setSelectedProvinceCode(prov.code);
-                          setShowProvinceDropdown(false);
-                          setWard(""); // Clear district when province changes
-                        }}
-                      >
-                        {prov.name}
-                      </div>
-                    ))}
+                        <div
+                          key={prov.code}
+                          className="px-4 py-2 hover:bg-neutral-light-80 cursor-pointer text-primary-80"
+                          onClick={() => {
+                            setProvince(prov.name);
+                            setSelectedProvinceCode(prov.code);
+                            setShowProvinceDropdown(false);
+                            setWard(""); // Clear district when province changes
+                          }}
+                        >
+                          {prov.name}
+                        </div>
+                      ))}
                   </div>
                 )}
               </div>
@@ -471,9 +514,6 @@ function CandidateProfileEditContent() {
                 District:
               </label>
               <div className="relative district-dropdown">
-                <div className="absolute left-4 top-1/2 transform -translate-y-1/2 text-primary">
-                  <MapPin size={18} />
-                </div>
                 <div className="relative">
                   <input
                     id="ward"
@@ -481,32 +521,34 @@ function CandidateProfileEditContent() {
                     value={ward}
                     onChange={(e) => setWard(e.target.value)}
                     placeholder="Select district"
-                    className="w-full border border-primary-60 pl-12 pr-10 py-2 bg-neutral-light-20 rounded-xl text-primary-80 outline-none focus:ring-1 focus:primary focus:bg-white transition-all duration-300 cursor-pointer"
-                    onClick={() => setShowDistrictDropdown(!showDistrictDropdown)}
+                    className="w-full border border-primary-60 pl-4 pr-10 py-2 bg-neutral-light-20 rounded-xl text-primary-80 outline-none focus:ring-1 focus:primary focus:bg-white transition-all duration-300 cursor-pointer"
+                    onClick={() =>
+                      setShowDistrictDropdown(!showDistrictDropdown)
+                    }
                     readOnly
                   />
                   <div className="absolute right-4 top-1/2 transform -translate-y-1/2 text-primary cursor-pointer">
                     <ChevronDown size={18} />
                   </div>
                 </div>
-                                 {showDistrictDropdown && (
-                   <div className="absolute z-10 w-full mt-1 bg-white border border-primary-60 rounded-xl shadow-lg max-h-60 overflow-y-auto">
-                     {districts
-                       .sort((a, b) => a.name.localeCompare(b.name))
-                       .map((district) => (
-                       <div
-                         key={district.code}
-                         className="px-4 py-2 hover:bg-neutral-light-80 cursor-pointer text-primary-80"
-                         onClick={() => {
-                           setWard(district.name);
-                           setShowDistrictDropdown(false);
-                         }}
-                       >
-                         {district.name}
-                       </div>
-                     ))}
-                   </div>
-                 )}
+                {showDistrictDropdown && (
+                  <div className="absolute z-10 w-full mt-1 bg-white border border-primary-60 rounded-xl shadow-lg max-h-60 overflow-y-auto">
+                    {districts
+                      .sort((a, b) => a.name.localeCompare(b.name))
+                      .map((district) => (
+                        <div
+                          key={district.code}
+                          className="px-4 py-2 hover:bg-neutral-light-80 cursor-pointer text-primary-80"
+                          onClick={() => {
+                            setWard(district.name);
+                            setShowDistrictDropdown(false);
+                          }}
+                        >
+                          {district.name}
+                        </div>
+                      ))}
+                  </div>
+                )}
               </div>
             </div>
           </div>
@@ -552,7 +594,9 @@ function CandidateProfileEditContent() {
                         if (!showIndustryDropdown) {
                           // Auto-focus search input when dropdown opens
                           setTimeout(() => {
-                            const searchInput = document.querySelector('.industry-search-input') as HTMLInputElement;
+                            const searchInput = document.querySelector(
+                              ".industry-search-input"
+                            ) as HTMLInputElement;
                             if (searchInput) {
                               searchInput.focus();
                             }
@@ -579,7 +623,9 @@ function CandidateProfileEditContent() {
                             </span>
                           ))
                         ) : (
-                          <span className="text-primary-60">Select industries</span>
+                          <span className="text-primary-60">
+                            Select industries
+                          </span>
                         )}
                       </div>
                       <div className="absolute right-4 top-1/2 transform -translate-y-1/2 text-primary cursor-pointer">
@@ -595,11 +641,18 @@ function CandidateProfileEditContent() {
                           type="text"
                           placeholder="Search industries..."
                           value={industrySearchTerm}
-                          onChange={(e) => setIndustrySearchTerm(e.target.value)}
+                          onChange={(e) =>
+                            setIndustrySearchTerm(e.target.value)
+                          }
                           onKeyDown={(e) => {
-                            if (e.key === 'Enter' && filteredIndustries.length > 0) {
+                            if (
+                              e.key === "Enter" &&
+                              filteredIndustries.length > 0
+                            ) {
                               e.preventDefault();
-                              const firstIndustry = filteredIndustries.sort((a, b) => a.name.localeCompare(b.name))[0];
+                              const firstIndustry = filteredIndustries.sort(
+                                (a, b) => a.name.localeCompare(b.name)
+                              )[0];
                               handleIndustryToggle(firstIndustry.name);
                               setIndustrySearchTerm("");
                             }
@@ -617,65 +670,79 @@ function CandidateProfileEditContent() {
                             filteredIndustries
                               .sort((a, b) => a.name.localeCompare(b.name))
                               .map((industry) => (
-                              <div
-                                key={industry.id}
-                                className={`px-4 py-2 hover:bg-neutral-light-80 cursor-pointer text-primary-80 flex items-center gap-2 ${
-                                  selectedIndustries.includes(industry.name) ? 'bg-primary-20' : ''
-                                }`}
-                                onClick={() => handleIndustryToggle(industry.name)}
-                              >
-                                <input
-                                  type="checkbox"
-                                  checked={selectedIndustries.includes(industry.name)}
-                                  onChange={() => {}}
-                                  aria-label={`Select industry ${industry.name}`}
-                                  title={`Select ${industry.name}`}
-                                  className="w-4 h-4 text-accent bg-gray-100 border-gray-300 rounded focus:ring-accent"
-                                />
-                                <span className="flex-1">{industry.name}</span>
-                              </div>
-                            ))
+                                <div
+                                  key={industry.id}
+                                  className={`px-4 py-2 hover:bg-neutral-light-80 cursor-pointer text-primary-80 flex items-center gap-2 ${
+                                    selectedIndustries.includes(industry.name)
+                                      ? "bg-primary-20"
+                                      : ""
+                                  }`}
+                                  onClick={() =>
+                                    handleIndustryToggle(industry.name)
+                                  }
+                                >
+                                  <input
+                                    type="checkbox"
+                                    checked={selectedIndustries.includes(
+                                      industry.name
+                                    )}
+                                    onChange={() => {}}
+                                    aria-label={`Select industry ${industry.name}`}
+                                    title={`Select ${industry.name}`}
+                                    className="w-4 h-4 text-accent bg-gray-100 border-gray-300 rounded focus:ring-accent"
+                                  />
+                                  <span className="flex-1">
+                                    {industry.name}
+                                  </span>
+                                </div>
+                              ))
                           ) : (
                             <div className="px-4 py-2 text-primary-60 text-center">
                               No industries found
                             </div>
                           )
-                        ) : (
-                          // Show categorized list when not searching
-                          filteredCategories.length > 0 ? (
-                            filteredCategories.map((category) => (
-                              <div key={category.id}>
-                                {/* Category Header */}
-                                <div className="px-4 py-2 bg-neutral-light-40 text-primary font-semibold text-sm border-b border-primary-20">
-                                  {category.name}
-                                </div>
-                                {/* Category Children */}
-                                {category.children.map((industry) => (
-                                  <div
-                                    key={industry.id}
-                                    className={`px-6 py-2 hover:bg-neutral-light-80 cursor-pointer text-primary-80 flex items-center gap-2 ${
-                                      selectedIndustries.includes(industry.name) ? 'bg-primary-20' : ''
-                                    }`}
-                                    onClick={() => handleIndustryToggle(industry.name)}
-                                  >
-                                    <input
-                                      type="checkbox"
-                                      checked={selectedIndustries.includes(industry.name)}
-                                      onChange={() => {}}
-                                      aria-label={`Select industry ${industry.name}`}
-                                      title={`Select ${industry.name}`}
-                                      className="w-4 h-4 text-accent bg-gray-100 border-gray-300 rounded focus:ring-accent"
-                                    />
-                                    <span className="flex-1">{industry.name}</span>
-                                  </div>
-                                ))}
+                        ) : // Show categorized list when not searching
+                        filteredCategories.length > 0 ? (
+                          filteredCategories.map((category) => (
+                            <div key={category.id}>
+                              {/* Category Header */}
+                              <div className="px-4 py-2 bg-neutral-light-40 text-primary font-semibold text-sm border-b border-primary-20">
+                                {category.name}
                               </div>
-                            ))
-                          ) : (
-                            <div className="px-4 py-2 text-primary-60 text-center">
-                              No industries available
+                              {/* Category Children */}
+                              {category.children.map((industry) => (
+                                <div
+                                  key={industry.id}
+                                  className={`px-6 py-2 hover:bg-neutral-light-80 cursor-pointer text-primary-80 flex items-center gap-2 ${
+                                    selectedIndustries.includes(industry.name)
+                                      ? "bg-primary-20"
+                                      : ""
+                                  }`}
+                                  onClick={() =>
+                                    handleIndustryToggle(industry.name)
+                                  }
+                                >
+                                  <input
+                                    type="checkbox"
+                                    checked={selectedIndustries.includes(
+                                      industry.name
+                                    )}
+                                    onChange={() => {}}
+                                    aria-label={`Select industry ${industry.name}`}
+                                    title={`Select ${industry.name}`}
+                                    className="w-4 h-4 text-accent bg-gray-100 border-gray-300 rounded focus:ring-accent"
+                                  />
+                                  <span className="flex-1">
+                                    {industry.name}
+                                  </span>
+                                </div>
+                              ))}
                             </div>
-                          )
+                          ))
+                        ) : (
+                          <div className="px-4 py-2 text-primary-60 text-center">
+                            No industries available
+                          </div>
                         )}
                       </div>
                     </div>
@@ -793,25 +860,25 @@ function CandidateProfileEditContent() {
             </div>
           </div>
 
-                     {/* Work Experience Section */}
-           {!loading && (
-             <WorkExperience 
-               experiences={experiences}
-               onExperiencesChange={setExperiences}
-             />
-           )}
+          {/* Work Experience Section */}
+          {!loading && (
+            <WorkExperience
+              experiences={experiences}
+              onExperiencesChange={setExperiences}
+            />
+          )}
 
-           {/* Education Section */}
-           {!loading && (
-             <EducationComponent 
-               educations={educations}
-               onEducationsChange={setEducations}
-             />
-           )}
+          {/* Education Section */}
+          {!loading && (
+            <EducationComponent
+              educations={educations}
+              onEducationsChange={setEducations}
+            />
+          )}
         </div>
         <div className="flex flex-wrap gap-4">
           <button
-            onClick={() => router.push('/candidate/profile')}
+            onClick={() => router.push("/candidate/profile")}
             className="hover:bg-accent hover:text-neutral-light-60 cursor-pointer text-accent border border-accent font-semibold rounded-2xl px-6 py-2"
           >
             Cancel
@@ -821,7 +888,7 @@ function CandidateProfileEditContent() {
             disabled={saving}
             className="bg-accent hover:text-accent hover:bg-neutral-light-60 cursor-pointer border border-accent text-neutral-light-20 font-semibold rounded-2xl px-6 py-2 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {saving ? 'Saving...' : 'Save'}
+            {saving ? "Saving..." : "Save"}
           </button>
         </div>
       </div>
@@ -831,9 +898,8 @@ function CandidateProfileEditContent() {
 
 export default function CandidateProfileEditPage() {
   return (
-    <ProtectedRoute allowedRoles={['candidate']}>
+    <ProtectedRoute allowedRoles={["candidate"]}>
       <CandidateProfileEditContent />
     </ProtectedRoute>
   );
 }
-  

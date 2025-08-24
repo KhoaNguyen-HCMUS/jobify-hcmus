@@ -27,10 +27,10 @@ import {
 } from "../../../services/companyProfile";
 import { toast } from "react-toastify";
 import GoBack from "../../../components/goBack";
-import { 
-  getTomorrowLocalTimeISO, 
-  localToUTC, 
-  isLocalDateTimeInFuture
+import {
+  getTomorrowLocalTimeISO,
+  localToUTC,
+  isLocalDateTimeInFuture,
 } from "../../../utils/timezoneUtils";
 import { parseAddressToLocation } from "../../../utils/addressUtils";
 import { useRouter } from "next/navigation";
@@ -142,7 +142,11 @@ function RecruiterPostJobContent({ isOpen, onClose }: JobPostProps) {
 
       // Auto-fill province and district from company address
       if (companyProfile.address && provinces.length > 0) {
-        const location = parseAddressToLocation(companyProfile.address, provinces, districts);
+        const location = parseAddressToLocation(
+          companyProfile.address,
+          provinces,
+          districts
+        );
         if (location) {
           if (!selectedProvince) {
             setSelectedProvince(location.province);
@@ -153,7 +157,14 @@ function RecruiterPostJobContent({ isOpen, onClose }: JobPostProps) {
         }
       }
     }
-  }, [companyProfile, workPlace, provinces, districts, selectedProvince, selectedDistrict]);
+  }, [
+    companyProfile,
+    workPlace,
+    provinces,
+    districts,
+    selectedProvince,
+    selectedDistrict,
+  ]);
 
   // Set default working time only once when component mounts
   useEffect(() => {
@@ -169,12 +180,27 @@ function RecruiterPostJobContent({ isOpen, onClose }: JobPostProps) {
   // Auto-fill district when districts are loaded and province is already selected
   useEffect(() => {
     if (companyProfile?.address && selectedProvince && districts.length > 0) {
-      const location = parseAddressToLocation(companyProfile.address, provinces, districts);
-      if (location && location.province === selectedProvince && !selectedDistrict && location.district) {
+      const location = parseAddressToLocation(
+        companyProfile.address,
+        provinces,
+        districts
+      );
+      if (
+        location &&
+        location.province === selectedProvince &&
+        !selectedDistrict &&
+        location.district
+      ) {
         setSelectedDistrict(location.district);
       }
     }
-  }, [districts, selectedProvince, companyProfile, provinces, selectedDistrict]);
+  }, [
+    districts,
+    selectedProvince,
+    companyProfile,
+    provinces,
+    selectedDistrict,
+  ]);
 
   const handleScheduleClick = () => {
     setShowScheduleModal(true);
@@ -254,7 +280,8 @@ function RecruiterPostJobContent({ isOpen, onClose }: JobPostProps) {
         cost_coin: 10,
         status: status,
         skills: skill,
-        ...(status === "schedule" && scheduledAt && { scheduled_at: localToUTC(scheduledAt) }),
+        ...(status === "schedule" &&
+          scheduledAt && { scheduled_at: localToUTC(scheduledAt) }),
       };
 
       const response = await postNewJob(jobData, token);
@@ -294,7 +321,6 @@ function RecruiterPostJobContent({ isOpen, onClose }: JobPostProps) {
         setShowScheduleModal(false);
         setCompanyProfile(null);
         router.push("/company/jobs");
-
       } else {
         toast.error("Failed to post job: " + response.message);
       }
@@ -466,8 +492,6 @@ function RecruiterPostJobContent({ isOpen, onClose }: JobPostProps) {
                   </div>
                 </div>
 
-
-
                 <div className="flex flex-col">
                   <label
                     htmlFor="positions"
@@ -493,7 +517,7 @@ function RecruiterPostJobContent({ isOpen, onClose }: JobPostProps) {
                     htmlFor="numberOfRecruits"
                     className="block text-sm font-bold text-primary"
                   >
-                    Number of recruits*:
+                    Number of opening*:
                   </label>
                   <div className="relative">
                     <input
@@ -596,13 +620,14 @@ function RecruiterPostJobContent({ isOpen, onClose }: JobPostProps) {
                       disabled={!selectedIndustry}
                     >
                       <option value="">Select specialization (optional)</option>
-                      {selectedIndustry && industryCategories
-                        .find(cat => cat.id === selectedIndustry)
-                        ?.children.map((subIndustry) => (
-                          <option key={subIndustry.id} value={subIndustry.id}>
-                            {subIndustry.name}
-                          </option>
-                        ))}
+                      {selectedIndustry &&
+                        industryCategories
+                          .find((cat) => cat.id === selectedIndustry)
+                          ?.children.map((subIndustry) => (
+                            <option key={subIndustry.id} value={subIndustry.id}>
+                              {subIndustry.name}
+                            </option>
+                          ))}
                     </select>
                   </div>
                 </div>
@@ -717,7 +742,7 @@ function RecruiterPostJobContent({ isOpen, onClose }: JobPostProps) {
                   id="jobDescription"
                   value={jobDescription}
                   onChange={(e) => setJobDescription(e.target.value)}
-                  className="w-full border border-primary-80 h-16 px-4 py-2 text-primary-80 focus:outline-none resize-none bg-neutral-light-20 rounded-xl focus:ring-1 focus:bg-white transition-all duration-300"
+                  className="w-full border border-primary-80 h-35 px-4 py-2 text-primary-80 focus:outline-none resize-none bg-neutral-light-20 rounded-xl focus:ring-1 focus:bg-white transition-all duration-300"
                   placeholder="Enter description"
                 ></textarea>
               </div>
@@ -734,7 +759,7 @@ function RecruiterPostJobContent({ isOpen, onClose }: JobPostProps) {
                   id="applicantRequirements"
                   value={applicantRequirements}
                   onChange={(e) => setApplicantRequirements(e.target.value)}
-                  className="w-full border border-primary-80 h-16 px-4 py-2 text-primary-80 focus:outline-none resize-none bg-neutral-light-20 rounded-xl focus:ring-1 focus:bg-white transition-all duration-300"
+                  className="w-full border border-primary-80 h-35 px-4 py-2 text-primary-80 focus:outline-none resize-none bg-neutral-light-20 rounded-xl focus:ring-1 focus:bg-white transition-all duration-300"
                   placeholder="Enter applicant requirements"
                 ></textarea>
               </div>
@@ -751,7 +776,7 @@ function RecruiterPostJobContent({ isOpen, onClose }: JobPostProps) {
                   id="benefit"
                   value={benefit}
                   onChange={(e) => setBenefit(e.target.value)}
-                  className="w-full border border-primary-80 h-16 px-4 py-2 text-primary-80 focus:outline-none resize-none bg-neutral-light-20 rounded-xl focus:ring-1 focus:bg-white transition-all duration-300"
+                  className="w-full border border-primary-80 h-30 px-4 py-2 text-primary-80 focus:outline-none resize-none bg-neutral-light-20 rounded-xl focus:ring-1 focus:bg-white transition-all duration-300"
                   placeholder="Enter benefit"
                 ></textarea>
               </div>
@@ -778,27 +803,27 @@ function RecruiterPostJobContent({ isOpen, onClose }: JobPostProps) {
               >
                 Schedule
               </button>
-                         </div>
-           </div>
-         </div>
-       </div>
+            </div>
+          </div>
+        </div>
+      </div>
 
-               {/* Schedule Modal */}
-        <ScheduleModal
-          isOpen={showScheduleModal}
-          onClose={() => {
-            setShowScheduleModal(false);
-            setScheduledAt("");
-          }}
-          scheduledAt={scheduledAt}
-          onScheduledAtChange={setScheduledAt}
-          onSchedule={() => handleSubmit("schedule")}
-          isLoading={isLoading}
-          title="Schedule Job Post"
-        />
-     </div>
-   );
- }
+      {/* Schedule Modal */}
+      <ScheduleModal
+        isOpen={showScheduleModal}
+        onClose={() => {
+          setShowScheduleModal(false);
+          setScheduledAt("");
+        }}
+        scheduledAt={scheduledAt}
+        onScheduledAtChange={setScheduledAt}
+        onSchedule={() => handleSubmit("schedule")}
+        isLoading={isLoading}
+        title="Schedule Job Post"
+      />
+    </div>
+  );
+}
 
 export default function RecruiterPostJobPage() {
   const [isOpen, setIsOpen] = useState(true);

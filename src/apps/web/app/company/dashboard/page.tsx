@@ -7,7 +7,10 @@ import usePagination from "../../../hooks/usePagination";
 import Pagination from "../../../components/pagination";
 import { DEFAULT_COVER_IMAGE } from "../../../constants/imgConstants";
 import { DEFAULT_AVATAR_IMAGE } from "../../../constants/imgConstants";
-import { getCompanyProfile, CompanyProfile } from "../../../services/companyProfile";
+import {
+  getCompanyProfile,
+  CompanyProfile,
+} from "../../../services/companyProfile";
 import { getJobsByCompany, Job } from "../../../services/jobs";
 import ProtectedRoute from "../../../components/ProtectedRoute";
 
@@ -47,9 +50,10 @@ const Stat = ({
   label: string;
   color: string;
 }) => (
-  <div className={`flex flex-col items-center font-bold text-[${color}]`}>
+  <div className="flex flex-col items-center font-bold" style={{ color }}>
     <span
       className="w-16 h-16 flex items-center justify-center text-2xl rounded-full border-2 bg-neutral-light-20"
+      style={{ borderColor: color }}
     >
       {value}
     </span>
@@ -58,7 +62,9 @@ const Stat = ({
 );
 
 function RecruiterDashboardContent() {
-  const [companyProfile, setCompanyProfile] = useState<CompanyProfile | null>(null);
+  const [companyProfile, setCompanyProfile] = useState<CompanyProfile | null>(
+    null
+  );
   const [jobs, setJobs] = useState<Job[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [jobStats, setJobStats] = useState({
@@ -66,14 +72,14 @@ function RecruiterDashboardContent() {
     activeJobs: 0,
     expiredJobs: 0,
     applications: 0,
-    coins: 250
+    coins: 250,
   });
 
   useEffect(() => {
     const loadDashboardData = async () => {
       try {
         setIsLoading(true);
-        
+
         const profileResponse = await getCompanyProfile();
         if (profileResponse.success && profileResponse.data) {
           setCompanyProfile(profileResponse.data.companyProfiles);
@@ -81,22 +87,31 @@ function RecruiterDashboardContent() {
 
         const jobsResponse = await getJobsByCompany();
         if (jobsResponse.success && jobsResponse.data) {
-          const sortedJobs = jobsResponse.data.sort((a, b) => 
-            new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+          const sortedJobs = jobsResponse.data.sort(
+            (a, b) =>
+              new Date(b.created_at).getTime() -
+              new Date(a.created_at).getTime()
           );
           setJobs(sortedJobs);
-          
+
           const totalJobs = sortedJobs.length;
-          const activeJobs = sortedJobs.filter(job => job.status === 'active').length;
-          const expiredJobs = sortedJobs.filter(job => job.status === 'expired').length;
-          const totalApplications = sortedJobs.reduce((sum, job) => sum + (job.applications_count || 0), 0);
-          
+          const activeJobs = sortedJobs.filter(
+            (job) => job.status === "active"
+          ).length;
+          const expiredJobs = sortedJobs.filter(
+            (job) => job.status === "expired"
+          ).length;
+          const totalApplications = sortedJobs.reduce(
+            (sum, job) => sum + (job.applications_count || 0),
+            0
+          );
+
           setJobStats({
             totalJobs,
             activeJobs,
             expiredJobs,
             applications: totalApplications,
-            coins: 250 
+            coins: 250,
           });
         }
       } catch (error) {
@@ -110,14 +125,19 @@ function RecruiterDashboardContent() {
   }, []);
 
   const transformedJobs = jobs.map(transformJobForCard);
-  const { page, maxPage, current, next, prev } = usePagination(transformedJobs, 4);
+  const { page, maxPage, current, next, prev } = usePagination(
+    transformedJobs,
+    4
+  );
 
   return (
     <div className="w-full h-full bg-neutral-light-60">
       <div className="flex flex-col px-6 lg:px-20 py-10 gap-10">
         {isLoading ? (
           <div className="flex min-h-screen justify-center items-center h-64">
-            <div className="text-primary text-lg">Loading company profile...</div>
+            <div className="text-primary text-lg">
+              Loading company profile...
+            </div>
           </div>
         ) : (
           <>
@@ -138,8 +158,11 @@ function RecruiterDashboardContent() {
                 <div className="flex bg-accent-20 rounded-b-3xl">
                   <div className="flex-2"></div>
                   <div className="flex-5">
-                    <div className="flex flex-col mb-4 space-y-2 font-semibold text-primary">
-                      <div className="text-lg">{companyProfile?.company_name || "Company Name Not Available"}</div>
+                    <div className="flex flex-col mb-4 space-y-2 pt-4 font-semibold text-primary">
+                      <div className="text-lg">
+                        {companyProfile?.company_name ||
+                          "Company Name Not Available"}
+                      </div>
                       <div className="flex flex-wrap justify-between gap-10">
                         <div className="flex items-center gap-2">
                           <Users />
@@ -147,7 +170,11 @@ function RecruiterDashboardContent() {
                         </div>
                         <div className="flex items-center gap-2">
                           <Unlink2 />
-                          <a href={companyProfile?.website || "#"} target="_blank" rel="noopener noreferrer">
+                          <a
+                            href={companyProfile?.website || "#"}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
                             {companyProfile?.website || "N/A"}
                           </a>
                         </div>
@@ -168,16 +195,36 @@ function RecruiterDashboardContent() {
             <div className="flex flex-col lg:flex-row gap-10">
               <div className="flex-1 flex flex-col justify-center items-center gap-6">
                 <div className="flex justify-center gap-12 flex-wrap">
-                  <Stat value={jobStats.totalJobs.toString()} label="Job Posts" color="#1C1C50" />
-                  <Stat value={jobStats.activeJobs.toString()} label="Active Jobs" color="#26B709" />
-                  <Stat value={jobStats.expiredJobs.toString()} label="Expired Jobs" color="#F52121" />
+                  <Stat
+                    value={jobStats.totalJobs.toString()}
+                    label="Job Posts"
+                    color="#1C1C50"
+                  />
+                  <Stat
+                    value={jobStats.activeJobs.toString()}
+                    label="Active Jobs"
+                    color="#26B709"
+                  />
+                  <Stat
+                    value={jobStats.expiredJobs.toString()}
+                    label="Expired Jobs"
+                    color="#F52121"
+                  />
                 </div>
                 <div className="flex justify-center gap-12 flex-wrap">
-                  <Stat value={jobStats.applications.toString()} label="Applications" color="#0C53DE" />
-                  <Stat value={jobStats.coins.toString()} label="Coins" color="#DD8D0E" />
+                  <Stat
+                    value={jobStats.applications.toString()}
+                    label="Applications"
+                    color="#0C53DE"
+                  />
+                  <Stat
+                    value={jobStats.coins.toString()}
+                    label="Coins"
+                    color="#DD8D0E"
+                  />
                 </div>
               </div>
-              
+
               {/* Notification */}
               <div className="flex-1 bg-neutral-light-60 rounded-2xl overflow-hidden">
                 <div className="flex flex-wrap justify-between px-4 py-2 bg-primary text-white">
@@ -191,13 +238,17 @@ function RecruiterDashboardContent() {
             </div>
             <div>
               <div className="flex flex-wrap justify-between bg-primary rounded-t-3xl px-6 py-2">
-                <div className=" text-accent-20 font-semibold text-xl">My Jobs</div>
+                <div className=" text-accent-20 font-semibold text-xl">
+                  My Jobs
+                </div>
                 <a href="/company/jobs">
-                  <span className="text-highlight-40 font-semibold">See All</span>
+                  <span className="text-highlight-40 font-semibold">
+                    See All
+                  </span>
                 </a>
               </div>
               <div className="bg-highlight-20 pb-6 rounded-b-3xl">
-                <div className="w-full grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-6 lg:px-20 py-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-6 lg:px-20 py-6">
                   {current.map((job) => (
                     <JobCard key={job.id} job={job} />
                   ))}
@@ -219,7 +270,7 @@ function RecruiterDashboardContent() {
 
 export default function RecruiterDashboardPage() {
   return (
-    <ProtectedRoute allowedRoles={['company']}>
+    <ProtectedRoute allowedRoles={["company"]}>
       <RecruiterDashboardContent />
     </ProtectedRoute>
   );
