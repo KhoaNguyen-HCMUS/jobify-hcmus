@@ -31,7 +31,7 @@ import { toast } from "react-toastify";
 import { getToken } from "../../utils/auth";
 import JobStatusBadge from "./jobStatusBadge";
 import { approveJob, rejectJob } from "../../services/admin";
-import { formatDateForDisplay } from "../../utils/dateUtils";
+import { formatDateForDisplay, formatDateForDisplayWithTime } from "../../utils/dateUtils";
 import { localToUTC } from "../../utils/timezoneUtils";
 import { renderTextWithLineBreaks } from "../../utils/textUtils";
 
@@ -722,6 +722,13 @@ export default function JobDetail({
           <div className="flex gap-2 items-center">
             <span className="text-primary-80 font-semibold">Status:</span>
             <JobStatusBadge status={job.status} />
+          </div>
+
+          <div className="flex gap-2 items-center">
+            <span className="text-primary-80 font-semibold">
+              Scheduled at:
+            </span>
+            <span className="text-primary-80">{formatDateForDisplayWithTime(job.scheduled_at)}</span>
           </div>
 
           <div className="flex gap-4 flex-wrap">

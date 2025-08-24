@@ -32,6 +32,27 @@ export const formatDateForDisplay = (date: string | null | undefined): string =>
   return "Not specified";
 };
 
+export const formatDateForDisplayWithTime = (date: string | null | undefined): string => {
+  if (!date) return "Not specified";
+  
+  if (typeof date === 'string') {
+    try {
+      const dateObj = new Date(date);
+      return dateObj.toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      });
+    } catch {
+      return date;
+    }
+  }
+  
+  return "Not specified";
+};
+
 export const getDaysAgo = (date: string | null | undefined): string => {
   if (!date) return "Unknown";
   
