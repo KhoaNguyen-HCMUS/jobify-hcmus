@@ -17,7 +17,6 @@ export default function OperatorCompanyPendingPage() {
   const [showRejectModal, setShowRejectModal] = useState(false);
   const [rejectReason, setRejectReason] = useState("");
 
-  // Fetch pending companies
   const fetchPendingCompanies = async () => {
     try {
       setLoading(true);
@@ -72,14 +71,15 @@ export default function OperatorCompanyPendingPage() {
     }
     
     try {
-      const response = await rejectCompany(selectedCompanyId, reason);
+      const moderator_notes = reason;
+      const response = await rejectCompany(selectedCompanyId, moderator_notes);
       if (response.success) {
         toast.success("Company rejected successfully!");
         setShowModal(false);
         setSelectedCompanyId(null);
         setRejectReason("");
         setShowRejectModal(false);
-        fetchPendingCompanies(); // Refresh the list
+        fetchPendingCompanies(); 
       } else {
         toast.error(response.message || "Failed to reject company");
       }
@@ -194,7 +194,7 @@ export default function OperatorCompanyPendingPage() {
                       </span>
                     </td>
                     <td className="w-4/15 border border-primary-60 p-2">
-                      <span className="line-clamp-1">-</span>
+                      <span className="line-clamp-1">{company?.moderator_notes }</span>
                     </td>
                   </tr>
                 ))
