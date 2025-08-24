@@ -19,6 +19,7 @@ export interface PendingCompany {
   created_at: string;
   updated_at: string;
   cover_id: string | null;
+  moderator_notes: string | null;
 }
 
 export interface PendingJob {
@@ -159,7 +160,7 @@ export const approveJob = async (jobId: string): Promise<{ success: boolean; mes
   }
 };
 
-export const rejectCompany = async (companyId: string, reason: string): Promise<{ success: boolean; message: string }> => {
+export const rejectCompany = async (companyId: string, moderator_notes: string): Promise<{ success: boolean; message: string }> => {
   try {
     const token = getToken();
     const response = await fetch(`${API_URL}/admin/companies/${companyId}/reject`, {
@@ -168,7 +169,7 @@ export const rejectCompany = async (companyId: string, reason: string): Promise<
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${token}`,
       },
-      body: JSON.stringify({ reason }),
+      body: JSON.stringify({ moderator_notes }),
     });
 
     const result = await response.json();

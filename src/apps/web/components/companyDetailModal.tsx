@@ -143,50 +143,56 @@ export default function CompanyDetailModal({
               </div>
             </div>
             <div className="flex flex-col gap-2">
-              <ModeratorNote />
-              <div className="flex flex-wrap gap-2">
+              {/* <ModeratorNote /> */}
+              <div className="flex gap-2">
                 <button
+                  className="bg-accent hover:bg-secondary text-neutral-light-20 px-6 py-2 rounded-full cursor-pointer"
                   onClick={onApprove}
-                  className="font-semibold bg-accent hover:bg-secondary cursor-pointer text-neutral-light-20 px-4 py-2 rounded-full"
                 >
-                  Approval
+                  Approve
                 </button>
                 <button
+                  className="bg-accent hover:bg-secondary text-neutral-light-20 px-6 py-2 rounded-full cursor-pointer"
                   onClick={() => setShowRejectModal(true)}
-                  className="font-semibold bg-primary-60 hover:bg-primary cursor-pointer text-neutral-light-20 px-4 py-2 rounded-full"
                 >
                   Reject
                 </button>
               </div>
+              {showRejectModal && (
+                <div className="flex flex-col gap-2 w-full mt-4">
+                  <label
+                    className="text-xl font-bold text-primary mb-1"
+                    htmlFor="reject-note"
+                  >
+                    Moderator's Note:
+                  </label>
+                  <textarea
+                    id="reject-note"
+                    className="w-full min-h-[100px] border border-primary-60 rounded-lg px-4 py-3 text-primary-80 focus:outline-none focus:ring-1 focus:ring-primary bg-white"
+                    placeholder="Enter moderator's note for rejection"
+                    value={rejectReason}
+                    onChange={(e) => setRejectReason(e.target.value)}
+                  />
+                  <div className="flex gap-4 mt-2">
+                    <button
+                      className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-2 rounded-full cursor-pointer font-semibold transition"
+                      onClick={() => onReject(rejectReason)}
+                    >
+                      Confirm Reject
+                    </button>
+                    <button
+                      className="bg-gray-400 hover:bg-gray-500 text-white px-8 py-2 rounded-full cursor-pointer font-semibold transition"
+                      onClick={() => setShowRejectModal(false)}
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </div>
       </div>
-
-      {/* Reject Modal */}
-      {showRejectModal && (
-        <div className="fixed inset-0 bg-primary/80 z-50 flex items-center justify-center">
-          <div className="w-2/5 bg-neutral-light rounded-md">
-            <div className="flex flex-col gap-2 mx-20 my-10 space-y-4">
-              <RejectReason value={rejectReason} onChange={setRejectReason} />
-              <div className="flex flex-wrap gap-2">
-                <button
-                  onClick={() => onReject(rejectReason)}
-                  className="bg-accent rounded-full hover:bg-secondary cursor-pointer text-neutral-light-20 px-4 py-2 font-semibold"
-                >
-                  Send
-                </button>
-                <button
-                  onClick={() => setShowRejectModal(false)}
-                  className="font-semibold rounded-full hover:bg-primary cursor-pointer bg-primary-60 text-neutral-light-20 px-4 py-2"
-                >
-                  Cancel
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

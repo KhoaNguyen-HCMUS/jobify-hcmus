@@ -22,6 +22,7 @@ export interface CompanyProfile {
   status: string;
   created_at: string;
   updated_at: string;
+  moderator_notes: string | null;
 }
 
 export interface CompanyProfileResponse {
