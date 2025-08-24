@@ -723,14 +723,14 @@ export default function JobDetail({
             <span className="text-primary-80 font-semibold">Status:</span>
             <JobStatusBadge status={job.status} />
           </div>
-
+          {job.status === "schedule" && (
           <div className="flex gap-2 items-center">
             <span className="text-primary-80 font-semibold">
               Scheduled at:
             </span>
             <span className="text-primary-80">{formatDateForDisplayWithTime(job.scheduled_at)}</span>
           </div>
-
+          )}
           <div className="flex gap-4 flex-wrap">
             <button
               onClick={handleEditClick}
