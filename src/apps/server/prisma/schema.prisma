@@ -45,22 +45,24 @@ model coin_transactions {
 
 model companies {
   id                String              @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-  name              String              @db.VarChar(255)
-  description       String
-  industry          String              @db.VarChar(100)
-  size              String              @db.VarChar(50)
-  website           String              @db.VarChar(255)
-  logo_url          String              @db.VarChar(500)
-  headquarters      String              @db.VarChar(255)
-  founded_year      Int
+  user_id           String              @unique @db.Uuid
+  company_name      String              @db.VarChar(255)
+  website           String?             @db.VarChar(255)
+  tax_code          String              @db.VarChar(50)
+  license_number    String              @db.VarChar(50)
+  phone_number      String?             @db.VarChar(20)
+  description       String?
+  address           String?             @db.VarChar(255)
+  industry          String?
+  size              String?             @db.VarChar(50)
+  logo_url          String?             @db.VarChar(500)
+  founded_year      Int?
   status            String              @db.VarChar(50)
-  created_by        String              @db.Uuid
   created_at        DateTime            @default(now()) @db.Timestamp(6)
   updated_at        DateTime            @default(now()) @db.Timestamp(6)
   coin_transactions coin_transactions[]
-  users             users               @relation(fields: [created_by], references: [id], onDelete: SetNull, onUpdate: NoAction)
+  users             users               @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
   company_wallets   company_wallets?
-  hr_profiles       hr_profiles[]
   job_posts         job_posts[]
 }
 
@@ -79,26 +81,34 @@ model currency_exchange_rates {
   updated_at DateTime @default(now()) @db.Timestamp(6)
 }
 
-model experiences_educations {
-  id                 String        @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-  user_profile_id    String        @db.Uuid
-  exp_company_name   String?       @db.VarChar(255)
-  exp_job_title      String?       @db.VarChar(255)
-  exp_description    String?
-  exp_start_date     DateTime?     @db.Date
-  exp_end_date       DateTime?     @db.Date
-  exp_is_current     Boolean?
-  exp_location       String?       @db.VarChar(255)
-  edu_institution    String?       @db.VarChar(255)
-  edu_degree         String?       @db.VarChar(255)
-  edu_field_of_study String?       @db.VarChar(255)
-  edu_start_date     DateTime?     @db.Date
-  edu_end_date       DateTime?     @db.Date
-  edu_grade          String?       @db.VarChar(50)
-  edu_description    String?
-  created_at         DateTime      @default(now()) @db.Timestamp(6)
-  updated_at         DateTime      @default(now()) @db.Timestamp(6)
-  user_profiles      user_profiles @relation(fields: [user_profile_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+model educations {
+  id              String        @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  user_profile_id String        @db.Uuid
+  institution     String?       @db.VarChar(255)
+  degree          String?       @db.VarChar(255)
+  field_of_study  String?       @db.VarChar(255)
+  start_date      DateTime?     @db.Date
+  end_date        DateTime?     @db.Date
+  grade           String?       @db.VarChar(50)
+  description     String?
+  created_at      DateTime      @default(now()) @db.Timestamp(6)
+  updated_at      DateTime      @default(now()) @db.Timestamp(6)
+  user_profiles   user_profiles @relation(fields: [user_profile_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+model experiences {
+  id              String        @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  user_profile_id String        @db.Uuid
+  company_name    String?       @db.VarChar(255)
+  job_title       String?       @db.VarChar(255)
+  description     String?
+  start_date      DateTime?     @db.Date
+  end_date        DateTime?     @db.Date
+  is_current      Boolean?
+  location        String?       @db.VarChar(255)
+  created_at      DateTime      @default(now()) @db.Timestamp(6)
+  updated_at      DateTime      @default(now()) @db.Timestamp(6)
+  user_profiles   user_profiles @relation(fields: [user_profile_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
 }
 
 model file_uploads {
@@ -117,19 +127,6 @@ model file_uploads {
   system_announcements system_announcements[]
 }
 
-model hr_profiles {
-  id                 String    @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-  user_id            String    @db.Uuid
-  company_id         String    @db.Uuid
-  job_title          String    @db.VarChar(255)
-  department         String    @db.VarChar(255)
-  is_primary_contact Boolean   @default(false)
-  created_at         DateTime  @default(now()) @db.Timestamp(6)
-  updated_at         DateTime  @default(now()) @db.Timestamp(6)
-  companies          companies @relation(fields: [company_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
-  users              users     @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
-}
-
 model job_applications {
   id                         String                       @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
   job_id                     String                       @db.Uuid
@@ -144,17 +141,6 @@ model job_applications {
   users                      users                        @relation(fields: [candidate_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
   job_posts                  job_posts                    @relation(fields: [job_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
   file_uploads               file_uploads?                @relation(fields: [resume_file_id], references: [id], onUpdate: NoAction)
-}
-
-model job_categories {
-  id                   String           @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-  name                 String           @unique @db.VarChar(100)
-  description          String
-  parent_id            String?          @db.Uuid
-  created_at           DateTime         @default(now()) @db.Timestamp(6)
-  job_categories       job_categories?  @relation("job_categoriesTojob_categories", fields: [parent_id], references: [id], onUpdate: NoAction)
-  other_job_categories job_categories[] @relation("job_categoriesTojob_categories")
-  job_posts            job_posts[]
 }
 
 model job_matches {
@@ -174,51 +160,41 @@ model job_posts {
   company_id                         String             @db.Uuid
   created_by                         String             @db.Uuid
   title                              String             @db.VarChar(255)
+  province                           String             @db.VarChar(100)
+  ward                               String             @db.VarChar(100)
+  work_place                         String             @db.VarChar(100)
+  salary_min                         Decimal            @db.Decimal
+  salary_max                         Decimal            @db.Decimal
+  is_salary_negotiable               Boolean            @default(false)
+  experience_level                   String             @db.VarChar(50)
+  position                           String             @db.VarChar(100)
+  education_level                    String             @db.VarChar(50)
+  job_type                           String             @db.VarChar(50)
+  number_of_openings                 Int
+  deadline                           DateTime           @db.Date
+  working_hours                      String             @db.VarChar(100)
   description                        String
   requirements                       String
   responsibilities                   String
   benefits                           String
-  category_id                        String             @db.Uuid
-  job_type                           String             @db.VarChar(50)
-  employment_type                    String             @db.VarChar(50)
-  experience_level                   String             @db.VarChar(50)
-  location                           String             @db.VarChar(255)
-  salary_min                         Decimal            @db.Decimal
-  salary_max                         Decimal            @db.Decimal
+  industry_id                        String             @db.Uuid
   currency                           String             @db.VarChar(10)
-  is_salary_negotiable               Boolean            @default(false)
-  application_deadline               DateTime           @db.Date
   status                             String             @db.VarChar(50)
   cost_coin                          Int
-  views_count                        Int                @default(0)
   applications_count                 Int                @default(0)
-  saved_count                        Int                @default(0)
   moderator_notes                    String?
   approved_by                        String?            @db.Uuid
   approved_at                        DateTime?          @db.Timestamp(6)
   created_at                         DateTime           @default(now()) @db.Timestamp(6)
   updated_at                         DateTime           @default(now()) @db.Timestamp(6)
-  province                           String?            @db.VarChar(100)
-  ward                               String?            @db.VarChar(100)
-  address_detail                     String?            @db.VarChar(255)
+  skills                             String
   job_applications                   job_applications[]
   job_matches                        job_matches[]
   users_job_posts_approved_byTousers users?             @relation("job_posts_approved_byTousers", fields: [approved_by], references: [id], onUpdate: NoAction)
-  job_categories                     job_categories     @relation(fields: [category_id], references: [id], onDelete: SetNull, onUpdate: NoAction)
   companies                          companies          @relation(fields: [company_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
   users_job_posts_created_byTousers  users              @relation("job_posts_created_byTousers", fields: [created_by], references: [id], onDelete: SetNull, onUpdate: NoAction)
-  job_skills                         job_skills[]
+  industries                         industries         @relation(fields: [industry_id], references: [id], onDelete: SetNull, onUpdate: NoAction)
   saved_jobs                         saved_jobs[]
-}
-
-model job_skills {
-  id          String    @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-  job_id      String    @db.Uuid
-  skill_id    String    @db.Uuid
-  is_required Boolean   @default(true)
-  created_at  DateTime  @default(now()) @db.Timestamp(6)
-  job_posts   job_posts @relation(fields: [job_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
-  skills      skills    @relation(fields: [skill_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
 }
 
 model notifications {
@@ -257,24 +233,15 @@ model saved_jobs {
   users      users     @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
 }
 
-model skills {
-  id          String        @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-  name        String        @unique @db.VarChar(100)
-  category    String        @db.VarChar(100)
-  created_at  DateTime      @default(now()) @db.Timestamp(6)
-  job_skills  job_skills[]
-  user_skills user_skills[]
-}
-
 model system_announcements {
   id              String        @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
   title           String        @db.VarChar(255)
   content         String
+  attachment_id   String?       @db.Uuid
   target_audience String        @db.VarChar(100)
   created_by      String        @db.Uuid
   scheduled_at    DateTime?     @db.Timestamp(6)
   created_at      DateTime      @default(now()) @db.Timestamp(6)
-  attachment_id   String?       @db.Uuid
   file_uploads    file_uploads? @relation(fields: [attachment_id], references: [id], onUpdate: NoAction)
   users           users         @relation(fields: [created_by], references: [id], onDelete: SetNull, onUpdate: NoAction)
 }
@@ -293,33 +260,27 @@ model system_settings {
 }
 
 model user_profiles {
-  id                     String                   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-  user_id                String                   @unique @db.Uuid
-  first_name             String                   @db.VarChar(100)
-  last_name              String                   @db.VarChar(100)
-  phone                  String?                  @db.VarChar(20)
-  profile_photo_url      String?                  @db.VarChar(500)
-  bio                    String?
-  location               String?                  @db.VarChar(255)
-  website                String?                  @db.VarChar(255)
-  linkedin_url           String?                  @db.VarChar(255)
-  github_url             String?                  @db.VarChar(255)
-  created_at             DateTime                 @default(now()) @db.Timestamp(6)
-  updated_at             DateTime                 @default(now()) @db.Timestamp(6)
-  gender                 String?                  @db.VarChar(20)
-  industry               String?                  @db.VarChar(100)
-  experiences_educations experiences_educations[]
-  users                  users                    @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
-}
-
-model user_skills {
-  id                String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-  user_id           String   @db.Uuid
-  skill_id          String   @db.Uuid
-  proficiency_level Int
-  created_at        DateTime @default(now()) @db.Timestamp(6)
-  skills            skills   @relation(fields: [skill_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
-  users             users    @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  id                String        @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  user_id           String        @unique @db.Uuid
+  full_name         String        @default("") @db.VarChar(200)
+  gender            String?       @db.VarChar(20)
+  date_of_birth     DateTime?     @db.Date
+  phone             String?       @db.VarChar(20)
+  profile_photo_url String?       @db.VarChar(500)
+  bio               String?
+  province          String?       @db.VarChar(100)
+  ward              String?       @db.VarChar(100)
+  address_detail    String?       @db.VarChar(255)
+  industry          String?
+  website           String?       @db.VarChar(255)
+  linkedin_url      String?       @db.VarChar(255)
+  github_url        String?       @db.VarChar(255)
+  created_at        DateTime      @default(now()) @db.Timestamp(6)
+  updated_at        DateTime      @default(now()) @db.Timestamp(6)
+  skills            String?
+  educations        educations[]
+  experiences       experiences[]
+  users             users         @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
 }
 
 model users {
@@ -337,9 +298,8 @@ model users {
   updated_at                             DateTime                     @default(now()) @db.Timestamp(6)
   application_status_history             application_status_history[]
   audit_logs                             audit_logs[]
-  companies                              companies[]
+  companies                              companies?
   file_uploads                           file_uploads[]
-  hr_profiles                            hr_profiles[]
   job_applications                       job_applications[]
   job_matches                            job_matches[]
   job_posts_job_posts_approved_byTousers job_posts[]                  @relation("job_posts_approved_byTousers")
@@ -351,5 +311,16 @@ model users {
   system_announcements                   system_announcements[]
   system_settings                        system_settings[]
   user_profiles                          user_profiles?
-  user_skills                            user_skills[]
+}
+
+model industries {
+  id               String       @id(map: "job_categories_pkey") @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  name             String       @unique(map: "job_categories_name_key") @db.VarChar(100)
+  description      String
+  parent_id        String?      @db.Uuid
+  created_at       DateTime     @default(now()) @db.Timestamp(6)
+  status           String       @db.VarChar(50)
+  industries       industries?  @relation("industriesToindustries", fields: [parent_id], references: [id], onUpdate: NoAction, map: "job_categories_parent_id_fkey")
+  other_industries industries[] @relation("industriesToindustries")
+  job_posts        job_posts[]
 }

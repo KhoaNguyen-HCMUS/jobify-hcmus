@@ -11,13 +11,23 @@ app.use(express.json());
 
 // Routes
 const authRoutes = require('./routes/auth.routes');
-app.use('/auth', authRoutes);
+app.use('/api/auth', authRoutes);
 const profileRoutes = require('./routes/profile.routes');
-app.use('/profile', profileRoutes);
+app.use('/api/profile', profileRoutes);
 const jobRoutes = require('./routes/job.routes');
-app.use('/jobs', jobRoutes);
+app.use('/api/jobs', jobRoutes);
 const applicationRoutes = require('./routes/application.routes');
-app.use('/applications', applicationRoutes);
+app.use('/api/applications', applicationRoutes);
+const companyRoutes = require('./routes/company.routes');
+app.use('/api/company', companyRoutes);
+const adminRoutes = require('./routes/admin.routes');
+app.use('/api/admin', adminRoutes);
+const notificationRoutes = require('./routes/notification.routes');
+app.use('/api/notifications', notificationRoutes);
+const announcementRoutes = require('./routes/announcement.routes');
+app.use('/api/announcements', announcementRoutes);
+const reportRoutes = require('./routes/report.routes');
+app.use('/api/reports', reportRoutes);
 
 // Health check route
 app.get('/api/health', (req, res) => {

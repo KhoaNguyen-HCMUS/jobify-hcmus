@@ -1,21 +1,23 @@
 const express = require('express');
 const router = express.Router();
 const jobController = require('../controllers/job.controller');
+const applicationController = require('../controllers/application.controller');
+const authenticateToken = require('../middlewares/auth.middleware');
+const authorizeRoles = require('../middlewares/checkRole.middleware');
 
 router.get('/', jobController.getJobs);
+router.post('/', authenticateToken, authorizeRoles(['company']), jobController.createJob);
+router.get('/saved', authenticateToken, jobController.getSavedJobs);
+router.get('/recommended', authenticateToken, jobController.getRecommendedJobs);
+
 router.get('/:id', jobController.getJobDetail);
-router.post('/', jobController.createJob);
-router.put('/:id', jobController.updateJob);
-router.delete('/:id', jobController.deleteJob);
+router.put('/:id', authenticateToken, authorizeRoles(['company', 'admin', 'moderator']), jobController.updateJob);
+router.delete('/:id', authenticateToken, authorizeRoles(['company', 'admin', 'moderator']), jobController.deleteJob);
+router.post('/:id/save', authenticateToken, jobController.saveJob);
+router.delete('/:id/save', authenticateToken, jobController.unsaveJob);
 
-router.post('/:id/apply', jobController.applyJob);
-router.delete('/:id/apply', jobController.cancelApplication);
-router.get('/:id/applications', jobController.getJobApplications);
-
-router.post('/:id/save', jobController.saveJob);
-router.delete('/:id/save', jobController.unsaveJob);
-router.get('/saved', jobController.getSavedJobs);
-
-router.get('/recommended', jobController.getRecommendedJobs);
+router.post('/:id/apply', authenticateToken, applicationController.applyJob);
+router.delete('/:id/apply', authenticateToken, applicationController.cancelApplication);
+router.get('/:id/applications', authenticateToken, applicationController.getJobApplications);
 
 module.exports = router;
