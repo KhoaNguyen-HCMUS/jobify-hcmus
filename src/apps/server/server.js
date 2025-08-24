@@ -16,6 +16,8 @@ const profileRoutes = require('./routes/profile.routes');
 app.use('/api/profile', profileRoutes);
 const jobRoutes = require('./routes/job.routes');
 app.use('/api/jobs', jobRoutes);
+const industryRoutes = require('./routes/industry.routes');
+app.use('/api/industries', industryRoutes);
 const applicationRoutes = require('./routes/application.routes');
 app.use('/api/applications', applicationRoutes);
 const companyRoutes = require('./routes/company.routes');
@@ -28,6 +30,8 @@ const announcementRoutes = require('./routes/announcement.routes');
 app.use('/api/announcements', announcementRoutes);
 const reportRoutes = require('./routes/report.routes');
 app.use('/api/reports', reportRoutes);
+const recommendationRoutes = require('./routes/recommendation.routes');
+app.use('/api/recommendations', recommendationRoutes);
 
 // Health check route
 app.get('/api/health', (req, res) => {

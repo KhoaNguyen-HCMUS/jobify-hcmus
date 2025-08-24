@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const reportController = require('../controllers/report.controller');
-const authenticateToken = require('../middlewares/auth.middleware');
+const { authenticateToken } = require('../middlewares/auth.middleware');
 const authorizeRoles = require('../middlewares/checkRole.middleware');
 
 router.post('/', authenticateToken, authorizeRoles(['candidate']), reportController.createReport);

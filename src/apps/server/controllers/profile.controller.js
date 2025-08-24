@@ -1,15 +1,18 @@
 const prisma = require('../prisma/client');
 const { successResponse, errorResponse } = require('../utils/response');
+const { uploadFile } = require('../utils/supabaseStorage');
+const { generateSignedUrl } = require('../utils/supabaseUrl');
 
-exports.getMyProfile = async (req, res) => {
+exports.getCandidateProfile = async (req, res) => {
+  const { user } = req;
+
   try {
-    const userId = req.user.id;
-
     const profile = await prisma.user_profiles.findUnique({
-      where: { user_id: userId },
+      where: { user_id: user.id },
       include: {
         experiences: true,
         educations: true,
+        file_uploads: true,
       },
     });
 
@@ -17,27 +20,43 @@ exports.getMyProfile = async (req, res) => {
       return errorResponse(res, 'Profile not found', [], 404);
     }
 
-    return successResponse(res, 'Profile fetched successfully', profile);
+    const { file_uploads, ...restProfile } = profile;
+
+    let profile_photo_url = null;
+    if (file_uploads) {
+      profile_photo_url = await generateSignedUrl(file_uploads.file_path);
+    }
+
+    return successResponse(res, 'Profile fetched successfully', {
+      profile: {
+        ...restProfile,
+        email: user.email,
+        profile_photo_url,
+      },
+    });
+
   } catch (error) {
-    console.error(error);
+    console.error('Get Candidate Profile Error:', error);
     return errorResponse(res, 'Failed to fetch profile', [error.message], 500);
   }
 };
 
-exports.updateMyProfile = async (req, res) => {
+exports.updateCandidateProfile = async (req, res) => {
+  const userId = req.user.id;
+
   try {
-    const userId = req.user.id;
     const {
       full_name,
       gender,
       date_of_birth,
       phone,
-      profile_photo_url,
+      profile_photo_id,
       bio,
       province,
       ward,
       address_detail,
       industry,
+      skills,
       website,
       linkedin_url,
       github_url,
@@ -61,12 +80,13 @@ exports.updateMyProfile = async (req, res) => {
       gender,
       date_of_birth: parsedDOB,
       phone,
-      profile_photo_url,
+      profile_photo_id,
       bio,
       province,
       ward,
       address_detail,
       industry,
+      skills,
       website,
       linkedin_url,
       github_url,
@@ -111,10 +131,10 @@ exports.updateMyProfile = async (req, res) => {
   }
 };
 
-exports.getCompanyProfiles = async (req, res) => {
-  try {
-    const userId = req.user.id;
+exports.getCompanyProfile = async (req, res) => {
+  const userId = req.user.id;
 
+  try {
     const companyProfiles = await prisma.companies.findUnique({
       where: { user_id: userId }
     });
@@ -122,7 +142,10 @@ exports.getCompanyProfiles = async (req, res) => {
       return errorResponse(res, 'Company profile not found', [], 404);
     }
 
-    return successResponse(res, 'Company profiles fetched successfully', companyProfiles);
+    const email = req.user.email;
+    companyProfiles.email = email;
+
+    return successResponse(res, 'Company profiles fetched successfully', { companyProfiles });
   } catch (error) {
     console.error(error);
     return errorResponse(res, 'Failed to fetch company profiles', [error.message], 500);
@@ -130,9 +153,10 @@ exports.getCompanyProfiles = async (req, res) => {
 };
 
 exports.updateCompanyProfile = async (req, res) => {
+  const userId = req.user.id;
+
   try {
-    const userId = req.user.id;
-    const { 
+    const {
       company_name,
       website,
       tax_code,
@@ -142,22 +166,21 @@ exports.updateCompanyProfile = async (req, res) => {
       address,
       industry,
       size,
-      logo_url,
-      founded_year} = req.body;
-    
-    const companyProfile = await prisma.companies.findUnique({
+      logo_id,
+      cover_id,
+      founded_year,
+    } = req.body;
+
+    const company = await prisma.companies.findUnique({
       where: { user_id: userId },
-      select: {
-        id: true,
-        user_id: true,
-      }
+      select: { id: true },
     });
 
-    if (!companyProfile) {
+    if (!company) {
       return errorResponse(res, 'Company profile not found', [], 404);
     }
 
-    await prisma.companies.update({
+    const updateCompanyPromise = prisma.companies.update({
       where: { user_id: userId },
       data: {
         company_name,
@@ -169,12 +192,37 @@ exports.updateCompanyProfile = async (req, res) => {
         address,
         industry,
         size,
-        logo_url,
+        logo_id,
+        cover_id,
         founded_year,
         status: 'pending',
         updated_at: new Date(),
-      }
+      },
     });
+
+    const activeJobs = await prisma.job_posts.findMany({
+      where: {
+        created_by: userId,
+        status: 'active',
+      },
+      select: { id: true },
+    });
+
+    let updateJobsPromise = Promise.resolve();
+    if (activeJobs.length > 0) {
+      const jobIds = activeJobs.map(job => job.id);
+
+      updateJobsPromise = prisma.job_posts.updateMany({
+        where: { id: { in: jobIds } },
+        data: {
+          prev_status: 'active',
+          status: 'draft',
+          updated_at: new Date(),
+        },
+      });
+    }
+
+    await Promise.all([updateCompanyPromise, updateJobsPromise]);
 
     return successResponse(res, 'Company profile updated successfully');
   } catch (error) {
@@ -183,25 +231,58 @@ exports.updateCompanyProfile = async (req, res) => {
   }
 };
 
-exports.getProfileById = async (req, res) => {
-  try {
-    const { id } = req.params;
+exports.getCandidateProfileById = async (req, res) => {
+  const { id } = req.params;
 
+  try {
     const profile = await prisma.user_profiles.findUnique({
       where: { user_id: id },
       include: {
         experiences: true,
-        educations: true
+        educations: true,
+        file_uploads: true,
+        users: {
+          select: { email: true },
+        },
       },
     });
 
     if (!profile) {
-      return errorResponse(res, 'Profile not found', [], 404);
+      return errorResponse(res, 'Candidate profile not found', [], 404);
     }
 
-    return successResponse(res, 'Profile fetched successfully', profile);
+    const { file_uploads, users, ...restProfile } = profile;
+    let profile_photo_url = null;
+    if (file_uploads) {
+      profile_photo_url = await generateSignedUrl(file_uploads.file_path);
+    }
+
+    return successResponse(res, 'Candidate profile fetched successfully', {
+      profile: {
+        ...restProfile,   
+        email: profile.users.email,
+        profile_photo_url,
+      },
+    });
   } catch (error) {
     console.error(error);
-    return errorResponse(res, 'Failed to fetch profile', [error.message], 500);
+    return errorResponse(res, 'Failed to fetch candidate profile', [error.message], 500);
+  }
+};
+
+exports.getCompanyProfileById = async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const companyProfile = await prisma.companies.findUnique({ where: { id }, });
+
+    if (!companyProfile) {
+      return errorResponse(res, 'Company profile not found', [], 404);
+    }
+
+    return successResponse(res, 'Company profile fetched successfully', companyProfile);
+  } catch (error) {
+    console.error(error);
+    return errorResponse(res, 'Failed to fetch company profile', [error.message], 500);
   }
 };
