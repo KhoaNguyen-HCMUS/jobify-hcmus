@@ -42,7 +42,6 @@ function RecommendedPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   
-  // Get filters from URL params
   const filters = {
     page: parseInt(searchParams.get("page") || "1"),
     limit: 10,
@@ -105,6 +104,9 @@ function RecommendedPageContent() {
       setLoading(true);
       setError(null);
       
+      generateRecommendations().catch(err => {
+        console.error('Background generate failed:', err);
+      });
       const jobsResponse = await getRecommendedJobs(filters);
       
       if (jobsResponse.success && jobsResponse.data && jobsResponse.data.length > 0) {
@@ -117,26 +119,7 @@ function RecommendedPageContent() {
           });
         }
       } else {
-        const generateResponse = await generateRecommendations();
-        
-        if (generateResponse.success) {
-          const newJobsResponse = await getRecommendedJobs(filters);
-          
-          if (newJobsResponse.success && newJobsResponse.data && newJobsResponse.data.length > 0) {
-            setJobs(newJobsResponse.data);
-            if (newJobsResponse.pagination) {
-              setPagination({
-                currentPage: newJobsResponse.pagination.page,
-                totalPages: newJobsResponse.pagination.totalPages,
-                hasNextPage: newJobsResponse.pagination.hasNextPage,
-              });
-            }
-          } else {
-            setJobs([]);
-          }
-        } else {
-          setError(generateResponse.message || 'Could not generate job recommendations');
-        }
+        setJobs([]);
       }
     } catch (err) {
       setError('Network connection error');
