@@ -66,8 +66,18 @@ function CandidateProfileContent() {
     );
   }
 
-  const skills = profile.skills ? profile.skills.split(',').map(skill => ({ skill: skill.trim() })).filter(skill => skill.skill) : [];
-  const industries = profile.industry ? profile.industry.split(',').map(industry => industry.trim()).filter(industry => industry) : [];
+  const skills = profile.skills
+    ? profile.skills
+        .split(",")
+        .map((skill) => ({ skill: skill.trim() }))
+        .filter((skill) => skill.skill)
+    : [];
+  const industries = profile.industry
+    ? profile.industry
+        .split(",")
+        .map((industry) => industry.trim())
+        .filter((industry) => industry)
+    : [];
 
   return (
     <div className="w-full h-full bg-neutral-light-60">
@@ -97,13 +107,13 @@ function CandidateProfileContent() {
             </div>
           </div>
           <div className="flex flex-col gap-2">
-            <b className="text-primary">Introduce yourself:</b>
+            <b className="text-primary text-xl">Introduce yourself:</b>
             <span className="text-primary-80">
               {profile.bio || "No bio available"}
             </span>
           </div>
           <div className="flex flex-col gap-2">
-            <b className="text-primary">Location detail:</b>
+            <b className="text-primary text-xl">Location detail:</b>
             <div className="flex flex-wrap gap-2 text-primary-80">
               <MapPin className="w-4 h-4" />
               <span className="flex justify-between">
@@ -125,14 +135,16 @@ function CandidateProfileContent() {
                         <Skills key={idx} skill={industry} />
                       ))
                     ) : (
-                      <span className="text-primary-60">No industry specified</span>
+                      <span className="text-primary-60">
+                        No industry specified
+                      </span>
                     )}
                   </div>
                 </div>
               </div>
-              <a 
-                href={profile.github_url} 
-                target="_blank" 
+              <a
+                href={profile.github_url}
+                target="_blank"
                 rel="noopener noreferrer"
                 title="Visit GitHub profile"
                 aria-label="Visit GitHub profile"
@@ -163,9 +175,9 @@ function CandidateProfileContent() {
               </div>
             </div>
             <div className="flex-1 flex flex-col gap-2">
-              <a 
-                href={profile.linkedin_url} 
-                target="_blank" 
+              <a
+                href={profile.linkedin_url}
+                target="_blank"
                 rel="noopener noreferrer"
                 title="Visit LinkedIn profile"
                 aria-label="Visit LinkedIn profile"
@@ -179,12 +191,12 @@ function CandidateProfileContent() {
             </div>
           </div>
 
-          <div className="flex flex-wrap gap-8">
+          <div className="flex flex-wrap">
             <div className="flex-1">
-              <h2 className="text-xl font-bold text-primary mb-4">
+              <h2 className="text-xl font-bold text-primary mb-2">
                 Work Experience
               </h2>
-              <div className="space-y-4">
+              <div className="space-y-4 pr-2">
                 {profile.experiences && profile.experiences.length > 0 ? (
                   profile.experiences.map((exp, idx) => (
                     <div key={idx} className="mb-4">
@@ -234,7 +246,7 @@ function CandidateProfileContent() {
             </div>
 
             <div className="flex-1">
-              <h2 className="text-xl font-bold text-primary mb-4">Education</h2>
+              <h2 className="text-xl font-bold text-primary mb-2">Education</h2>
               <div className="space-y-4">
                 {profile.educations && profile.educations.length > 0 ? (
                   profile.educations.map((edu, idx) => (

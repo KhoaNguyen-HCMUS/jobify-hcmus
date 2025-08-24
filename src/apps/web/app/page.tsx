@@ -7,18 +7,18 @@ import { Suspense } from "react";
 export default function HomePage() {
   return (
     <div className="w-full min-h-screen bg-accent-40">
-      <div className="mb-10">
-        <h1 className="font-bold text-7xl text-primary ml-16 py-10">
+      <div className="mb-6">
+        <h1 className="font-bold text-5xl text-primary ml-16 py-6">
           Find Opportunities <br /> That Fit You Best!
         </h1>
-        <p className="text-2xl text-secondary ml-16">
+        <p className="text-xl text-secondary mx-16">
           From Startup Roles to Global Careers - Lat's Build Your Future
           Together.
         </p>
       </div>
       <div>
-        <div className="mx-16 mb-16">
-          <Suspense fallback={<div />}> 
+        <div className="mx-16 mb-10">
+          <Suspense fallback={<div />}>
             <KeywordSearch />
           </Suspense>
         </div>
@@ -35,7 +35,7 @@ export default function HomePage() {
           <FeaturedJob />
         </div>
         <div className="bg-accent-20">
-          <h2 className="font-bold text-4xl text-neutral-light-20 pl-10 py-6 w-full bg-primary">
+          <h2 className="font-bold text-3xl text-neutral-light-20 pl-10 py-2 w-full bg-primary">
             <i>Top Outstanding Industries</i>
           </h2>
           <CategoryGrid />

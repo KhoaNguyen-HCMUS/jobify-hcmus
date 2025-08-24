@@ -16,11 +16,13 @@ export default function CategoryGrid() {
         const response = await getAllIndustries();
         if (response.success && response.data) {
           // Get only parent industries (parent_id is null)
-          const parentIndustries = response.data.filter(industry => !industry.parent_id);
+          const parentIndustries = response.data.filter(
+            (industry) => !industry.parent_id
+          );
           setIndustries(parentIndustries);
         }
       } catch (error) {
-        console.error('Failed to fetch industries:', error);
+        console.error("Failed to fetch industries:", error);
       } finally {
         setLoading(false);
       }
@@ -41,13 +43,10 @@ export default function CategoryGrid() {
 
   return (
     <div className="bg-highlight-20">
-      <div className="mx-7">
+      <div className="mx-6">
         <div className="w-full grid grid-cols-1 md:grid-cols-4 gap-4 text-center">
           {current.map((industry: Industry) => (
-            <CategoryCard 
-              key={industry.id} 
-              category={industry} 
-            />
+            <CategoryCard key={industry.id} category={industry} />
           ))}
         </div>
         <div className="py-4">
