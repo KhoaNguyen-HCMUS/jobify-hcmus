@@ -67,6 +67,7 @@ exports.approveCompany = async (req, res) => {
       },
       data: {
         status: 'active',
+        moderator_notes: null,
         updated_at: new Date(),
         prev_status: null, 
       },

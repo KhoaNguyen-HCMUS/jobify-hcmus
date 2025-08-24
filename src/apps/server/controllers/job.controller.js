@@ -494,7 +494,7 @@ exports.getSavedJobs = async (req, res) => {
 
   try {
     const page = parseInt(req.query.page) || 1;
-    const limit = 10; 
+    const limit = parseInt(req.query.limit) || 10; 
     const offset = (page - 1) * limit;
 
     const totalSavedJobs = await prisma.saved_jobs.count({ 
@@ -549,7 +549,7 @@ exports.getRecommendedJobs = async (req, res) => {
 
   try {
     const page = parseInt(req.query.page) || 1;
-    const limit = 10;
+    const limit = parseInt(req.query.limit) || 10;
     const offset = (page - 1) * limit;
 
     const totalRecommendedJobs = await prisma.job_matches.count({
@@ -616,7 +616,7 @@ exports.getAppliedJobs = async (req, res) => {
 
   try {
     const page = parseInt(req.query.page) || 1;
-    const limit = 10;
+    const limit = parseInt(req.query.limit) || 10;
     const offset = (page - 1) * limit;
 
     const totalAppliedJobs = await prisma.job_applications.count({
