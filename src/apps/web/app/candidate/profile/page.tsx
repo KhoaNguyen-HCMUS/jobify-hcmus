@@ -279,7 +279,9 @@ function CandidateProfileContent() {
                           {edu.field_of_study && (
                             <li>Field of Study: {edu.field_of_study}</li>
                           )}
-                          {edu.description && <li>{edu.description}</li>}
+                          {edu.description.split("\n").map((line, i) => (
+                            <li key={i}>{line.trim()}</li>
+                          ))}
                         </ul>
                       </div>
                     </div>

@@ -101,7 +101,7 @@ function RecruiterJobsContent() {
             className="border-2 border-secondary text-secondary font-semibold rounded-full flex items-center px-4 hover:bg-secondary hover:text-accent-20 transition cursor-pointer"
           >
             <Plus size={24} />
-            <span>Post new job</span>
+            <span>Post New Job</span>
           </a>
           <KeyWord />
         </div>
