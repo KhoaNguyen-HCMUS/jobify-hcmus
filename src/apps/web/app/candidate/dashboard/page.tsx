@@ -1,5 +1,12 @@
 "use client";
-import { FilePenLine, Mail, Phone, MapPin, Bookmark, Briefcase } from "lucide-react";
+import {
+  FilePenLine,
+  Mail,
+  Phone,
+  MapPin,
+  Bookmark,
+  Briefcase,
+} from "lucide-react";
 import Notification from "../../../components/notification";
 import JobCard from "../../../components/job/jobCard";
 import usePagination from "../../../hooks/usePagination";
@@ -9,9 +16,18 @@ import ProtectedRoute from "../../../components/ProtectedRoute";
 import { getProfile, Profile } from "../../../services/candidateProfile";
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
-import { getSavedJobs, getAppliedJobs, Job, AppliedJob } from "../../../services/jobs";
+import {
+  getSavedJobs,
+  getAppliedJobs,
+  Job,
+  AppliedJob,
+} from "../../../services/jobs";
 
-const transformJobForCard = (job: Job, isSaved: boolean = false, isApplied: boolean = false) => ({
+const transformJobForCard = (
+  job: Job,
+  isSaved: boolean = false,
+  isApplied: boolean = false
+) => ({
   id: job.id,
   title: job.title,
   company_name: job.company_name || null,
@@ -19,8 +35,8 @@ const transformJobForCard = (job: Job, isSaved: boolean = false, isApplied: bool
   salary_max: job.salary_max,
   currency: job.currency,
   province: job.province,
-  logo: "/logo.png", 
-  name: job.title, 
+  logo: "/logo.png",
+  name: job.title,
   status: job.status,
   created_at: new Date(job.created_at),
   is_saved: isSaved,
@@ -33,10 +49,10 @@ const transformAppliedJobForCard = (appliedJob: AppliedJob) => ({
   company_name: appliedJob.company_name || null,
   salary_min: appliedJob.salary_min,
   salary_max: appliedJob.salary_max,
-  currency: appliedJob.currency, 
+  currency: appliedJob.currency,
   province: appliedJob.province,
-  logo: "/logo.png", 
-  name: appliedJob.title, 
+  logo: "/logo.png",
+  name: appliedJob.title,
   status: appliedJob.status,
   created_at: new Date(),
   is_saved: false,
@@ -55,20 +71,20 @@ function CandidateDashboardContent() {
   const [appliedJobsError, setAppliedJobsError] = useState<string | null>(null);
 
   // Pagination hooks
-  const { 
-    page: savedJobsPage, 
-    maxPage: savedJobsMaxPage, 
-    current: savedJobsCurrent, 
-    next: savedJobsNext, 
-    prev: savedJobsPrev 
+  const {
+    page: savedJobsPage,
+    maxPage: savedJobsMaxPage,
+    current: savedJobsCurrent,
+    next: savedJobsNext,
+    prev: savedJobsPrev,
   } = usePagination(savedJobs, 3);
 
-  const { 
-    page: appliedJobsPage, 
-    maxPage: appliedJobsMaxPage, 
-    current: appliedJobsCurrent, 
-    next: appliedJobsNext, 
-    prev: appliedJobsPrev 
+  const {
+    page: appliedJobsPage,
+    maxPage: appliedJobsMaxPage,
+    current: appliedJobsCurrent,
+    next: appliedJobsNext,
+    prev: appliedJobsPrev,
   } = usePagination(appliedJobs, 3);
 
   const fetchProfile = async () => {
@@ -78,10 +94,10 @@ function CandidateDashboardContent() {
       if (response.success && response.data?.profile) {
         setProfile(response.data.profile);
       } else {
-        toast.error(response.message || 'Failed to load profile');
+        toast.error(response.message || "Failed to load profile");
       }
     } catch (error) {
-      toast.error('Error loading profile data');
+      toast.error("Error loading profile data");
     } finally {
       setLoading(false);
     }
@@ -91,21 +107,22 @@ function CandidateDashboardContent() {
     try {
       setSavedJobsLoading(true);
       const response = await getSavedJobs();
-      
+
       if (response.success && response.data) {
-        const sortedJobs = response.data.sort((a, b) => 
-          new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+        const sortedJobs = response.data.sort(
+          (a, b) =>
+            new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
         );
         setSavedJobs(sortedJobs);
       } else {
-        if (response.message === 'Authentication required') {
-          setSavedJobsError('Please login to view saved jobs');
+        if (response.message === "Authentication required") {
+          setSavedJobsError("Please login to view saved jobs");
         } else {
-          setSavedJobsError(response.message || 'Failed to fetch saved jobs');
+          setSavedJobsError(response.message || "Failed to fetch saved jobs");
         }
       }
     } catch (error) {
-      setSavedJobsError('Network error occurred');
+      setSavedJobsError("Network error occurred");
     } finally {
       setSavedJobsLoading(false);
     }
@@ -115,22 +132,24 @@ function CandidateDashboardContent() {
     try {
       setAppliedJobsLoading(true);
       const response = await getAppliedJobs();
-      
+
       if (response.success && response.data) {
         // Sort by application_id (newest first) since we don't have created_at
-        const sortedJobs = response.data.sort((a, b) => 
+        const sortedJobs = response.data.sort((a, b) =>
           b.application_id.localeCompare(a.application_id)
         );
         setAppliedJobs(sortedJobs);
       } else {
-        if (response.message === 'Authentication required') {
-          setAppliedJobsError('Please login to view applied jobs');
+        if (response.message === "Authentication required") {
+          setAppliedJobsError("Please login to view applied jobs");
         } else {
-          setAppliedJobsError(response.message || 'Failed to fetch applied jobs');
+          setAppliedJobsError(
+            response.message || "Failed to fetch applied jobs"
+          );
         }
       }
     } catch (error) {
-      setAppliedJobsError('Network error occurred');
+      setAppliedJobsError("Network error occurred");
     } finally {
       setAppliedJobsLoading(false);
     }
@@ -158,7 +177,7 @@ function CandidateDashboardContent() {
             <div className="flex flex-wrap">
               <div className="p-4">
                 <img
-                  src={profile?.profile_photo_url || "/avt.jpg"}
+                  src={profile?.profile_photo_url || "/avt_new.jpg"}
                   alt={profile?.full_name || "Profile"}
                   className="w-40 h-44 object-contain rounded-2xl"
                 />
@@ -178,7 +197,11 @@ function CandidateDashboardContent() {
                   </span>
                   <span className="flex gap-2 text-primary">
                     <MapPin size={24} />
-                    <span>{profile?.province && profile?.ward ? `${profile.province}, ${profile.ward}` : "Not updated"}</span>
+                    <span>
+                      {profile?.province && profile?.ward
+                        ? `${profile.province}, ${profile.ward}`
+                        : "Not updated"}
+                    </span>
                   </span>
                 </div>
               </div>
@@ -215,20 +238,27 @@ function CandidateDashboardContent() {
                 </span>
               </a>
             </div>
-            
+
             {appliedJobsLoading ? (
               <div className="flex justify-center items-center h-32">
-                <div className="text-primary text-lg">Loading applied jobs...</div>
+                <div className="text-primary text-lg">
+                  Loading applied jobs...
+                </div>
               </div>
             ) : appliedJobsError ? (
               <div className="flex justify-center items-center h-32">
-                <div className="text-red-500 text-lg">Error: {appliedJobsError}</div>
+                <div className="text-red-500 text-lg">
+                  Error: {appliedJobsError}
+                </div>
               </div>
             ) : appliedJobs.length > 0 ? (
               <>
                 <div className="flex flex-col gap-y-6 px-4 py-4">
                   {appliedJobsCurrent.map((appliedJob) => (
-                    <JobCard key={appliedJob.application_id} job={transformAppliedJobForCard(appliedJob)} />
+                    <JobCard
+                      key={appliedJob.application_id}
+                      job={transformAppliedJobForCard(appliedJob)}
+                    />
                   ))}
                 </div>
                 {appliedJobsMaxPage > 1 && (
@@ -248,7 +278,7 @@ function CandidateDashboardContent() {
                   No applied jobs yet
                 </h3>
                 <p className="text-gray-500 text-sm mb-4">
-                Start applying to jobs you're interested in
+                  Start applying to jobs you're interested in
                 </p>
                 <a
                   href="/jobs"
@@ -273,20 +303,27 @@ function CandidateDashboardContent() {
                 </span>
               </a>
             </div>
-            
+
             {savedJobsLoading ? (
               <div className="flex justify-center items-center h-32">
-                <div className="text-primary text-lg">Loading saved jobs...</div>
+                <div className="text-primary text-lg">
+                  Loading saved jobs...
+                </div>
               </div>
             ) : savedJobsError ? (
               <div className="flex justify-center items-center h-32">
-                <div className="text-red-500 text-lg">Error: {savedJobsError}</div>
+                <div className="text-red-500 text-lg">
+                  Error: {savedJobsError}
+                </div>
               </div>
             ) : savedJobs.length > 0 ? (
               <>
                 <div className="flex flex-col gap-y-6 px-4 py-4">
                   {savedJobsCurrent.map((job) => (
-                    <JobCard key={job.id} job={transformJobForCard(job, true, false)} />
+                    <JobCard
+                      key={job.id}
+                      job={transformJobForCard(job, true, false)}
+                    />
                   ))}
                 </div>
                 {savedJobsMaxPage > 1 && (
@@ -306,7 +343,8 @@ function CandidateDashboardContent() {
                   No saved jobs yet
                 </h3>
                 <p className="text-gray-500 text-sm mb-4">
-                Start saving jobs you're interested in by clicking the heart icon
+                  Start saving jobs you're interested in by clicking the heart
+                  icon
                 </p>
                 <a
                   href="/jobs"
@@ -325,7 +363,7 @@ function CandidateDashboardContent() {
 
 export default function CandidateDashboardPage() {
   return (
-    <ProtectedRoute allowedRoles={['candidate']}>
+    <ProtectedRoute allowedRoles={["candidate"]}>
       <CandidateDashboardContent />
     </ProtectedRoute>
   );

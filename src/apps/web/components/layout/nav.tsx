@@ -157,7 +157,7 @@ export default function NavBar() {
                           ? "/company/profile"
                           : "/profile"
                       }
-                      className="px-4 py-2 bg-primary text-background rounded-lg font-medium hover:bg-primary/90 transition-colors"
+                      className="border-2 border-primary px-4 py-2 bg-primary text-background rounded-lg font-medium hover:bg-primary/90 transition-colors"
                     >
                       Profile
                     </Link>

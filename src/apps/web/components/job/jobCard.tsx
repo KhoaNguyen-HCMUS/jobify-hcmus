@@ -84,7 +84,7 @@ export default function JobCard({ job }: JobCardProps) {
             <h3 className="font-bold text-lg text-primary line-clamp-1">
               {job.title}
             </h3>
-            <p className="text-text-80">{job.company_name}</p>
+            <p className="text-text-80 line-clamp-1">{job.company_name}</p>
             {!(job.is_applied || job.is_saved) && (
               <p className="text-text-80">
                 {formatRelativeTime(job.created_at)}
@@ -92,7 +92,7 @@ export default function JobCard({ job }: JobCardProps) {
             )}
           </div>
         </div>
-        <div className="flex flex-wrap gap-2 justify-between items-center text-xs">
+        <div className="flex flex-wrap gap-0.5 justify-between items-center text-xs">
           <span className="text-primary-80 font-semibold px-2 py-2 bg-accent-20 rounded-full">
             {formatSalaryRange(job.salary_min, job.salary_max)} {job.currency}
           </span>
@@ -111,7 +111,7 @@ export default function JobCard({ job }: JobCardProps) {
               title={isSaved ? "Remove from saved" : "Save job"}
             >
               <Heart
-                size={24}
+                size={20}
                 className={isSaved ? "fill-red-500 text-red-500" : ""}
               />
             </button>
