@@ -178,7 +178,7 @@ function JobsPageContent() {
       </div>
       <div className="bg-neutral-light-60">
         <div className="flex gap-2 py-4">
-          <div className="flex-1 hidden md:block bg-neutral-light-20 shadow-2xs">
+          <div className="flex-1 hidden md:block bg-neutral-light-20">
             <div>
               <div className="bg-primary text-highlight-20 px-4 py-2 font-semibold rounded-tr-md">
                 Industry

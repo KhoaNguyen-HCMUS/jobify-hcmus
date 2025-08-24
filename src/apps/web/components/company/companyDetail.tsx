@@ -1,7 +1,6 @@
 "use client";
 import { MapPin, Search, Unlink2, Users } from "lucide-react";
 import { useState, useEffect } from "react";
-import JobCard from "../../components/job/jobCard";
 import usePagination from "../../hooks/usePagination";
 import Pagination from "../pagination";
 import { useParams } from "next/navigation";
@@ -44,7 +43,7 @@ export default function CompanyDetail() {
 
   return (
     <div>
-      <div className="rounded-3xl shadow-md mx-10 mt-6">
+      <div className="rounded-3xl border border-primary-20 mx-10 mt-6">
         <div className="flex flex-col">
           <div className="relative w-full h-72">
             <img
@@ -80,7 +79,7 @@ export default function CompanyDetail() {
         </div>
       </div>
       <div className="flex flex-wrap m-10 gap-20">
-        <div className="flex-2 shadow-md rounded-3xl bg-neutral-light-20 space-y-4">
+        <div className="flex-2 border border-primary-20 rounded-3xl bg-neutral-light-20 space-y-4">
           <div className="flex flex-col space-y-4">
             <span className="w-full rounded-t-3xl text-background font-semibold text-2xl px-6 py-4 bg-secondary">
               Company Introduction
@@ -88,7 +87,7 @@ export default function CompanyDetail() {
             <p className="text-primary px-6 mb-4">{company?.introduction}</p>
           </div>
         </div>
-        <div className="flex-1 shadow-md rounded-3xl bg-neutral-light-20 space-y-4">
+        <div className="flex-1 border border-primary-20 rounded-3xl bg-neutral-light-20 space-y-4">
           <div className="flex flex-col space-y-4">
             <span className="w-full rounded-t-3xl text-background font-semibold text-2xl px-6 py-4 bg-secondary">
               Contact Information
@@ -102,7 +101,7 @@ export default function CompanyDetail() {
         </div>
       </div>
       <div className="mx-10 mb-20">
-        <div className="shadow-md rounded-3xl bg-neutral-light-20 space-y-4">
+        <div className="border border-primary-20 rounded-3xl bg-neutral-light-20 space-y-4">
           <div className="flex flex-col items-center space-y-4">
             <span className="w-full rounded-t-3xl text-background font-semibold text-2xl px-6 py-4 bg-secondary">
               Job News

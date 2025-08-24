@@ -1,7 +1,7 @@
 export default function AboutUsPage() {
   return (
     <div className="flex flex-col my-10 gap-10 mx-30">
-      <div className="shadow-xl bg-neutral-light-20 rounded-2xl py-10">
+      <div className="border border-highlight-20 bg-neutral-light-20 rounded-2xl py-10">
         <div className="flex flex-col items-center text-center space-y-6">
           <span className="font-bold text-4xl text-accent">ABOUT US</span>
           <p className="text-primary-80 font-semibold text-xl">
@@ -10,13 +10,13 @@ export default function AboutUsPage() {
           </p>
         </div>
       </div>
-      <div className="flex flex-col gap-10">
-        <div className="shadow-xl rounded-2xl space-y-4">
-          <div className="flex flex-col bg-neutral-light-20 space-y-8">
+      <div className="rounded-3xl flex flex-col gap-10">
+        <div className="rounded-2xl space-y-4">
+          <div className="border border-primary-20 rounded-3xl flex flex-col bg-neutral-light-20 space-y-8">
             <span className="rounded-t-3xl text-background text-center font-semibold text-3xl px-10 py-4 bg-primary">
               GET TO KNOW US
             </span>
-            <div className="flex flex-col gap-4 px-10">
+            <div className="rounded-b-3xl flex flex-col gap-4 px-10">
               <div>
                 <span className="text-accent font-semibold text-2xl">
                   Our Mission

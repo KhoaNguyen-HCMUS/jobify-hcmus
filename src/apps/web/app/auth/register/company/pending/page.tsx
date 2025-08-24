@@ -11,7 +11,7 @@ export default function CompanyPendingPage() {
 
   return (
     <div className="flex items-center justify-center w-full min-h-screen p-4 bg-background">
-      <div className="bg-neutral-light-20 rounded-3xl shadow-xl max-w-4xl w-full p-12 flex flex-col lg:flex-row items-center gap-12">
+      <div className="bg-neutral-light-20 rounded-3xl border border-primary-20 max-w-4xl w-full p-12 flex flex-col lg:flex-row items-center gap-12">
         
         <div className="flex-1 space-y-6">
           <div className="space-y-4">

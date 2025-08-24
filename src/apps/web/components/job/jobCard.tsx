@@ -73,7 +73,7 @@ export default function JobCard({ job }: JobCardProps) {
 
   return (
     <Link href={buildJobUrl()}>
-      <div className="bg-neutral-light-20 rounded-2xl p-6 transition-transform duration-300 hover:-translate-y-2 hover:shadow-lg cursor-pointer">
+      <div className="border border-primary-20 bg-neutral-light-20 rounded-2xl p-6 transition-transform duration-300 hover:-translate-y-2 hover:shadow-lg cursor-pointer">
         <div className="flex items-center space-x-4 mb-4">
           <img
             src={job.logo || DEFAULT_LOGO_IMAGE}

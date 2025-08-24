@@ -62,7 +62,7 @@ export default function CompanyRegistrationPage() {
 
   return (
     <div className="flex items-center justify-center w-full min-h-screen p-4 bg-linear-(--gradient-primary)">
-      <div className="backdrop-blur-sm rounded-[57px] shadow-xl max-w-4xl w-full p-8 lg:p-12 gap-12 bg-highlight-20 mx-auto">
+      <div className="backdrop-blur-sm rounded-[57px] border border-primary-20 max-w-4xl w-full p-8 lg:p-12 gap-12 bg-highlight-20 mx-auto">
         <div className="flex justify-center mb-8">
           <h1 className="text-4xl font-bold text-primary">
             Company Registration

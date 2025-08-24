@@ -70,7 +70,7 @@ export default function Job({ job }: JobItemProps) {
 
   return (
     <Link href={buildJobUrl()}>
-      <div className="shadow-md bg-neutral-light-20 rounded-xl border border-primary-20 p-3 mx-4 mt-3 transition-transform duration-300 hover:-translate-y-1 hover:shadow-lg cursor-pointer">
+      <div className="bg-neutral-light-20 rounded-xl border border-primary-20 p-3 mx-4 mt-3 transition-transform duration-300 hover:-translate-y-1 hover:shadow-lg cursor-pointer">
         <div className="flex gap-3">
           <img
             src={job.logo}
@@ -78,7 +78,7 @@ export default function Job({ job }: JobItemProps) {
             className="object-contain h-12 w-12"
           />
           <div className="flex flex-col justify-between flex-1">
-            <span className="font-bold text-base text-primary line-clamp-2">
+            <span className="font-bold text-base text-primary line-clamp-1">
               {job.title}
             </span>
             <div className="flex flex-col justify-between gap-1.5 mt-1.5">

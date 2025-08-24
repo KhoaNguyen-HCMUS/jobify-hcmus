@@ -48,7 +48,7 @@ export default function CompanyDetailModal({
                 onClick={onClose}
               />
             </div>
-            <div className="bg-neutral-light-40 shadow-md rounded-3xl">
+            <div className="bg-neutral-light-40 border border-primary-20 rounded-3xl">
               <div className="flex flex-col gap-y-4 mx-10 my-4">
                 <div className="flex flex-wrap gap-4">
                   <div className="flex-1 flex justify-center items-center">

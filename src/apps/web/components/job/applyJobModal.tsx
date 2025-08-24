@@ -211,7 +211,7 @@ export default function ApplyJobModal({ jobId, jobTitle, isOpen, onClose, onAppl
                     className="absolute top-3 right-4 text-secondary-40 cursor-pointer"
                   />
                 </div>
-                <div className="w-full flex flex-col px-4 mb-4 border-1 border-primary-60 bg-neutral-light-20 rounded-xl shadow-2xl text-primary-60 focus:ring-2 focus:bg-white transition-all duration-300">
+                <div className="w-full flex flex-col px-4 mb-4 border-1 border-primary-60 bg-neutral-light-20 rounded-xl text-primary-60 focus:ring-2 focus:bg-white transition-all duration-300">
                   <div className="py-4">
                     <div className="flex gap-1 font-semibold text-xl text-[#FF5E5E]">
                       <TriangleAlert size={24} />

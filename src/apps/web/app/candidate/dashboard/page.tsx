@@ -173,7 +173,7 @@ function CandidateDashboardContent() {
     <div className="w-full h-full min-h-screen bg-neutral-light-60">
       <div className="flex flex-col px-20 py-10 gap-10">
         <div className="flex flex-wrap gap-15">
-          <div className="flex-1 flex flex-wrap justify-between bg-highlight-20 rounded-2xl">
+          <div className="flex-1 flex flex-wrap justify-between bg-highlight-20 rounded-2xl border border-primary-20">
             <div className="flex flex-wrap">
               <div className="p-4">
                 <img
@@ -207,7 +207,7 @@ function CandidateDashboardContent() {
               </div>
             </div>
           </div>
-          <div className="flex-1 bg-highlight-40 rounded-2xl shadow-lg">
+          <div className="flex-1 bg-highlight-40 rounded-2xl">
             <div className="flex flex-col">
               <div className="flex justify-between px-4 py-2">
                 <div className="text-xl text-primary font-semibold">
@@ -224,7 +224,7 @@ function CandidateDashboardContent() {
           </div>
         </div>
         <div className="flex flex-wrap gap-15">
-          <div className="flex-1 flex flex-col bg-highlight-20 rounded-2xl p-4 shadow-lg">
+          <div className="flex-1 flex flex-col bg-highlight-20 rounded-2xl p-4 border border-primary-20">
             <div className="flex justify-between items-center mb-4">
               <div className="flex items-center gap-2">
                 <Briefcase className="text-primary" size={24} />
@@ -289,7 +289,7 @@ function CandidateDashboardContent() {
               </div>
             )}
           </div>
-          <div className="flex-1 flex flex-col bg-highlight-20 rounded-2xl p-4 shadow-lg">
+          <div className="flex-1 flex flex-col bg-highlight-20 rounded-2xl p-4 border border-primary-20">
             <div className="flex justify-between items-center mb-4">
               <div className="flex items-center gap-2">
                 <Bookmark className="text-primary" size={24} />

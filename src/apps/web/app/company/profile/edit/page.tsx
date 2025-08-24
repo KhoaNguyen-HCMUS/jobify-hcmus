@@ -474,7 +474,7 @@ function RecruiterProfileEditContent() {
                 </div>
               </div>
               {showIndustryDropdown && (
-                <div className="absolute z-10 w-full mt-1 bg-white border border-primary-60 rounded-xl shadow-lg max-h-60 overflow-hidden">
+                <div className="absolute z-10 w-full mt-1 bg-white border border-primary-60 rounded-xl max-h-60 overflow-hidden">
                   {/* Search Input */}
                   <div className="p-3 border-b border-primary-20">
                     <input

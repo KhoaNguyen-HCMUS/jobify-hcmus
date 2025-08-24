@@ -93,7 +93,7 @@ export default function NavBar() {
 
   return (
     <header
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 bg-white/95 backdrop-blur-md shadow-lg`}
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 bg-accent-20 backdrop-blur-md`}
     >
       <div className="container mx-auto px-6">
         <div className="flex items-center justify-between h-20">

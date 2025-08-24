@@ -81,7 +81,7 @@ export default function RecruiterNotificationsPage() {
             Mark all as read
           </button>
         </div>
-        <div className="w-full grid grid-cols-1 gap-2 bg-highlight-40 shadow-2xl p-4">
+        <div className="w-full grid grid-cols-1 gap-2 bg-highlight-40 border border-primary-20 rounded-2xl p-4">
           {current.map((noti, idx) => (
             <Noti
               key={idx}

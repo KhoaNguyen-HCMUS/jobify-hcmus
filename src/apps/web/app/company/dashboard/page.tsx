@@ -141,7 +141,7 @@ function RecruiterDashboardContent() {
           </div>
         ) : (
           <>
-            <div className="rounded-3xl shadow-md">
+            <div className="rounded-3xl">
               <div className="flex flex-col">
                 <div className="relative w-full h-56">
                   <img

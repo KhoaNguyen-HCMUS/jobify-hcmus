@@ -1,7 +1,7 @@
 export default function SupportPage() {
   return (
     <div className="flex flex-col my-10 gap-10 mx-30">
-      <div className="shadow-xl bg-neutral-light-20 rounded-2xl py-10">
+      <div className="border border-highlight-20 bg-neutral-light-20 rounded-2xl py-10">
         <div className="flex flex-col items-center text-center space-y-6">
           <span className="font-bold text-4xl text-accent">SUPPORT CENTER</span>
           <p className="text-primary-80 font-semibold text-xl">
@@ -10,13 +10,13 @@ export default function SupportPage() {
           </p>
         </div>
       </div>
-      <div className="shadow-xl bg-neutral-light-20 rounded-2xl space-y-4">
+      <div className="border border-highlight-20 bg-neutral-light-20 rounded-2xl space-y-4">
         <div className="flex flex-col space-y-4">
           <span className="rounded-t-3xl text-background font-semibold text-3xl text-center px-6 py-4 bg-primary">
             Frequently asked questions
           </span>
           <div className="flex flex-col gap-6 mt-6 mb-10">
-            <div className="flex flex-col px-4 gap-2 bg-highlight-20 mx-20 py-4 rounded-2xl shadow-xl">
+            <div className="flex flex-col px-4 gap-2 bg-highlight-20 mx-20 py-4 rounded-2xl">
               <span className="text-accent font-semibold text-xl">
                 How do I apply for a job on Jobify?
               </span>
@@ -26,7 +26,7 @@ export default function SupportPage() {
                 profile and uploaded a resume.
               </span>
             </div>
-            <div className="flex flex-col px-4 gap-2 bg-highlight-20 mx-20 py-4 rounded-2xl shadow-xl">
+            <div className="flex flex-col px-4 gap-2 bg-highlight-20 mx-20 py-4 rounded-2xl">
               <span className="text-accent font-semibold text-xl">
                 I forgot my password. What should I do?
               </span>
@@ -36,7 +36,7 @@ export default function SupportPage() {
                 password.
               </span>
             </div>
-            <div className="flex flex-col px-4 gap-2 bg-highlight-20 mx-20 py-4 rounded-2xl shadow-xl">
+            <div className="flex flex-col px-4 gap-2 bg-highlight-20 mx-20 py-4 rounded-2xl">
               <span className="text-accent font-semibold text-xl">
                 How can I post a job as a company?
               </span>
@@ -46,7 +46,7 @@ export default function SupportPage() {
                 jobs using available coins.
               </span>
             </div>
-            <div className="flex flex-col px-4 gap-2 bg-highlight-20 mx-20 py-4 rounded-2xl shadow-xl">
+            <div className="flex flex-col px-4 gap-2 bg-highlight-20 mx-20 py-4 rounded-2xl">
               <span className="text-accent font-semibold text-xl">
                 How do job coins work for companies?
               </span>
@@ -56,7 +56,7 @@ export default function SupportPage() {
                 continue posting.
               </span>
             </div>
-            <div className="flex flex-col px-4 gap-2 bg-highlight-20 mx-20 py-4 rounded-2xl shadow-xl">
+            <div className="flex flex-col px-4 gap-2 bg-highlight-20 mx-20 py-4 rounded-2xl">
               <span className="text-accent font-semibold text-xl">
                 How can I contact support if I encounter an issue?
               </span>

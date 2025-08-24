@@ -342,7 +342,7 @@ export default function JobDetail({
 
       <div className="grid grid-cols-1 md:grid-cols-[2fr_1fr] gap-10 mx-10 py-6">
         <div className="flex flex-col gap-8">
-          <div className="flex flex-col justify-between bg-neutral-light-20 shadow-xl rounded-3xl space-y-4 p-4">
+          <div className="flex flex-col justify-between bg-neutral-light-20 border border-primary-20 rounded-3xl space-y-4 p-4">
             <div className="text-primary font-semibold text-2xl">
               {job.title}
             </div>
@@ -469,7 +469,7 @@ export default function JobDetail({
             </div>
           </div>
 
-          <div className="bg-neutral-light-20 shadow-xl rounded-3xl space-y-4">
+          <div className="bg-neutral-light-20 border border-primary-20 rounded-3xl space-y-4">
             <div className="flex flex-col">
               <span className="w-full rounded-t-3xl text-background font-semibold text-2xl px-6 py-4 bg-secondary">
                 Job Detail
@@ -539,7 +539,7 @@ export default function JobDetail({
           </div>
         </div>
         <div className="flex flex-col gap-8">
-          <div className="flex flex-col justify-between bg-neutral-light-20 shadow-xl rounded-3xl space-y-2 p-4">
+          <div className="flex flex-col justify-between bg-neutral-light-20 border border-primary-20 rounded-3xl space-y-2 p-4">
             <div className="flex px-2">
               <img
                 src={company?.logo_url || "/logo.png"}
@@ -602,7 +602,7 @@ export default function JobDetail({
             </div>
           </div>
 
-          <div className="bg-neutral-light-20 shadow-xl rounded-3xl space-y-4">
+          <div className="bg-neutral-light-20 border border-primary-20 rounded-3xl space-y-4">
             <div className="flex flex-col">
               <span className="w-full rounded-t-3xl text-background font-semibold text-2xl text-center px-6 py-4 bg-secondary">
                 General Information
@@ -664,7 +664,7 @@ export default function JobDetail({
             </div>
           </div>
 
-          <div className="bg-neutral-light-20 shadow-xl rounded-3xl space-y-4">
+          <div className="bg-neutral-light-20 border border-primary-20 rounded-3xl space-y-4">
             <div className="flex flex-col">
               <span className="w-full rounded-t-3xl text-background font-semibold text-2xl text-center px-6 py-4 bg-secondary">
                 Job Tags

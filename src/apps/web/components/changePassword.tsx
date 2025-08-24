@@ -34,7 +34,7 @@ export default function ChangePassword() {
                   value={currentPassword}
                   onChange={(e) => setCurrentPassword(e.target.value)}
                   placeholder="Enter your current password"
-                  className="w-full pl-4 pr-10 py-2 bg-neutral-light-20 shadow-lg rounded-xl text-primary outline-none focus:ring-2 focus:ring-blue-400 focus:bg-white transition-all duration-300"
+                  className="w-full pl-4 pr-10 py-2 bg-neutral-light-20 border border-primary-20 rounded-xl text-primary outline-none focus:ring-2 focus:ring-blue-400 focus:bg-white transition-all duration-300"
                   required
                 />
                 <button
@@ -60,7 +60,7 @@ export default function ChangePassword() {
                   value={newPassword}
                   onChange={(e) => setNewPassword(e.target.value)}
                   placeholder="Enter a new password"
-                  className="w-full pl-4 pr-10 py-2 bg-neutral-light-20 shadow-lg rounded-xl text-primary-80 outline-none focus:ring-2 focus:ring-blue-400 focus:bg-white transition-all duration-300"
+                  className="w-full pl-4 pr-10 py-2 bg-neutral-light-20 border border-primary-20 rounded-xl text-primary-80 outline-none focus:ring-2 focus:ring-blue-400 focus:bg-white transition-all duration-300"
                   required
                 />
                 <button
@@ -94,7 +94,7 @@ export default function ChangePassword() {
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   placeholder="Re-enter new password"
-                  className="w-full pl-4 pr-10 py-2 bg-neutral-light-20 shadow-lg rounded-xl text-primary-80 outline-none focus:ring-2 focus:ring-blue-400 focus:bg-white transition-all duration-300"
+                  className="w-full pl-4 pr-10 py-2 bg-neutral-light-20 border border-primary-20 rounded-xl text-primary-80 outline-none focus:ring-2 focus:ring-blue-400 focus:bg-white transition-all duration-300"
                   required
                 />
                 <button

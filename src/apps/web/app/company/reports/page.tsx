@@ -50,7 +50,7 @@ function RecruiterReportsContent() {
         <div className="flex justify-between">
           <div className="text-accent font-bold text-3xl">Report History</div>
         </div>
-        <div className="w-full grid grid-cols-1 gap-2 bg-highlight-40 shadow-2xl p-4">
+        <div className="w-full grid grid-cols-1 gap-2 bg-highlight-40 border border-primary-20 rounded-2xl p-4">
           {current.map((report, idx) => (
             <ReportHistory
               key={idx}

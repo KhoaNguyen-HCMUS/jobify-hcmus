@@ -203,7 +203,7 @@ export default function OperatorSystemSettingsPage() {
       <div className="flex flex-col px-6 lg:px-20 py-10 gap-4">
         <div
           onClick={() => setOpen(!open)}
-          className="flex justify-between bg-neutral-light-20 hover:bg-neutral-light font-semibold text-primary px-4 py-1 cursor-pointer rounded-md shadow-md"
+          className="flex justify-between bg-neutral-light-20 hover:bg-neutral-light font-semibold text-primary px-4 py-1 cursor-pointer rounded-md border border-primary-20"
         >
           <span className="text-xl px-4 py-2">Industries</span>
           {open ? (
@@ -284,10 +284,10 @@ export default function OperatorSystemSettingsPage() {
             </div>
           </div>
         )}
-        <div className="flex flex-col gap-4 bg-neutral-light-40 shadow-md rounded-md">
+        <div className="flex flex-col gap-4 bg-neutral-light-40 border border-primary-20 rounded-md">
           <div
             onClick={() => setSettingOpen(!settingOpen)}
-            className="w-full flex justify-between bg-neutral-light-20 rounded-t-md hover:bg-neutral-light cursor-pointer px-4 py-1"
+            className="w-full flex justify-between bg-neutral-light-20 hover:bg-neutral-light cursor-pointer px-4 py-1 rounded-md"
           >
             <span className="text-primary font-semibold text-lg px-4 py-2">
               System Settings
@@ -299,8 +299,8 @@ export default function OperatorSystemSettingsPage() {
             )}
           </div>
           {settingOpen && (
-            <div className="flex flex-col space-y-4 font-semibold bg-neutral-light-40 text-primary px-4 pb-4 rounded-b-md">
-              <div className="flex justify-between text-center items-center border bg-neutral-light-20 border-primary-40 px-4 py-4">
+            <div className="flex flex-col space-y-4 font-semibold bg-neutral-light-40 text-primary px-4 pb-4 rounded-md">
+              <div className="flex justify-between text-center items-center bg-neutral-light-20 border border-primary-40  px-4 py-4">
                 <span>Maintenance Mode</span>
                 <div
                   onClick={() => setEnabled(!enabled)}

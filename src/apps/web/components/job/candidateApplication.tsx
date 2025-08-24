@@ -87,7 +87,7 @@ export default function CandidateApplication({ jobId, applicationId }: Candidate
   }
 
   return (
-    <div className="p-6 mt-6">
+    <div className="px-10 mt-6">
       <div className="space-y-6">
         <div>
           <span className="text-primary font-medium">Application Status:</span>  <JobStatusBadge status={applicationDetail.status} />
@@ -107,9 +107,9 @@ export default function CandidateApplication({ jobId, applicationId }: Candidate
           </div>
         </div>
 
-        <div className="bg-neutral-light-20 rounded-lg overflow-hidden">
+        <div className="bg-neutral-light-20 rounded-lg overflow-hidden border border-primary-20">
           <div className="bg-secondary text-white px-4 py-2 text-center font-medium">
-            Cover letter
+            Cover Letter
           </div>
           <div className="p-4 bg-neutral-light-20">
             <p className="text-text-80 text-sm leading-relaxed">
