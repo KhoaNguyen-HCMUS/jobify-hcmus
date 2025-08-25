@@ -153,6 +153,8 @@ model job_matches {
   created_at    DateTime  @default(now()) @db.Timestamp(6)
   job_posts     job_posts @relation(fields: [job_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
   users         users     @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@unique([user_id, job_id], map: "unique_user_job")
 }
 
 model job_posts {
