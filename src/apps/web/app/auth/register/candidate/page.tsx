@@ -21,6 +21,16 @@ export default function CandidateRegistrationPage() {
       toast.error("Passwords do not match");
       return;
     }
+
+    if (password.length < 8) {
+      toast.error("Password must be at least 8 characters long");
+      return;
+    }
+    
+    if (!/\d/.test(password)) {
+      toast.error("Password must contain at least one number");
+      return;
+    }
     
     if (!check) {
       toast.error("Please agree to the Terms of Service");
